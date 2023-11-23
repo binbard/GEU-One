@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bottomNavFeed"
+        android:icon="@android:drawable/btn_star"
+        android:title="Feed" />
+    <item
+        android:id="@+id/bottomNavRes"
+        android:icon="@android:drawable/btn_star_big_on"
+        android:title="Res" />
+    <item
+        android:id="@+id/bottomNavNotes"
+        android:icon="@android:drawable/checkbox_on_background"
+        android:title="Notes" />
+    <item
+        android:id="@+id/bottomNavErp"
+        android:icon="@android:drawable/ic_delete"
+        android:title="ERP" />
+</menu>

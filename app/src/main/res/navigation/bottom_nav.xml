@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_nav"
+    app:startDestination="@id/bottomNavFeed">
+
+    <fragment
+        android:id="@+id/bottomNavFeed"
+        android:name="com.binbard.geu.geuone.ui.feed.FeedFragment"
+        android:label="FeedFragment" />
+    <fragment
+        android:id="@+id/bottomNavRes"
+        android:name="com.binbard.geu.geuone.ui.res.ResFragment"
+        android:label="ResFragment" />
+    <fragment
+        android:id="@+id/bottomNavNotes"
+        android:name="com.binbard.geu.geuone.ui.notes.NotesFragment"
+        android:label="NotesFragment" />
+    <fragment
+        android:id="@+id/bottomNavErp"
+        android:name="com.binbard.geu.geuone.ui.erp.ErpFragment"
+        android:label="ErpFragment" />
+</navigation>
