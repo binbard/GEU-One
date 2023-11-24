@@ -1,5 +1,6 @@
 package com.binbard.geu.geuone.ui.feed
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,17 +13,15 @@ import java.io.StringReader
 
 class FeedViewModel: ViewModel() {
     private val _text = MutableLiveData<String>().apply {
-        value = "This is feed fragment"
+        value = "The Feed"
     }
     val feedText: LiveData<String> = _text
 
-    private val _feedList = MutableLiveData<List<Feed>>(
-        List(10) { Feed("Loading...", "Hii") }
-    )
+    private val _feedList = MutableLiveData<List<Feed>>()
     val feedList: LiveData<List<Feed>> = _feedList
 
     init{
-//        fetchData()
+        fetchData()
     }
     @OptIn(DelicateCoroutinesApi::class)
     private fun fetchData() {
@@ -50,19 +49,31 @@ class FeedViewModel: ViewModel() {
         parser.setInput(StringReader(xmlData))
 
         var eventType = parser.eventType
-        var currentData: Feed? = null
+        var feedLink = ""
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
             when (eventType) {
                 XmlPullParser.START_TAG -> {
                     when (parser.name) {
-                        "url" -> currentData = Feed("", "")
-                        "loc" -> currentData?.link = parser.nextText()
+                        "url" -> feedLink = ""
+                        "loc" -> feedLink = parser.nextText()
                     }
                 }
                 XmlPullParser.END_TAG -> {
                     if (parser.name == "url") {
-                        dataList.add(currentData!!)
+                        val arr = feedLink.split("/")
+                        try{
+                            val feedDate = FDate(arr[6].toInt(), arr[5].toInt(), arr[4].toInt())
+
+                            val slug = arr[arr.size-2]
+                            val feedTitle = slug.split("-").map { it.capitalize() }.joinToString(" ")
+
+                            dataList.add(0, Feed(feedLink, feedTitle, feedDate))
+                        } catch (e: Exception) {
+                            Log.e("BIN_X_ERROR", "FeedViewModel.parseXml: $e")
+                            break
+                        }
+
                     } else if (parser.name == "urlset") {
                         // End of the document
                     }

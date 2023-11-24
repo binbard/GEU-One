@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.R
 
@@ -21,8 +23,13 @@ class FeedRecyclerAdapter(private val feeds: List<Feed>): RecyclerView.Adapter<F
 
     override fun onBindViewHolder(holder: FeedViewHolder, position: Int) {
         val feed = feeds[position]
-        holder.tvFeedTitle.text = feed.link
-        holder.tvFeedDate.text = feed.date
+        holder.tvFeedTitle.text = feed.title
+        holder.tvFeedDate.text = feed.date.diff()
+
+        holder.itemView.setOnClickListener {
+            val intent = CustomTabsIntent.Builder().build()
+            intent.launchUrl(it.context, feed.link.toUri())
+        }
     }
 
     override fun getItemCount(): Int {

@@ -1,14 +1,14 @@
 package com.binbard.geu.geuone.ui.feed
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.databinding.FragmentFeedBinding
 
 class FeedFragment: Fragment() {
@@ -23,14 +23,7 @@ class FeedFragment: Fragment() {
         val feedViewModel = ViewModelProvider(this)[FeedViewModel::class.java]
         val rvFeed = binding.rvFeed
 
-        feedViewModel.feedText.observe(viewLifecycleOwner) {
-            binding.textFeed.text = it
-        }
-
-//        val mList = MutableLiveData<List<Feed>>(
-//            List(10) { Feed("Loading...", "Hii") }
-//        )
-//        val dList: LiveData<List<Feed>> = mList
+        rvFeed.addItemDecoration(ItemSpacingDecoration(10))
         rvFeed.adapter = FeedRecyclerAdapter(feedViewModel.feedList.value ?: emptyList())
         rvFeed.layoutManager = LinearLayoutManager(context)
 
@@ -40,4 +33,15 @@ class FeedFragment: Fragment() {
 
         return binding.root
     }
+
+    class ItemSpacingDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            outRect.left = space
+            outRect.right = space
+            outRect.top = space
+            outRect.bottom = space
+        }
+    }
+
 }
+
