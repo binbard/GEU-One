@@ -1,8 +1,11 @@
 package com.binbard.geu.geuone.ui.notes
 
+import android.os.Build.VERSION_CODES.S
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -50,8 +53,8 @@ class NotesViewModel: ViewModel() {
     private fun parseNotes(txtData: String){
         val lines = txtData.split("\n")
         val line1s = lines[0].split(" ")
-        val pre = line1s[0][0]
-        val post = line1s[0][1]
+        val pre = line1s[0]
+        val post = line1s[0]
 
         for(line in lines){
             if(!line.endsWith(".pdf")) continue

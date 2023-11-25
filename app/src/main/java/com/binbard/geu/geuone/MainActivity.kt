@@ -1,5 +1,6 @@
 package com.binbard.geu.geuone
 
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavView.setupWithNavController(bottomNavController)
 
     }
+
 
 //    override fun onBackPressed() {
 //        val fragment =

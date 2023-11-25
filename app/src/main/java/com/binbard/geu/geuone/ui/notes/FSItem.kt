@@ -1,7 +1,7 @@
 package com.binbard.geu.geuone.ui.notes
 
 data class FSItem(
-    val name: String = "",
+    var name: String = "",
     var url: String? = null,
     val children: MutableSet<FSItem> = mutableSetOf(),
     val parent: FSItem? = null

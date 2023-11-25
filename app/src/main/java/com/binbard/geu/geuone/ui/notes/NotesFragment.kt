@@ -1,5 +1,6 @@
 package com.binbard.geu.geuone.ui.notes
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,6 +19,7 @@ class NotesFragment : Fragment() {
     private lateinit var binding: FragmentNotesBinding
     lateinit var notesViewModel: NotesViewModel
     lateinit var rvNotes: RecyclerView
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,7 +31,7 @@ class NotesFragment : Fragment() {
         rvNotes = binding.rvNotes
 
         rvNotes.addItemDecoration(FeedFragment.ItemSpacingDecoration(10))
-        rvNotes.adapter = NotesRecyclerAdapter(notesViewModel.notes.value!!)
+        rvNotes.adapter = NotesRecyclerAdapter(requireContext(),notesViewModel.notes.value!!)
 
         val layoutManager = GridLayoutManager(context, 2)
         rvNotes.layoutManager = layoutManager
