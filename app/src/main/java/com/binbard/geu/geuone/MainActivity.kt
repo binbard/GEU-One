@@ -8,6 +8,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.binbard.geu.geuone.databinding.ActivityMainBinding
+import com.binbard.geu.geuone.ui.notes.IOnBackPressed
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -34,4 +35,13 @@ class MainActivity : AppCompatActivity() {
         bottomNavView.setupWithNavController(bottomNavController)
 
     }
+
+//    override fun onBackPressed() {
+//        val fragment =
+//            this.supportFragmentManager.findFragmentById(R.id.bottomNavFeed)
+//        (fragment as? IOnBackPressed)?.onBackPressed()?.not()?.let {
+//            super.onBackPressed()
+//        }
+//    }
+
 }

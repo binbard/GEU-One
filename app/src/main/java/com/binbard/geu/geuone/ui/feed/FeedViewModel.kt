@@ -63,7 +63,7 @@ class FeedViewModel: ViewModel() {
                     if (parser.name == "url") {
                         val arr = feedLink.split("/")
                         try{
-                            val feedDate = FDate(arr[6].toInt(), arr[5].toInt(), arr[4].toInt())
+                            val feedDate = Feed.FDate(arr[6].toInt(), arr[5].toInt(), arr[4].toInt())
 
                             val slug = arr[arr.size-2]
                             val feedTitle = slug.split("-").map { it.capitalize() }.joinToString(" ")

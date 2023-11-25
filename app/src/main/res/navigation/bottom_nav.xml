@@ -7,17 +7,17 @@
     <fragment
         android:id="@+id/bottomNavFeed"
         android:name="com.binbard.geu.geuone.ui.feed.FeedFragment"
-        android:label="FeedFragment" />
+        android:label="Feed" />
     <fragment
         android:id="@+id/bottomNavRes"
         android:name="com.binbard.geu.geuone.ui.res.ResFragment"
-        android:label="ResFragment" />
+        android:label="Resources" />
     <fragment
         android:id="@+id/bottomNavNotes"
         android:name="com.binbard.geu.geuone.ui.notes.NotesFragment"
-        android:label="NotesFragment" />
+        android:label="Notes" />
     <fragment
         android:id="@+id/bottomNavErp"
         android:name="com.binbard.geu.geuone.ui.erp.ErpFragment"
-        android:label="ErpFragment" />
+        android:label="ERP" />
 </navigation>
