@@ -7,53 +7,57 @@ data class FSItem(
     val parent: FSItem? = null
 ){
 
-    companion object {
-        val root = FSItem("ROOT", null, mutableSetOf())
-
-        fun add(path: String, url: String){
-            val parts = path.split("/")
-            var current = root
-            var currPart = 0
-            while(currPart < parts.size){
-                val part = parts[currPart]
-                var found = false
-                for(child in current.children){
-                    if(child.name == part){
-                        current = child
-                        found = true
-                        break
-                    }
+    fun add(path: String, url: String){
+        val parts = path.split("/")
+        var current = getRoot()
+        var currPart = 0
+        while(currPart < parts.size){
+            val part = parts[currPart]
+            var found = false
+            for(child in current.children){
+                if(child.name == part){
+                    current = child
+                    found = true
+                    break
                 }
-                if(!found){
-                    val newChild = FSItem(part, "", mutableSetOf(), current)
-                    current.children.add(newChild)
-                    current = newChild
-                }
-                currPart++
             }
-            current.url = url
-        }
-
-        fun gotoPath(path: String): FSItem? {
-            val parts = path.split("/")
-            var current = root
-            var currPart = 0
-            while(currPart < parts.size){
-                val part = parts[currPart]
-                var found = false
-                for(child in current.children){
-                    if(child.name == part){
-                        current = child
-                        found = true
-                        break
-                    }
-                }
-                if(!found)
-                    return null
-                currPart++
+            if(!found){
+                val newChild = FSItem(part, "", mutableSetOf(), current)
+                current.children.add(newChild)
+                current = newChild
             }
-            return current
+            currPart++
         }
+        current.url = url
+    }
+
+    private fun getRoot(): FSItem{
+        var current = this
+        while(current.parent != null){
+            current = current.parent!!
+        }
+        return current
+    }
+
+    fun gotoPath(path: String): FSItem? {
+        val parts = path.split("/")
+        var current = getRoot()
+        var currPart = 1
+        while(currPart < parts.size){
+            val part = parts[currPart]
+            var found = false
+            for(child in current.children){
+                if(child.name == part){
+                    current = child
+                    found = true
+                    break
+                }
+            }
+            if(!found)
+                return null
+            currPart++
+        }
+        return current
     }
 
     fun add(item: FSItem){

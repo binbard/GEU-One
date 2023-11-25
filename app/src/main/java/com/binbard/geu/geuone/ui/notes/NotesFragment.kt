@@ -19,6 +19,7 @@ class NotesFragment : Fragment() {
     private lateinit var binding: FragmentNotesBinding
     lateinit var notesViewModel: NotesViewModel
     lateinit var rvNotes: RecyclerView
+
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,7 +32,7 @@ class NotesFragment : Fragment() {
         rvNotes = binding.rvNotes
 
         rvNotes.addItemDecoration(FeedFragment.ItemSpacingDecoration(10))
-        rvNotes.adapter = NotesRecyclerAdapter(requireContext(),notesViewModel.notes.value!!)
+        rvNotes.adapter = NotesRecyclerAdapter(requireContext(), notesViewModel)
 
         val layoutManager = GridLayoutManager(context, 2)
         rvNotes.layoutManager = layoutManager
@@ -44,16 +45,10 @@ class NotesFragment : Fragment() {
             .onBackPressedDispatcher
             .addCallback(this, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    Log.d("POX", "Before handleOnBackPressed: "+notesViewModel.notes.value?.name)
-                    val done = notesViewModel.gotoPrevDir()
-                    Log.d("PXX", "After handleOnBackPressed: $done" +notesViewModel.notes.value?.name)
-
-                    if (done) rvNotes.adapter?.notifyDataSetChanged()
-//                    else requireActivity().onBackPressed()
+                    notesViewModel.gotoPrevDir()
                 }
             }
             )
-
 
         return binding.root
     }

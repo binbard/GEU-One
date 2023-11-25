@@ -1,6 +1,7 @@
 package com.binbard.geu.geuone.ui.notes
 
 import android.os.Build.VERSION_CODES.S
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,8 +17,8 @@ class NotesViewModel: ViewModel() {
     }
     val notesText: LiveData<String> = _text
 
-    val notes = MutableLiveData<FSItem>().apply {
-        value = FSItem.root
+    var notes = MutableLiveData<FSItem>().apply {
+        value = FSItem("root", "", mutableSetOf(), null)
     }
 
     fun gotoPrevDir(): Boolean {
@@ -26,6 +27,24 @@ class NotesViewModel: ViewModel() {
             return true
         }
         return false
+    }
+
+    fun gotoNextDir(dir: String){
+        for (child in notes.value!!.children){
+            if(child.name == dir){
+                notes.value = child
+                return
+            }
+        }
+    }
+
+    fun gotoPath(path: String) {
+        notes.value = notes.value!!.gotoPath(path)
+    }
+
+    fun notesCount(): Int{
+        if(notes.value == null) return 0
+        return notes.value!!.children.size
     }
 
     init{
@@ -37,7 +56,7 @@ class NotesViewModel: ViewModel() {
             val response = fetchPage("https://raw.githubusercontent.com/geu-one-static/notes/master/notes.txt")
             withContext(Dispatchers.Main) {
                 parseNotes(response)
-                notes.value = FSItem.root
+                notes.value = notes.value
             }
         }
     }
@@ -59,7 +78,7 @@ class NotesViewModel: ViewModel() {
         for(line in lines){
             if(!line.endsWith(".pdf")) continue
             val url = pre + line.replace(" ","%20") + post
-            FSItem.add(line, url)
+            notes.value!!.add(line, url)
         }
     }
 }
