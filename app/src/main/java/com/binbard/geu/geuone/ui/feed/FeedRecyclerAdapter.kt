@@ -1,5 +1,6 @@
 package com.binbard.geu.geuone.ui.feed
 
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.R
+import java.io.File
 
 class FeedRecyclerAdapter(private val feeds: List<Feed>): RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

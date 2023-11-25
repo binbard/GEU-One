@@ -54,7 +54,7 @@ class NotesViewModel: ViewModel() {
         val lines = txtData.split("\n")
         val line1s = lines[0].split(" ")
         val pre = line1s[0]
-        val post = line1s[0]
+        val post = line1s[1]
 
         for(line in lines){
             if(!line.endsWith(".pdf")) continue
