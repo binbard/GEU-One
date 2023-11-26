@@ -1,20 +1,18 @@
 package com.binbard.geu.geuone.ui.notes
 
-import android.content.Context
-import android.os.Build.VERSION_CODES.S
-import android.util.Log
-import android.widget.Toast
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class NotesViewModel: ViewModel() {
+class NotesViewModel(application: Application): AndroidViewModel(application) {
+    private val notesCacheHelper = NotesCacheHelper(application)
+
     private var _text = MutableLiveData<String>().apply {
-        value = "Notes"
+        value = notesCacheHelper.getLastPath()
     }
     val notesTitle: LiveData<String> = _text
 
@@ -57,11 +55,21 @@ class NotesViewModel: ViewModel() {
     @OptIn(DelicateCoroutinesApi::class)
     private fun fetchData() {
         GlobalScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                val cache = notesCacheHelper.getData()
+                if(cache.isNotEmpty()){
+                    parseNotes(notesCacheHelper.getData())
+                    gotoPath(notesCacheHelper.getLastPath())
+                    notes.value = notes.value
+                }
+            }
             val response = fetchPage("https://raw.githubusercontent.com/geu-one-static/notes/master/notes.txt")
+            if(response.isEmpty()) return@launch
             withContext(Dispatchers.Main) {
                 parseNotes(response)
                 notes.value = notes.value
             }
+            notesCacheHelper.saveData(response)
         }
     }
     private fun fetchPage(url: String): String {

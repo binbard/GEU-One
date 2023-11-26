@@ -44,8 +44,11 @@ class NotesFragment : Fragment() {
             rvNotes.adapter?.notifyDataSetChanged()
         }
 
+        val notesCacheHelper = NotesCacheHelper(requireContext())
+
         notesViewModel.notesTitle.observe(viewLifecycleOwner) {
             titleListener?.updateTitle(it)
+            notesCacheHelper.setLastPath(it)
         }
 
         requireActivity()

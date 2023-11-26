@@ -36,7 +36,6 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
     }
     @OptIn(DelicateCoroutinesApi::class)
     private fun fetchData() {
-        Log.d("BIN_X", "FeedViewModel.fetchData: ")
         GlobalScope.launch(Dispatchers.IO) {
             var cachedFeeds = repository.getSomeFeeds()
             if (cachedFeeds.isNotEmpty()) {
