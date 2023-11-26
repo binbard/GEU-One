@@ -1,9 +1,8 @@
 package com.binbard.geu.geuone.ui.feed
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -11,7 +10,7 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
 
-class FeedViewModel: ViewModel() {
+class FeedViewModel(application: Application): AndroidViewModel(application) {
     private val _text = MutableLiveData<String>().apply {
         value = "The Feed"
     }
@@ -20,25 +19,48 @@ class FeedViewModel: ViewModel() {
     private val _feedList = MutableLiveData<List<Feed>>()
     val feedList: LiveData<List<Feed>> = _feedList
 
+    private lateinit var repository: FeedRepository
+
     init{
+        val feedDao = AppDatabase.getInstance(application).feedDao()
+        repository = FeedRepository(feedDao)
+
         fetchData()
     }
     @OptIn(DelicateCoroutinesApi::class)
     private fun fetchData() {
         GlobalScope.launch(Dispatchers.IO) {
+            var cachedFeeds = repository.getSomeFeeds()
+            if (cachedFeeds.isNotEmpty()) {
+                withContext(Dispatchers.Main) {
+                    _feedList.value = cachedFeeds.map { it.toFeed() }
+                }
+                cachedFeeds = repository.getAllFeeds()
+                withContext(Dispatchers.Main) {
+                    _feedList.value = cachedFeeds.map { it.toFeed() }
+                }
+            }
+
             val response = makeHttpRequest("https://csitgeu.in/wp/wp-sitemap-posts-post-1.xml")
+
+            if(response.isEmpty()) return@launch
             val feedList = parseXml(response)
             withContext(Dispatchers.Main) {
                 _feedList.value = feedList
             }
+
+            repository.insertFeeds(feedList.map { it.toFeedEntity() })
         }
     }
     private fun makeHttpRequest(url: String): String {
         val client = OkHttpClient()
         val request = Request.Builder().url(url).build()
 
-        client.newCall(request).execute().use { response ->
+        try{
+            val response = client.newCall(request).execute()
             return response.body?.string() ?: ""
+        } catch (e: Exception) {
+            return ""
         }
     }
     private fun parseXml(xmlData: String): List<Feed> {

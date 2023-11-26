@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -37,6 +39,10 @@ android {
 }
 
 dependencies {
+    implementation "androidx.room:room-runtime:2.3.0"
+    kapt "androidx.room:room-compiler:2.3.0"
+    implementation "androidx.room:room-ktx:2.3.0"
+
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.11.0"))
     implementation 'com.squareup.okhttp3:okhttp'
     implementation "androidx.browser:browser:1.7.0"

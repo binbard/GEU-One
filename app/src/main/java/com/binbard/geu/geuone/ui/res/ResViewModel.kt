@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 
 class ResViewModel: ViewModel() {
     private val _text = MutableLiveData<String>().apply{
-        value = "This is res fragment"
+        value = "Some Resources"
     }
     val resText: LiveData<String> = _text
 }

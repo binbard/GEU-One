@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 
 class ErpViewModel: ViewModel() {
     private val _text: MutableLiveData<String> = MutableLiveData<String>().apply {
-        value = "This is ERP Fragment"
+        value = "Your ERP"
     }
     val erpText: LiveData<String> = _text
 }
