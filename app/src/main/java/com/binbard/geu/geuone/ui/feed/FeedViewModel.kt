@@ -1,20 +1,27 @@
 package com.binbard.geu.geuone.ui.feed
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okio.IOException
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
+import java.net.UnknownHostException
 
 class FeedViewModel(application: Application): AndroidViewModel(application) {
     private val _text = MutableLiveData<String>().apply {
         value = "The Feed"
     }
     val feedText: LiveData<String> = _text
+
+    var someError = MutableLiveData<String>().apply {
+        value = ""
+    }
 
     private val _feedList = MutableLiveData<List<Feed>>()
     val feedList: LiveData<List<Feed>> = _feedList
@@ -29,6 +36,7 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
     }
     @OptIn(DelicateCoroutinesApi::class)
     private fun fetchData() {
+        Log.d("BIN_X", "FeedViewModel.fetchData: ")
         GlobalScope.launch(Dispatchers.IO) {
             var cachedFeeds = repository.getSomeFeeds()
             if (cachedFeeds.isNotEmpty()) {
@@ -58,10 +66,22 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
 
         try{
             val response = client.newCall(request).execute()
+            if (!response.isSuccessful) {
+                someError.postValue("Could not fetch Feeds")
+                return ""
+            }
             return response.body?.string() ?: ""
+        } catch (e: UnknownHostException) {
+            someError.postValue("No Internet Connection")
+            return ""
+        } catch (e: IOException) {
+            someError.postValue("IO Error")
+            return ""
         } catch (e: Exception) {
+            someError.postValue("Something went wrong")
             return ""
         }
+
     }
     private fun parseXml(xmlData: String): List<Feed> {
         val dataList = mutableListOf<Feed>()

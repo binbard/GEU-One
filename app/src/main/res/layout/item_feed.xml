@@ -8,6 +8,7 @@
     app:cardCornerRadius="8dp"
     android:clickable="true"
     android:focusable="true"
+    android:elevation="4dp"
     app:cardBackgroundColor="#00FFFFFF"
     android:layout_marginStart="20dp"
     android:layout_marginEnd="20dp">

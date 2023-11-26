@@ -1,11 +1,13 @@
 package com.binbard.geu.geuone.ui.notes
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +21,7 @@ class NotesFragment : Fragment() {
     private lateinit var binding: FragmentNotesBinding
     lateinit var notesViewModel: NotesViewModel
     lateinit var rvNotes: RecyclerView
+    private var titleListener: FragmentTitleListener? = null
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
@@ -41,6 +44,10 @@ class NotesFragment : Fragment() {
             rvNotes.adapter?.notifyDataSetChanged()
         }
 
+        notesViewModel.notesTitle.observe(viewLifecycleOwner) {
+            titleListener?.updateTitle(it)
+        }
+
         requireActivity()
             .onBackPressedDispatcher
             .addCallback(this, object : OnBackPressedCallback(true) {
@@ -51,6 +58,15 @@ class NotesFragment : Fragment() {
             )
 
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is FragmentTitleListener) {
+            titleListener = context
+        } else {
+            throw ClassCastException("$context must implement FragmentTitleListener")
+        }
     }
 
 }

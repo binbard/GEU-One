@@ -1,6 +1,5 @@
 package com.binbard.geu.geuone
 
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
@@ -9,9 +8,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.binbard.geu.geuone.databinding.ActivityMainBinding
-import com.binbard.geu.geuone.ui.notes.IOnBackPressed
+import com.binbard.geu.geuone.ui.notes.FragmentTitleListener
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FragmentTitleListener {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,16 +33,10 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(bottomNavController, appBarConfiguration)
         bottomNavView.setupWithNavController(bottomNavController)
-
     }
 
-
-//    override fun onBackPressed() {
-//        val fragment =
-//            this.supportFragmentManager.findFragmentById(R.id.bottomNavFeed)
-//        (fragment as? IOnBackPressed)?.onBackPressed()?.not()?.let {
-//            super.onBackPressed()
-//        }
-//    }
+    override fun updateTitle(title: String) {
+        supportActionBar?.title = title
+    }
 
 }

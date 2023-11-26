@@ -35,6 +35,7 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
 
         if(item.isFolder()) {
             holder.imgNoteItem.setImageResource(R.drawable.ic_folder_with_files)
+            changeAlpha(holder.imgNoteItem, item.getFileName())
         } else {
             holder.imgNoteItem.setImageResource(R.drawable.ic_pdf_file_2)
             changeAlpha(holder.imgNoteItem, item.getFileName()+".pdf")
@@ -52,6 +53,9 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
     }
 
     private fun changeAlpha(img: ImageView, fileName: String){
+        if(!fileName.endsWith(".pdf")){
+            img.alpha = 1f
+        }
         val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
         if (file.exists()) {
             img.alpha = 1f

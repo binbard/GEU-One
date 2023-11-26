@@ -1,5 +1,6 @@
 package com.binbard.geu.geuone.ui.notes
 
+import android.content.Context
 import android.os.Build.VERSION_CODES.S
 import android.util.Log
 import android.widget.Toast
@@ -13,29 +14,32 @@ import okhttp3.Request
 
 class NotesViewModel: ViewModel() {
     private var _text = MutableLiveData<String>().apply {
-        value = "The Notes"
+        value = "Notes"
     }
-    val notesText: LiveData<String> = _text
+    val notesTitle: LiveData<String> = _text
 
     var notes = MutableLiveData<FSItem>().apply {
-        value = FSItem("root", "", mutableSetOf(), null)
+        value = FSItem("Notes", "", mutableSetOf(), null)
     }
 
     fun gotoPrevDir(): Boolean {
         if(notes.value?.parent != null){
             notes.value = notes.value?.parent!!
+            _text.value = notes.value!!.getPath()
             return true
         }
         return false
     }
 
-    fun gotoNextDir(dir: String){
+    fun gotoNextDir(dir: String): Boolean{
         for (child in notes.value!!.children){
             if(child.name == dir){
                 notes.value = child
-                return
+                _text.value = notes.value!!.getPath()
+                return true
             }
         }
+        return false
     }
 
     fun gotoPath(path: String) {
@@ -64,12 +68,17 @@ class NotesViewModel: ViewModel() {
         val client = OkHttpClient()
         val request = Request.Builder().url(url).build()
 
-        client.newCall(request).execute().use { response ->
-            return response.body?.string() ?: ""
+        try{
+            client.newCall(request).execute().use { response ->
+                return response.body?.string() ?: ""
+            }
+        } catch(e: Exception){
+            return ""
         }
     }
 
     private fun parseNotes(txtData: String){
+        if(txtData.isEmpty()) return
         val lines = txtData.split("\n")
         val line1s = lines[0].split(" ")
         val pre = line1s[0]

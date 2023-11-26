@@ -26,6 +26,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:alpha="0.5"
             app:srcCompat="@drawable/ic_pdf_file_2" />
 
         <TextView
