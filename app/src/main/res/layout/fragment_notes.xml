@@ -9,15 +9,14 @@
         android:id="@+id/rvNotes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:foregroundGravity="center_horizontal"
-        android:layout_marginStart="60dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginTop="30dp"
-        app:layout_goneMarginBottom="80dp"
+        android:paddingStart="60dp"
+        android:paddingTop="60dp"
+        android:paddingEnd="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_goneMarginBottom="80dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

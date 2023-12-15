@@ -31,7 +31,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun login(
+    fun preLogin(
         etShow: EditText,
         etShow2: EditText,
         etShow3: EditText,
@@ -45,16 +45,46 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         GlobalScope.launch(Dispatchers.IO) {
             val token = ErpNetUtils.getToken(cookies)
             Log.d("ErpRepository", "id: $id, password: $password, token: $token, cookies: $cookies")
-            val captcha = ErpNetUtils.getCaptcha(token)
-            val captchaText = ocrUtils.getText(captcha!!)
-            val loginResponse = ErpNetUtils.login(id, password, token, captchaText, cookies)
+            val captchaImg = ErpNetUtils.getCaptcha(cookies)
+            if(captchaImg==null){
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(imageView.context, "Failed to Load Captcha", Toast.LENGTH_SHORT).show()
+                }
+                return@launch
+            }
+            val captchaTxt = ocrUtils.getText(captchaImg)
+//            val loginResponse = ErpNetUtils.login(id, password, token, captchaTxt, cookies)
 
             withContext(Dispatchers.Main) {
-                etShow.setText(captchaText)
+                etShow.setText(captchaTxt)
+                etShow2.setText("$id $password")
                 etShow3.setText(token)
                 etShow4.setText(cookies)
+//                textView.text = loginResponse
+                imageView.setImageBitmap(captchaImg)
+            }
+
+            Log.d("ErpNetUtils", "$id $password $captchaTxt $token\n$cookies")
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun login(etShow: EditText, etShow2: EditText, etShow3: EditText, textView: TextView){
+//        val id = erpCacheHelper.getId()
+//        val password = erpCacheHelper.getPassword()
+        val idpass = etShow2.text.toString().split(" ")
+        if(idpass.size!=2){
+            Toast.makeText(etShow.context, "..", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val id = idpass[0]
+        val password = idpass[1]
+        val token = etShow3.text.toString()
+        val captchaTxt = etShow.text.toString()
+        GlobalScope.launch(Dispatchers.IO) {
+            val loginResponse = ErpNetUtils.login(id, password, token, captchaTxt, cookies)
+            withContext(Dispatchers.Main) {
                 textView.text = loginResponse
-                imageView.setImageBitmap(captcha)
             }
         }
     }

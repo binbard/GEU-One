@@ -18,7 +18,7 @@ class ErpCacheHelper(context: Context) {
     }
 
     fun getId(): String {
-        return sharedPreferences.getString("id", "21021913") ?: ""
+        return sharedPreferences.getString("id", "") ?: ""
     }
 
     fun savePassword(value: String) {
@@ -26,6 +26,15 @@ class ErpCacheHelper(context: Context) {
     }
 
     fun getPassword(): String {
-        return sharedPreferences.getString("password", "notok1234") ?: ""
+        return sharedPreferences.getString("password", "") ?: ""
     }
+
+    fun saveUid(value: String) {
+        sharedPreferences.edit().putString("uid", value).apply()
+    }
+
+    fun getUid(): String {
+        return sharedPreferences.getString("uid", "") ?: ""
+    }
+
 }

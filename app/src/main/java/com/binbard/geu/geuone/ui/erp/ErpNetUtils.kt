@@ -14,7 +14,7 @@ import java.util.*
 object ErpNetUtils {
     val client = OkHttpClient()
 
-    private const val erpUrl = "https://erp.geu.ac.in"
+    private const val erpUrl = "https://erp.geu.ac.in/"
 
     suspend fun getCookies(): String = withContext(Dispatchers.IO) {
         val request = okhttp3.Request.Builder()
@@ -22,8 +22,14 @@ object ErpNetUtils {
             .build()
         return@withContext try {
             val response = client.newCall(request).execute()
-            val cookies = response.headers("Set-Cookie")
-            cookies.joinToString("; ")
+            val cookiesList = response.headers("Set-Cookie")
+            val cookieSet = HashSet(cookiesList)
+            var cookies = ""
+            for(cookie in cookieSet){
+                val mainCookie = cookie.split(";")[0]
+                cookies += mainCookie + ";"
+            }
+            cookies
         } catch (e: Exception) {
             Log.d("ErpNetUtils", "Error: ${e.message}")
             ""
@@ -31,10 +37,13 @@ object ErpNetUtils {
     }
 
     suspend fun getToken(cookies: String): String = withContext(Dispatchers.IO) {
+        val request = okhttp3.Request.Builder()
+            .url(erpUrl)
+            .header("Cookie", cookies)
+            .build()
         try {
-            val doc = Jsoup.connect(erpUrl)
-                .header("Cookie", cookies)
-                .get()
+            val response = client.newCall(request).execute()
+            val doc = Jsoup.parse(response.body?.string())
             val token =
                 doc.select("input[name=__RequestVerificationToken]").first()?.attr("value") ?: ""
             return@withContext token
@@ -48,13 +57,12 @@ object ErpNetUtils {
             .build()
         val request = okhttp3.Request.Builder()
             .url("$erpUrl/Account/showrefreshcaptchaImage")
-            .post(formBody)
             .header("Cookie", cookies)
+            .post(formBody)
             .build()
 
         return@withContext try {
             val response = client.newCall(request).execute().peekBody(Long.MAX_VALUE)
-            Log.d("ErpNetUtils", "Response: $response")
             val captchaJson = response.string()
 
             val integerArray: Array<Int> = Gson().fromJson(captchaJson, Array<Int>::class.java)
@@ -79,15 +87,24 @@ object ErpNetUtils {
                 .add("captcha", captchaText)
                 .build()
 
+            val client1 = client.newBuilder().followRedirects(false).build()
+
             val request = okhttp3.Request.Builder()
                 .url(erpUrl)
                 .header("Cookie", cookies)
                 .post(fill)
                 .build()
 
-            val response = client.newCall(request).execute()
+            val response = client1.newCall(request).execute()
 
-            return@withContext response.body?.string() ?: ""
+            if(response.code == 302){
+                val cookiesList = response.headers("Set-Cookie")
+                if(cookiesList.isEmpty()) return@withContext "x"
+                val uid = cookiesList[0].split("=")[2].split("&")[0]
+                return@withContext uid
+            }
+            return@withContext "x"
+
         }
 
 }

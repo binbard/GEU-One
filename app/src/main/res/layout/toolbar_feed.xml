@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbarFeed"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="@color/material_dynamic_neutral_variant10"
+    android:elevation="4dp"
+    app:titleTextColor="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/feedSearchView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search..."
+            app:iconifiedByDefault="false"
+            app:searchHintIcon="@drawable/ic_search"
+            app:queryBackground="@android:color/transparent"/>
+    </LinearLayout>
+</androidx.appcompat.widget.Toolbar>

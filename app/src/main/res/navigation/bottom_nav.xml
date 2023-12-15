@@ -1,23 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_nav"
     app:startDestination="@id/bottomNavFeed">
 
     <fragment
         android:id="@+id/bottomNavFeed"
         android:name="com.binbard.geu.geuone.ui.feed.FeedFragment"
-        android:label="Feed" />
+        android:label="Feed"
+        tools:layout="@layout/fragment_feed"/>
     <fragment
         android:id="@+id/bottomNavRes"
         android:name="com.binbard.geu.geuone.ui.res.ResFragment"
-        android:label="Resources" />
+        android:label="Resources"
+        tools:layout="@layout/fragment_res"/>
     <fragment
         android:id="@+id/bottomNavNotes"
         android:name="com.binbard.geu.geuone.ui.notes.NotesFragment"
-        android:label="Notes" />
+        android:label="Notes"
+        tools:layout="@layout/fragment_notes"/>
     <fragment
         android:id="@+id/bottomNavErp"
         android:name="com.binbard.geu.geuone.ui.erp.ErpFragment"
-        android:label="ERP" />
+        android:label="ERP"
+        tools:layout="@layout/fragment_erp">
+    </fragment>
+    <fragment
+        android:id="@+id/erpLoginFragment"
+        android:name="com.binbard.geu.geuone.ui.erp.ErpLoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_erp_login"/>
 </navigation>
