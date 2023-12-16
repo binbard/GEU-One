@@ -6,9 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <include layout="@layout/toolbar_feed" android:visibility="gone" />
     <include layout="@layout/toolbar_erp" android:visibility="gone" />
     <include layout="@layout/toolbar_notes" android:visibility="gone" />
-    <include layout="@layout/toolbar_feed" android:visibility="gone" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavView"
@@ -30,7 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarErp"
+        app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/bottom_nav"
         tools:layout="@layout/fragment_erp" />
 

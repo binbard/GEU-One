@@ -13,11 +13,11 @@ class ErpCacheHelper(context: Context) {
         return sharedPreferences.getString("cookies", "") ?: ""
     }
 
-    fun saveId(value: String) {
+    fun saveStudentId(value: String) {
         sharedPreferences.edit().putString("id", value).apply()
     }
 
-    fun getId(): String {
+    fun getStudentId(): String {
         return sharedPreferences.getString("id", "") ?: ""
     }
 
@@ -29,12 +29,28 @@ class ErpCacheHelper(context: Context) {
         return sharedPreferences.getString("password", "") ?: ""
     }
 
-    fun saveUid(value: String) {
+    fun saveStudentUid(value: String) {
         sharedPreferences.edit().putString("uid", value).apply()
     }
 
-    fun getUid(): String {
+    fun getStudentUid(): String {
         return sharedPreferences.getString("uid", "") ?: ""
+    }
+
+    fun saveStudentName(value: String) {
+        sharedPreferences.edit().putString("name", value).apply()
+    }
+
+    fun getStudentName(): String {
+        return sharedPreferences.getString("name", "") ?: ""
+    }
+
+    fun saveStudentImage(value: String) {
+        sharedPreferences.edit().putString("image", value).apply()
+    }
+
+    fun getStudentImage(): String {
+        return sharedPreferences.getString("image", "") ?: ""
     }
 
 }

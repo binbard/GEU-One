@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
                     changeToolbar(findViewById(R.id.toolbarFeed))
                 }
                 R.id.bottomNavRes -> {
-                    supportActionBar?.hide()
+                    changeToolbar(findViewById(R.id.toolbarErp))
                 }
                 R.id.bottomNavNotes -> {
                     changeToolbar(findViewById(R.id.toolbarNotes))

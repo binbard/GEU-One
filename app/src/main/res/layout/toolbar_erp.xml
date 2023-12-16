@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.Toolbar
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbarErp"
     android:layout_width="match_parent"
@@ -11,21 +10,22 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/imgErpMenu"
             android:layout_width="80dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1"
+            android:background="?attr/actionBarItemBackground"
             android:clickable="true"
+            android:contentDescription="ERP Menu"
             android:focusable="true"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
-            android:background="?attr/selectableItemBackground"
-            app:srcCompat="@drawable/ic_menu_alt_2"
-            android:contentDescription="TODO" />
+            app:srcCompat="@drawable/ic_menu_alt_2" />
 
         <TextView
             android:id="@+id/textView3"

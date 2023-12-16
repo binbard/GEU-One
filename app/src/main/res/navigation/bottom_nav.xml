@@ -25,6 +25,11 @@
         android:name="com.binbard.geu.geuone.ui.erp.ErpFragment"
         android:label="ERP"
         tools:layout="@layout/fragment_erp">
+        <action
+            android:id="@+id/action_bottomNavErp_to_erpLoginFragment"
+            app:destination="@id/erpLoginFragment"
+            app:popUpTo="@id/bottomNavErp"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/erpLoginFragment"

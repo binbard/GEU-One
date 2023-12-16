@@ -3,7 +3,10 @@ package com.binbard.geu.geuone.ui.erp
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import com.binbard.geu.geuone.ui.erp.menu.StateData
+import com.binbard.geu.geuone.ui.erp.menu.StudentData
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -14,7 +17,7 @@ import java.util.*
 object ErpNetUtils {
     val client = OkHttpClient()
 
-    private const val erpUrl = "https://erp.geu.ac.in/"
+    private const val erpUrl = "https://erp.geu.ac.in"
 
     suspend fun getCookies(): String = withContext(Dispatchers.IO) {
         val request = okhttp3.Request.Builder()
@@ -106,5 +109,54 @@ object ErpNetUtils {
             return@withContext "x"
 
         }
+
+    fun getStudentDetails(cookies: String): StudentData? {
+        val request = okhttp3.Request.Builder()
+            .url("$erpUrl/Account/GetStudentDetail")
+            .header("Cookie", cookies)
+            .post(FormBody.Builder().build())
+            .build()
+        try {
+            val response = client.newCall(request).execute()
+
+            val body = response.body?.string()
+
+            val json = body?.replace("\\", "")?.replace("\"[", "[")?.replace("]\"", "]")
+
+            val stateData: StateData = Gson().fromJson(json, StateData::class.java)
+            val details = stateData.state
+
+            if(details.isEmpty()) return null
+
+            var result = ""
+
+            val studentData = details[0]
+
+            for(data in studentData.properties){
+                result += "${data.first}: ${data.second}\n"
+            }
+
+            return studentData
+
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
+    fun getStudentImage(cookies: String): Bitmap?{
+        val request = okhttp3.Request.Builder()
+            .url("$erpUrl/Account/show")
+            .header("Cookie", cookies)
+            .post(FormBody.Builder().build())
+            .build()
+        try {
+            val response = client.newCall(request).execute()
+
+            val byteArray = response.body?.bytes() ?: return null
+            return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+        } catch (e: Exception) {
+            return null
+        }
+    }
 
 }

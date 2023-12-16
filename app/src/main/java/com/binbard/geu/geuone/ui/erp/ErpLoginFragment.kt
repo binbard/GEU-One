@@ -4,14 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
-import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.databinding.FragmentErpLoginBinding
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class ErpLoginFragment: Fragment() {
     private lateinit var binding: FragmentErpLoginBinding
@@ -41,7 +38,7 @@ class ErpLoginFragment: Fragment() {
             val pass = etPass.text.toString()
             val erpCacheHelper = ErpCacheHelper(requireContext())
             if(id != "" && pass!= "") {
-                erpCacheHelper.saveId(id)
+                erpCacheHelper.saveStudentId(id)
                 erpCacheHelper.savePassword(pass)
             }
 
