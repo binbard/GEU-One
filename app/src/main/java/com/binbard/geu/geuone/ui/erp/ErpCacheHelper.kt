@@ -53,4 +53,11 @@ class ErpCacheHelper(context: Context) {
         return sharedPreferences.getString("image", "") ?: ""
     }
 
+    fun loadLocalData(erpViewModel: ErpViewModel) {
+        erpViewModel.erpStudentId.value = getStudentId()
+        erpViewModel.erpPassword.value = getPassword()
+        erpViewModel.erpStudentName.value = getStudentName()
+        erpViewModel.erpStudentImg.value = getStudentImage()
+    }
+
 }

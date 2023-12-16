@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import com.binbard.geu.geuone.ui.erp.menu.StateData
 import com.binbard.geu.geuone.ui.erp.menu.StudentData
+import com.binbard.geu.geuone.utils.BitmapHelper
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
@@ -151,9 +152,7 @@ object ErpNetUtils {
             .build()
         try {
             val response = client.newCall(request).execute()
-
-            val byteArray = response.body?.bytes() ?: return null
-            return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+            return BitmapHelper.stringToBitmap(response.body?.string() ?: "")
         } catch (e: Exception) {
             return null
         }

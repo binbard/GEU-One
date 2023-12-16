@@ -36,8 +36,7 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
                 R.id.bottomNavFeed,
                 R.id.bottomNavRes,
                 R.id.bottomNavNotes,
-                R.id.bottomNavErp,
-                R.id.erpLoginFragment
+                R.id.bottomNavErp
             )
         )
 

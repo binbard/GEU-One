@@ -26,6 +26,7 @@ class ErpFragment: Fragment() {
     private lateinit var erpCacheHelper: ErpCacheHelper
     private lateinit var erpRepository: ErpRepository
     private lateinit var erpStudentFragment: ErpStudentFragment
+    private lateinit var erpViewModel: ErpViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,34 +35,33 @@ class ErpFragment: Fragment() {
     ): View? {
         binding = FragmentErpBinding.inflate(inflater, container, false)
 
-        val erpViewModel = ViewModelProvider(this)[ErpViewModel::class.java]
+        erpViewModel = ViewModelProvider(this)[ErpViewModel::class.java]
 
         erpCacheHelper = ErpCacheHelper(requireContext())
         erpRepository = ErpRepository(erpCacheHelper)
 
-        erpRepository.preLogin(context)
-
-        erpRepository.fetchImage(erpCacheHelper)
-
-        if(erpViewModel.loginDone.value == false) {
-            if(erpViewModel.loginDone.value == false) {
-                erpViewModel.loginDone.value = true
-//                NavHostFragment.findNavController(this).navigate(R.id.erpLoginFragment)
-            }
-        }
-
-        sideSheetDialog = SideSheetDialog(requireContext())
-        sideSheetDialog.setContentView(R.layout.fragment_erp_sidesheet)
-        sideSheetDialog.setSheetEdge(Gravity.START)
-        setupErpFeatures()
+        erpCacheHelper.loadLocalData(erpViewModel)
+        erpRepository.preLogin(erpViewModel)
 
         val toolbarErp: Toolbar = requireActivity().findViewById(R.id.toolbarErp)
         val btnErpMenu: ImageView = toolbarErp.findViewById(R.id.imgErpMenu)
-        btnErpMenu.setOnClickListener {
-            if(sideSheetDialog.isShowing){
-                sideSheetDialog.dismiss()
-            } else {
-                sideSheetDialog.show()
+
+        erpViewModel.loginStatus.observe(viewLifecycleOwner) {
+            if(it==1){
+                Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+                setupErpFeatures()
+                erpRepository.syncStudentData(erpCacheHelper)
+
+                btnErpMenu.setOnClickListener {
+                    if(sideSheetDialog.isShowing){
+                        sideSheetDialog.dismiss()
+                    } else {
+                        sideSheetDialog.show()
+                    }
+                }
+            } else if(it==0){
+                Toast.makeText(requireContext(), "Login Failed", Toast.LENGTH_SHORT).show()
+                requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragmentContainerView2, ErpLoginFragment()).commit()
             }
         }
 
@@ -69,6 +69,10 @@ class ErpFragment: Fragment() {
     }
 
     fun setupErpFeatures(){
+
+        sideSheetDialog = SideSheetDialog(requireContext())
+        sideSheetDialog.setContentView(R.layout.fragment_erp_sidesheet)
+        sideSheetDialog.setSheetEdge(Gravity.START)
 
         erpStudentFragment = ErpStudentFragment()
         requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragmentContainerView2, erpStudentFragment).commit()
@@ -84,11 +88,17 @@ class ErpFragment: Fragment() {
         val btnExam: TextView? = sideSheetDialog.findViewById(R.id.btnExam)
         val btnMarks: TextView? = sideSheetDialog.findViewById(R.id.btnMarks)
 
-        tvStuName?.text = erpCacheHelper.getStudentName()
-        tvStuId?.text = erpCacheHelper.getStudentId()
-        val bitmap = BitmapHelper.stringToBitmap(erpCacheHelper.getStudentImage())
 
-        tvStuImg?.setImageBitmap(bitmap)
+        erpViewModel.erpStudentId.observe(viewLifecycleOwner) {
+            tvStuId?.text = it
+        }
+        erpViewModel.erpStudentName.observe(viewLifecycleOwner) {
+            tvStuName?.text = it
+        }
+        erpViewModel.erpStudentImg.observe(viewLifecycleOwner) {
+            val bitmap = BitmapHelper.stringToBitmap(it)
+            tvStuImg?.setImageBitmap(bitmap)
+        }
 
         btnStudent?.setOnClickListener {
             sideSheetDialog.dismiss()

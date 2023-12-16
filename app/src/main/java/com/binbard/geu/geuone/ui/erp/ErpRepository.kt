@@ -24,24 +24,22 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun preLogin(context: Context?) {
+    fun preLogin(erpViewModel: ErpViewModel) {
         val id = erpCacheHelper.getStudentId()
         val password = erpCacheHelper.getPassword()
 
         GlobalScope.launch(Dispatchers.IO) {
             val token = ErpNetUtils.getToken(cookies)
-            Log.d("ErpRepository", "id: $id, password: $password, token: $token, cookies: $cookies")
             val captchaImg = ErpNetUtils.getCaptcha(cookies)
             if(captchaImg==null){
-                withContext(Dispatchers.Main) {
-                    Log.d("ErpRepository", "Failed to load captcha")
-                }
+                Log.d("ErpRepository", "Failed to load captcha")
                 return@launch
             }
             val captchaTxt = ocrUtils.getText(captchaImg)
             val loginResponse = ErpNetUtils.login(id, password, token, captchaTxt, cookies)
             withContext(Dispatchers.Main) {
-                Toast.makeText(context, "$loginResponse", Toast.LENGTH_SHORT).show()
+                if(loginResponse=="x") erpViewModel.loginStatus.value = 0
+                else erpViewModel.loginStatus.value = 1
             }
 
             Log.d("ErpNetUtils", "$loginResponse $id $password $captchaTxt $token\n$cookies")
@@ -68,6 +66,18 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
             val image = ErpNetUtils.getStudentImage(cookies)
             if(image!=null){
                 erpCacheHelper.saveStudentImage(BitmapHelper.bitmapToString(image))
+            }
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun syncStudentData(erpCacheHelper: ErpCacheHelper){
+        fetchImage(erpCacheHelper)
+        GlobalScope.launch(Dispatchers.IO) {
+            val studentDetails = ErpNetUtils.getStudentDetails(cookies)
+            if(studentDetails!=null){
+                erpCacheHelper.saveStudentName(studentDetails.studentName)
+                erpCacheHelper.saveStudentId(studentDetails.studentID)
             }
         }
     }
