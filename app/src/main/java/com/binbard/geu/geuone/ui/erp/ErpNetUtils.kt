@@ -7,7 +7,6 @@ import com.binbard.geu.geuone.ui.erp.menu.StateData
 import com.binbard.geu.geuone.ui.erp.menu.StudentData
 import com.binbard.geu.geuone.utils.BitmapHelper
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -152,7 +151,7 @@ object ErpNetUtils {
             .build()
         try {
             val response = client.newCall(request).execute()
-            return BitmapHelper.stringToBitmap(response.body?.string() ?: "")
+            return BitmapHelper.streamToBitmap(response.body?.byteStream()!!)
         } catch (e: Exception) {
             return null
         }

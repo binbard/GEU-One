@@ -9,18 +9,23 @@ import android.widget.Button
 import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.binbard.geu.geuone.databinding.ActivityMainBinding
+import com.binbard.geu.geuone.ui.erp.ErpCacheHelper
+import com.binbard.geu.geuone.ui.erp.ErpRepository
+import com.binbard.geu.geuone.ui.erp.ErpViewModel
 import com.binbard.geu.geuone.ui.notes.FragmentTitleListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity(), FragmentTitleListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var bottomNavView: BottomNavigationView
+    private lateinit var erpViewModel: ErpViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +35,14 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
         bottomNavView = binding.bottomNavView
         val bottomNavHost = supportFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
         val bottomNavController = bottomNavHost.findNavController()
+
+        erpViewModel = ViewModelProvider(this)[ErpViewModel::class.java]
+        if(erpViewModel.erpCacheHelper==null){
+            erpViewModel.erpCacheHelper = ErpCacheHelper(this)
+        }
+        if(erpViewModel.erpRepository==null){
+            erpViewModel.erpRepository = ErpRepository(erpViewModel.erpCacheHelper!!)
+        }
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
@@ -99,7 +112,9 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
-                Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Logged Out", Toast.LENGTH_SHORT).show()
+                erpViewModel.loginStatus.value = 0
+                erpViewModel.erpCacheHelper!!.savePassword("x")
                 return true
             }
             else -> return super.onOptionsItemSelected(item)

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import java.io.ByteArrayOutputStream
 import android.util.Base64
+import java.io.InputStream
 
 object BitmapHelper {
     fun bitmapToString(bitmap: Bitmap): String {
@@ -16,6 +17,10 @@ object BitmapHelper {
     fun stringToBitmap(encodedString: String): Bitmap? {
         val decodedString: ByteArray = Base64.decode(encodedString, Base64.DEFAULT)
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+    }
+
+    fun streamToBitmap(stream: InputStream): Bitmap? {
+        return BitmapFactory.decodeStream(stream)
     }
 
 }

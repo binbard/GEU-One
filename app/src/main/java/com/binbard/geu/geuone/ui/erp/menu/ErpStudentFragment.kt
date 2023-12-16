@@ -14,37 +14,38 @@ import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.databinding.FragmentErpStudentBinding
 import com.binbard.geu.geuone.ui.erp.ErpCacheHelper
 import com.binbard.geu.geuone.ui.erp.ErpRepository
+import com.binbard.geu.geuone.ui.erp.ErpViewModel
 import com.google.android.material.sidesheet.SideSheetDialog
 
 class ErpStudentFragment: Fragment() {
     private lateinit var binding: FragmentErpStudentBinding
     private lateinit var sideSheetDialog: SideSheetDialog
-    private lateinit var erpCacheHelper: ErpCacheHelper
+    private lateinit var erpViewModel: ErpViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentErpStudentBinding.inflate(inflater, container, false)
 
-        val erpStudentViewModel = ViewModelProvider(this)[ErpStudentViewModel::class.java]
+        erpViewModel = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
-        erpStudentViewModel.details.observe(viewLifecycleOwner) {
+        erpViewModel.erpStudentName.observe(viewLifecycleOwner) {
             binding.tvErpStudent.text = it
         }
-
-        erpCacheHelper = ErpCacheHelper(requireContext())
 
         sideSheetDialog = SideSheetDialog(requireContext())
         val tvStuName: TextView? = sideSheetDialog.findViewById(R.id.tvStuName)
         val tvStuId: TextView? = sideSheetDialog.findViewById(R.id.tvStuId)
 
-        erpStudentViewModel.studentData.observe(viewLifecycleOwner) {
+        erpViewModel.studentData.observe(viewLifecycleOwner) {
             if(it!=null) {
                 binding.tblStudentDetails.visibility = View.VISIBLE
 
-                erpCacheHelper.saveStudentName(it.studentName)
-                erpCacheHelper.saveStudentId(it.studentID)
+                erpViewModel.erpCacheHelper!!.saveStudentName(it.studentName)
+                erpViewModel.erpCacheHelper!!.saveStudentId(it.studentID)
 
                 tvStuName?.text = it.studentName
                 tvStuId?.text = it.studentID
+
+                binding.tblStudentDetails.removeAllViews()
 
                 it.properties.forEach{(name, value) ->
                     val row = TableRow(context)
@@ -77,7 +78,7 @@ class ErpStudentFragment: Fragment() {
         val erpCacheHelper = ErpCacheHelper(requireContext())
         val erpRepository = ErpRepository(erpCacheHelper)
 
-        erpRepository.getStudentDetails(erpStudentViewModel)
+        erpRepository.getStudentDetails(erpViewModel)
 
 
         return binding.root

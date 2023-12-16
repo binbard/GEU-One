@@ -1,8 +1,5 @@
 package com.binbard.geu.geuone.ui.erp
 
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -20,7 +17,7 @@ import com.binbard.geu.geuone.utils.BitmapHelper
 import com.google.android.material.sidesheet.SideSheetDialog
 
 
-class ErpFragment: Fragment() {
+class ErpFragment : Fragment() {
     private lateinit var binding: FragmentErpBinding
     private lateinit var sideSheetDialog: SideSheetDialog
     private lateinit var erpCacheHelper: ErpCacheHelper
@@ -35,47 +32,52 @@ class ErpFragment: Fragment() {
     ): View? {
         binding = FragmentErpBinding.inflate(inflater, container, false)
 
-        erpViewModel = ViewModelProvider(this)[ErpViewModel::class.java]
+        erpViewModel = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
-        erpCacheHelper = ErpCacheHelper(requireContext())
-        erpRepository = ErpRepository(erpCacheHelper)
+        erpCacheHelper = erpViewModel.erpCacheHelper!!
+        erpRepository = erpViewModel.erpRepository!!
 
         erpCacheHelper.loadLocalData(erpViewModel)
-        erpRepository.preLogin(erpViewModel)
+        if (erpViewModel.loginStatus.value == -1) erpRepository.preLogin(erpViewModel)
 
         val toolbarErp: Toolbar = requireActivity().findViewById(R.id.toolbarErp)
         val btnErpMenu: ImageView = toolbarErp.findViewById(R.id.imgErpMenu)
 
         erpViewModel.loginStatus.observe(viewLifecycleOwner) {
-            if(it==1){
-                Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+            if (it == 1) {
+//                Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+                childFragmentManager.popBackStack()
+                childFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerView2, erpViewModel.erpOptionStudent).commit()
+
                 setupErpFeatures()
                 erpRepository.syncStudentData(erpCacheHelper)
 
                 btnErpMenu.setOnClickListener {
-                    if(sideSheetDialog.isShowing){
+                    if (sideSheetDialog.isShowing) {
                         sideSheetDialog.dismiss()
                     } else {
                         sideSheetDialog.show()
                     }
                 }
-            } else if(it==0){
+                erpViewModel.loginStatus.value = 2
+            } else if (it == 0) {
                 Toast.makeText(requireContext(), "Login Failed", Toast.LENGTH_SHORT).show()
-                requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragmentContainerView2, ErpLoginFragment()).commit()
+                childFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerView2, ErpLoginFragment()).commit()
             }
         }
 
         return binding.root
     }
 
-    fun setupErpFeatures(){
+    fun setupErpFeatures() {
 
         sideSheetDialog = SideSheetDialog(requireContext())
         sideSheetDialog.setContentView(R.layout.fragment_erp_sidesheet)
         sideSheetDialog.setSheetEdge(Gravity.START)
 
-        erpStudentFragment = ErpStudentFragment()
-        requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragmentContainerView2, erpStudentFragment).commit()
+//        requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragmentContainerView2, ErpStudentFragment()).commit()
 
         val tvStuName: TextView? = sideSheetDialog.findViewById(R.id.tvStuName)
         val tvStuId: TextView? = sideSheetDialog.findViewById(R.id.tvStuId)
@@ -103,13 +105,15 @@ class ErpFragment: Fragment() {
         btnStudent?.setOnClickListener {
             sideSheetDialog.dismiss()
             Toast.makeText(requireContext(), "Student", Toast.LENGTH_SHORT).show()
-            requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragmentContainerView2, erpStudentFragment).commit()
+            childFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainerView2,erpViewModel.erpOptionStudent).commit()
         }
 
         btnAttendance?.setOnClickListener {
             sideSheetDialog.dismiss()
             Toast.makeText(requireContext(), "Attendance", Toast.LENGTH_SHORT).show()
-            requireActivity().supportFragmentManager.beginTransaction().replace(R.id.fragmentContainerView2, ErpDefaultPage()).commit()
+            childFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainerView2, ErpDefaultPage()).commit()
         }
     }
 

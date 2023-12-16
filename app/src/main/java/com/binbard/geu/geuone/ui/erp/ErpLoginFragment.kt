@@ -4,16 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.NavHostFragment
 import com.binbard.geu.geuone.databinding.FragmentErpLoginBinding
-import com.google.android.material.snackbar.Snackbar
 
-class ErpLoginFragment: Fragment() {
+class ErpLoginFragment : Fragment() {
     private lateinit var binding: FragmentErpLoginBinding
+    private lateinit var erpViewModel: ErpViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -21,7 +20,7 @@ class ErpLoginFragment: Fragment() {
     ): View? {
         binding = FragmentErpLoginBinding.inflate(inflater, container, false)
 
-        val erpViewModel = ViewModelProvider(this)[ErpViewModel::class.java]
+        erpViewModel = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
         val btLogin = binding.btLogin
         val etId = binding.etId
@@ -39,22 +38,17 @@ class ErpLoginFragment: Fragment() {
             val id = etId.text.toString()
             val pass = etPass.text.toString()
             val erpCacheHelper = ErpCacheHelper(requireContext())
-            if(id != "" && pass!= "") {
+            if (id == "") {
+                etId.error = "Please enter your ID"
+            }
+            if (pass == "") {
+                etPass.error = "Please enter your password"
+            }
+
+            if (id != "" && pass != "") {
                 erpCacheHelper.saveStudentId(id)
                 erpCacheHelper.savePassword(pass)
-            } else{
-                val snackbar = Snackbar.make(requireView(), "Please enter your credentials", Snackbar.LENGTH_SHORT)
-                val snackbarView = snackbar.view
-                val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
-                params.setMargins(params.leftMargin,
-                    params.topMargin,
-                    params.rightMargin,
-                    params.bottomMargin + 180)
-                snackbarView.layoutParams = params
-                snackbar.setAction("OK") {
-                    snackbar.dismiss()
-                }
-                snackbar.show()
+                erpViewModel.erpRepository!!.preLogin(erpViewModel)
             }
 
         }
