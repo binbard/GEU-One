@@ -30,9 +30,7 @@ class ErpViewModel: ViewModel() {
     val studentData = MutableLiveData<StudentData>().apply {
         value = null
     }
-    val erpSelectedOptionIndex = MutableLiveData<Int>().apply {
-        value = 0
-    }
+
     val erpOptionStudent = ErpStudentFragment()
 
     var erpCacheHelper: ErpCacheHelper? = null

@@ -112,9 +112,7 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
-                Toast.makeText(this, "Logged Out", Toast.LENGTH_SHORT).show()
-                erpViewModel.loginStatus.value = 0
-                erpViewModel.erpCacheHelper!!.savePassword("x")
+                erpViewModel.loginStatus.value = -2
                 return true
             }
             else -> return super.onOptionsItemSelected(item)

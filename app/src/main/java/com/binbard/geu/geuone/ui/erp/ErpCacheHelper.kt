@@ -53,11 +53,29 @@ class ErpCacheHelper(context: Context) {
         return sharedPreferences.getString("image", "") ?: ""
     }
 
+    fun getLoginStatus(): Int {
+        return sharedPreferences.getInt("loginStatus", 0)
+    }
+
+    fun saveLoginStatus(value: Int) {
+        sharedPreferences.edit().putInt("loginStatus", value).apply()
+    }
+
     fun loadLocalData(erpViewModel: ErpViewModel) {
         erpViewModel.erpStudentId.value = getStudentId()
         erpViewModel.erpPassword.value = getPassword()
         erpViewModel.erpStudentName.value = getStudentName()
         erpViewModel.erpStudentImg.value = getStudentImage()
+    }
+
+    fun clearLocalData(){
+//        sharedPreferences.edit().clear().apply()
+        sharedPreferences.edit().remove("id").apply()
+        sharedPreferences.edit().remove("password").apply()
+        sharedPreferences.edit().remove("uid").apply()
+        sharedPreferences.edit().remove("name").apply()
+        sharedPreferences.edit().remove("image").apply()
+        sharedPreferences.edit().remove("loginStatus").apply()
     }
 
 }

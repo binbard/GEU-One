@@ -64,20 +64,22 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun fetchImage(erpCacheHelper: ErpCacheHelper){
+    fun fetchImage(erpViewModel: ErpViewModel){
         GlobalScope.launch(Dispatchers.IO) {
             val image = ErpNetUtils.getStudentImage(cookies)
             if(image!=null){
                 erpCacheHelper.saveStudentImage(BitmapHelper.bitmapToString(image))
+                erpViewModel.erpStudentImg.postValue(BitmapHelper.bitmapToString(image))
             }
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun syncStudentData(erpCacheHelper: ErpCacheHelper){
-        fetchImage(erpCacheHelper)
+    fun syncStudentData(erpViewModel: ErpViewModel){
+        fetchImage(erpViewModel)
         GlobalScope.launch(Dispatchers.IO) {
             val studentDetails = ErpNetUtils.getStudentDetails(cookies)
+            erpViewModel.studentData.postValue(studentDetails)
             if(studentDetails!=null){
                 erpCacheHelper.saveStudentName(studentDetails.studentName)
                 erpCacheHelper.saveStudentId(studentDetails.studentID)
