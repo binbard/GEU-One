@@ -43,6 +43,7 @@ class ErpFragment : Fragment() {
 
         erpCacheHelper.loadLocalData(erpViewModel)
         if (loginStatus == 1){
+            setupErpFeatures()
             if(erpViewModel.loginStatus.value!=2) erpRepository.preLogin(erpViewModel)
         } else{
             childFragmentManager.beginTransaction()
@@ -55,13 +56,13 @@ class ErpFragment : Fragment() {
                 childFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainerView2, erpViewModel.erpOptionStudent).commit()
 
-                setupErpFeatures()
                 erpRepository.syncStudentData(erpViewModel)
 
                 erpViewModel.loginStatus.value = 2
                 erpViewModel.erpCacheHelper!!.saveLoginStatus(1)
             }
             else if(it==0){
+                setupErpFeatures(unset=true)
                 if(loginStatus==1){
                     Snack.showMsg(requireActivity().findViewById(android.R.id.content), "Session Expired")
                     childFragmentManager.beginTransaction()
@@ -82,7 +83,7 @@ class ErpFragment : Fragment() {
         return binding.root
     }
 
-    fun setupErpFeatures() {
+    fun setupErpFeatures(unset: Boolean = false) {
 
         sideSheetDialog = SideSheetDialog(requireContext())
         sideSheetDialog.setContentView(R.layout.fragment_erp_sidesheet)
@@ -101,6 +102,10 @@ class ErpFragment : Fragment() {
         val btnSyllabus: TextView? = sideSheetDialog.findViewById(R.id.btnSyllabus)
         val btnExam: TextView? = sideSheetDialog.findViewById(R.id.btnExam)
         val btnMarks: TextView? = sideSheetDialog.findViewById(R.id.btnMarks)
+
+        if(unset){
+            btnErpMenu.setOnClickListener {}
+        }
 
         btnErpMenu.setOnClickListener {
             if (sideSheetDialog.isShowing) {

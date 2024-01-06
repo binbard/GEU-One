@@ -15,13 +15,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
+import com.binbard.geu.geuone.R
 import java.io.File
 
 object PdfHelper{
     private val downloadingFiles = mutableListOf<String>()
     fun openOrDownloadPdf(context: Context, url: String, fileName: String) {
         val file = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            Environment.getExternalStoragePublicDirectory("${Environment.DIRECTORY_DOWNLOADS}/${context.getString(
+                R.string.app_name)}"),
             "$fileName.pdf"
         )
 
@@ -56,9 +58,17 @@ object PdfHelper{
                 .setDescription("Downloading")
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
 
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+            val folder = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), context.getString(
+                R.string.app_name))
+            if (!folder.exists()) {
+                folder.mkdirs()
+            }
+
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/${context.getString(
+                R.string.app_name)}/$fileName")
 
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+
             downloadManager.enqueue(request)
             downloadingFiles.add(url)
 

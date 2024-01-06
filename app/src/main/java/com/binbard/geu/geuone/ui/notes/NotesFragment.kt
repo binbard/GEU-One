@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
@@ -14,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.databinding.FragmentNotesBinding
 import com.binbard.geu.geuone.ui.feed.FeedFragment
 
@@ -49,6 +51,12 @@ class NotesFragment : Fragment() {
         notesViewModel.notesTitle.observe(viewLifecycleOwner) {
             titleListener?.updateTitle(it)
             notesCacheHelper.setLastPath(it)
+        }
+
+        val tvTitleNotes: TextView = requireActivity().findViewById(R.id.tvTitleNotes)
+
+        notesViewModel.notesTitle.observe(viewLifecycleOwner) {
+            tvTitleNotes.text = it
         }
 
         requireActivity()

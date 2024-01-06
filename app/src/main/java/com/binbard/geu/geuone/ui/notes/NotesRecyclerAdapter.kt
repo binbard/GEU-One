@@ -56,7 +56,8 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
         if(!fileName.endsWith(".pdf")){
             img.alpha = 1f
         }
-        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
+        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "/${context.getString(
+            R.string.app_name)}/$fileName")
         if (file.exists()) {
             img.alpha = 1f
         } else {
