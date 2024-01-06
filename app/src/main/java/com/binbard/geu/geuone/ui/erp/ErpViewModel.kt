@@ -1,12 +1,9 @@
 package com.binbard.geu.geuone.ui.erp
 
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.binbard.geu.geuone.ui.erp.menu.ErpDefaultPage
 import com.binbard.geu.geuone.ui.erp.menu.ErpStudentFragment
-import com.binbard.geu.geuone.ui.erp.menu.StudentData
+import com.binbard.geu.geuone.ui.erp.menu.Student
 
 class ErpViewModel: ViewModel() {
     val comments: MutableLiveData<String> = MutableLiveData<String>().apply {
@@ -27,7 +24,7 @@ class ErpViewModel: ViewModel() {
     val erpStudentImg = MutableLiveData<String>().apply {
         value = ""
     }
-    val studentData = MutableLiveData<StudentData>().apply {
+    val studentData = MutableLiveData<Student>().apply {
         value = null
     }
 

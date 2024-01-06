@@ -19,7 +19,7 @@ object BitmapHelper {
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
     }
 
-    fun streamToBitmap(stream: InputStream): Bitmap? {
+    fun decodeBase64(stream: InputStream): Bitmap? {
         return BitmapFactory.decodeStream(stream)
     }
 

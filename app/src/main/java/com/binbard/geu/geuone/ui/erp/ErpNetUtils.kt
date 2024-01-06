@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import com.binbard.geu.geuone.ui.erp.menu.StateData
-import com.binbard.geu.geuone.ui.erp.menu.StudentData
+import com.binbard.geu.geuone.ui.erp.menu.Student
 import com.binbard.geu.geuone.utils.BitmapHelper
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -110,7 +110,7 @@ object ErpNetUtils {
 
         }
 
-    fun getStudentDetails(cookies: String): StudentData? {
+    fun getStudentDetails(cookies: String): Student? {
         val request = okhttp3.Request.Builder()
             .url("$erpUrl/Account/GetStudentDetail")
             .header("Cookie", cookies)
@@ -151,7 +151,7 @@ object ErpNetUtils {
             .build()
         try {
             val response = client.newCall(request).execute()
-            return BitmapHelper.streamToBitmap(response.body?.byteStream()!!)
+            return BitmapHelper.decodeBase64(response.body?.byteStream()!!)
         } catch (e: Exception) {
             return null
         }

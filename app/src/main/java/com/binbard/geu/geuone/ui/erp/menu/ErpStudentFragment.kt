@@ -15,6 +15,7 @@ import com.binbard.geu.geuone.databinding.FragmentErpStudentBinding
 import com.binbard.geu.geuone.ui.erp.ErpCacheHelper
 import com.binbard.geu.geuone.ui.erp.ErpRepository
 import com.binbard.geu.geuone.ui.erp.ErpViewModel
+import com.binbard.geu.geuone.utils.BitmapHelper
 import com.google.android.material.sidesheet.SideSheetDialog
 
 class ErpStudentFragment: Fragment() {
@@ -35,8 +36,21 @@ class ErpStudentFragment: Fragment() {
         val tvStuName: TextView? = sideSheetDialog.findViewById(R.id.tvStuName)
         val tvStuId: TextView? = sideSheetDialog.findViewById(R.id.tvStuId)
 
+        erpViewModel.erpStudentImg.observe(viewLifecycleOwner) {
+            if(it!="") {
+                val bitmap = BitmapHelper.stringToBitmap(it)
+                binding.sivErpStuImg.setImageBitmap(bitmap)
+            }
+        }
+
         erpViewModel.studentData.observe(viewLifecycleOwner) {
             if(it!=null) {
+
+                binding.tvErpStuName.text = it.studentName
+                binding.tvErpStuId.text = it.studentID
+                binding.tvErpStuEmail.text = it.email
+                binding.tvErpStuPhone.text = it.mobileNO
+
                 binding.tblStudentDetails.visibility = View.VISIBLE
 
                 erpViewModel.erpCacheHelper!!.saveStudentName(it.studentName)

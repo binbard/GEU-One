@@ -2,7 +2,7 @@ package com.binbard.geu.geuone.ui.erp.menu
 
 import com.google.gson.annotations.SerializedName
 
-data class StudentData(
+data class Student(
     @SerializedName("RegID") var regID: String,
     @SerializedName("StudentID") var studentID: String,
     @SerializedName("EnrollmentNo") var enrollmentNo: String,
@@ -49,4 +49,4 @@ data class StudentData(
     )
 }
 
-data class StateData(@SerializedName("state") val state: List<StudentData>)
+data class StateData(@SerializedName("state") val state: List<Student>)
