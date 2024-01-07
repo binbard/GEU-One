@@ -28,10 +28,6 @@ class ErpStudentFragment: Fragment() {
 
         erpViewModel = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
-        erpViewModel.erpStudentName.observe(viewLifecycleOwner) {
-            binding.tvErpStudent.text = it
-        }
-
         sideSheetDialog = SideSheetDialog(requireContext())
         val tvStuName: TextView? = sideSheetDialog.findViewById(R.id.tvStuName)
         val tvStuId: TextView? = sideSheetDialog.findViewById(R.id.tvStuId)
@@ -61,16 +57,19 @@ class ErpStudentFragment: Fragment() {
 
                 binding.tblStudentDetails.removeAllViews()
 
+                var colorRow = false
+
                 it.properties.forEach{(name, value) ->
                     val row = TableRow(context)
-                    row.layoutParams = TableRow.LayoutParams(
-                        TableRow.LayoutParams.MATCH_PARENT,
-                        TableRow.LayoutParams.WRAP_CONTENT
-                    )
+                    row.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT)
+                    row.setPadding(10, 2, 10, 2)
+
+                    if(colorRow) row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+                    colorRow = !colorRow
 
                     val textViewName = TextView(context)
                     textViewName.textSize = 16f
-                    textViewName.text = name
+                    textViewName.text = "$name:"
                     textViewName.gravity = Gravity.START
 
                     val params = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT)
@@ -93,7 +92,6 @@ class ErpStudentFragment: Fragment() {
         val erpRepository = ErpRepository(erpCacheHelper)
 
         erpRepository.getStudentDetails(erpViewModel)
-
 
         return binding.root
     }

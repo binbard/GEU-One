@@ -35,6 +35,10 @@ class ErpLoginFragment : Fragment() {
         }
 
         btLogin.setOnClickListener {
+
+            val imm = requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.hideSoftInputFromWindow(view?.windowToken, 0)
+
             val id = etId.text.toString()
             val pass = etPass.text.toString()
             val erpCacheHelper = ErpCacheHelper(requireContext())

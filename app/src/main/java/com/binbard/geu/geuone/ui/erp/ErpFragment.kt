@@ -46,12 +46,14 @@ class ErpFragment : Fragment() {
             setupErpFeatures()
             if(erpViewModel.loginStatus.value!=2) erpRepository.preLogin(erpViewModel)
         } else{
+            setupErpFeatures(unset=true)
             childFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainerView2, ErpLoginFragment()).commit()
         }
 
         erpViewModel.loginStatus.observe(viewLifecycleOwner) {
             if(it==1){
+                setupErpFeatures()
                 childFragmentManager.popBackStack()
                 childFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainerView2, erpViewModel.erpOptionStudent).commit()
@@ -74,9 +76,12 @@ class ErpFragment : Fragment() {
             }
             else if(it==-2){
                 Toast.makeText(requireContext(), "Logged Out", Toast.LENGTH_SHORT).show()
+                setupErpFeatures(unset=true)
                 erpViewModel.erpCacheHelper!!.saveLoginStatus(0)
                 erpViewModel.erpCacheHelper!!.clearLocalData()
                 erpViewModel.loginStatus.value = -1
+                childFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerView2, ErpLoginFragment()).commit()
             }
         }
 
@@ -92,6 +97,11 @@ class ErpFragment : Fragment() {
         val toolbarErp: Toolbar = requireActivity().findViewById(R.id.toolbarErp)
         val btnErpMenu: ImageView = toolbarErp.findViewById(R.id.imgErpMenu)
 
+        if(unset){
+            btnErpMenu.setOnClickListener(null)
+            return
+        }
+
         val tvStuName: TextView? = sideSheetDialog.findViewById(R.id.tvStuName)
         val tvStuId: TextView? = sideSheetDialog.findViewById(R.id.tvStuId)
         val tvStuImg: ImageView? = sideSheetDialog.findViewById(R.id.tvStuImg)
@@ -102,10 +112,6 @@ class ErpFragment : Fragment() {
         val btnSyllabus: TextView? = sideSheetDialog.findViewById(R.id.btnSyllabus)
         val btnExam: TextView? = sideSheetDialog.findViewById(R.id.btnExam)
         val btnMarks: TextView? = sideSheetDialog.findViewById(R.id.btnMarks)
-
-        if(unset){
-            btnErpMenu.setOnClickListener {}
-        }
 
         btnErpMenu.setOnClickListener {
             if (sideSheetDialog.isShowing) {

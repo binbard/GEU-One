@@ -23,8 +23,8 @@ data class Student(
     @SerializedName("MobileNO") var mobileNO: String,
     @SerializedName("FMobileNo") var fMobileNo: String,
     @SerializedName("MRollNo") var mRollNo: String,
-    @SerializedName("Marks10") var marks10: String,
-    @SerializedName("Marks12") var marks12: String,
+    @SerializedName("10") var marks10: String,
+    @SerializedName("10+2") var marks12: String,
     @SerializedName("MarksGraduation") var marksGraduation: String,
     @SerializedName("PRollNo") var pRollNo: String,
     @SerializedName("RegisDate") var regisDate: String,
@@ -37,15 +37,20 @@ data class Student(
     @SerializedName("ABCAccountNo") var abcAccountNo: String,
 ){
     val properties: List<Pair<String,String>> get() = listOf(
-        "StudentName" to studentName,
-        "StudentID" to studentID,
-        "EnrollmentNo" to enrollmentNo,
-        "Father's Name" to fatherHusName,
-        "Mother's Name" to motherName,
+        "Father Name" to fatherHusName,
+        "Mother Name" to motherName,
+        "D.O.B." to dob,
         "College" to college,
         "Course" to course,
         "Specialization" to courseSpecialization,
-        "University" to university,
+        "Year/Sem" to yearSem,
+        "Branch" to branch,
+        "Section" to section,
+        "Class Roll No." to classRollNo,
+        "Enroll No." to enrollmentNo,
+        "University Roll No." to pRollNo,
+        "HighSchool %" to marks10,
+        "Intermediate %" to marks12,
     )
 }
 
