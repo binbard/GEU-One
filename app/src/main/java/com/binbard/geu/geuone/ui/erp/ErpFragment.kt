@@ -1,94 +1,87 @@
 package com.binbard.geu.geuone.ui.erp
 
-import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
+ import android.os.Bundle
+ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.fragment.app.Fragment
+ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.databinding.FragmentErpBinding
+ import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.ui.Snack
 import com.binbard.geu.geuone.ui.erp.menu.ErpDefaultPage
-import com.binbard.geu.geuone.ui.erp.menu.ErpStudentFragment
-import com.binbard.geu.geuone.utils.BitmapHelper
+ import com.binbard.geu.geuone.utils.BitmapHelper
 import com.google.android.material.sidesheet.SideSheetDialog
-import com.google.android.material.snackbar.Snackbar
 
 
 class ErpFragment : Fragment() {
     private lateinit var binding: FragmentErpBinding
     private lateinit var sideSheetDialog: SideSheetDialog
-    private lateinit var erpCacheHelper: ErpCacheHelper
-    private lateinit var erpRepository: ErpRepository
-    private lateinit var erpStudentFragment: ErpStudentFragment
-    private lateinit var erpViewModel: ErpViewModel
+    private lateinit var evm: ErpViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         binding = FragmentErpBinding.inflate(inflater, container, false)
 
-        erpViewModel = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
+        evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
-        erpCacheHelper = erpViewModel.erpCacheHelper!!
-        erpRepository = erpViewModel.erpRepository!!
-
-        val loginStatus = erpViewModel.erpCacheHelper!!.getLoginStatus()
-
-        erpCacheHelper.loadLocalData(erpViewModel)
-        if (loginStatus == 1){
-            setupErpFeatures()
-            if(erpViewModel.loginStatus.value!=2) erpRepository.preLogin(erpViewModel)
-        } else{
-            setupErpFeatures(unset=true)
-            childFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerView2, ErpLoginFragment()).commit()
-        }
-
-        erpViewModel.loginStatus.observe(viewLifecycleOwner) {
-            if(it==1){
-                setupErpFeatures()
-                childFragmentManager.popBackStack()
-                childFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainerView2, erpViewModel.erpOptionStudent).commit()
-
-                erpRepository.syncStudentData(erpViewModel)
-
-                erpViewModel.loginStatus.value = 2
-                erpViewModel.erpCacheHelper!!.saveLoginStatus(1)
+        evm.loginStatus.observe(viewLifecycleOwner) {
+            if(it== LoginStatus.UNKNOWN){
+                evm.loginStatus.value = evm.erpCacheHelper?.getLoginStatus()
             }
-            else if(it==0){
+            else if(it==LoginStatus.PREV_LOGGED_IN){
+                setupErpFeatures()
+                evm.erpCacheHelper?.loadLocalStudentData(evm)
+                showErpPage(evm.erpOptionStudent)
+                evm.erpRepository?.preLogin(evm)
+            }
+            else if(it== LoginStatus.PREV_LOGGED_OUT){
+                evm.loginStatus.value = LoginStatus.NOT_LOGGED_IN
+                showErpPage(ErpLoginFragment())
+            }
+            else if(it==LoginStatus.LOGIN_SUCCESS){
+                evm.loginStatus.value = LoginStatus.LOGGED_IN
+                evm.erpCacheHelper!!.saveLoginStatus(LoginStatus.PREV_LOGGED_IN)
+                setupErpFeatures()
+                showErpPage(evm.erpOptionStudent)
+                evm.erpRepository?.syncStudentData(evm)
+            }
+            else if(it==LoginStatus.LOGIN_FAILED){
+                evm.loginStatus.value = LoginStatus.NOT_LOGGED_IN
                 setupErpFeatures(unset=true)
-                if(loginStatus==1){
+                if(evm.erpCacheHelper?.getLoginStatus()==LoginStatus.PREV_LOGGED_IN){
                     Snack.showMsg(requireActivity().findViewById(android.R.id.content), "Session Expired")
-                    childFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainerView2, ErpLoginFragment()).commit()
+//                    evm.erpCacheHelper?.saveLoginStatus(LoginStatus.PREV_LOGGED_OUT)
+                    showErpPage(ErpLoginFragment())
                 } else{
                     Snack.showMsg(requireActivity().findViewById(android.R.id.content), "Wrong Credentials")
                 }
-                erpViewModel.loginStatus.value = -1
             }
-            else if(it==-2){
+            else if(it==LoginStatus.LOGOUT){
                 Toast.makeText(requireContext(), "Logged Out", Toast.LENGTH_SHORT).show()
                 setupErpFeatures(unset=true)
-                erpViewModel.erpCacheHelper!!.saveLoginStatus(0)
-                erpViewModel.erpCacheHelper!!.clearLocalData()
-                erpViewModel.loginStatus.value = -1
-                childFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainerView2, ErpLoginFragment()).commit()
+                evm.erpCacheHelper!!.saveLoginStatus(LoginStatus.PREV_LOGGED_OUT)
+                evm.erpCacheHelper!!.clearLocalData()
+                evm.loginStatus.value = LoginStatus.NOT_LOGGED_IN
+                showErpPage(ErpLoginFragment())
             }
         }
 
         return binding.root
     }
 
-    fun setupErpFeatures(unset: Boolean = false) {
+    private fun showErpPage(erpStudentFragment: Fragment){
+        childFragmentManager.popBackStack()
+        childFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainerView2, erpStudentFragment).commit()
+    }
+
+    private fun setupErpFeatures(unset: Boolean = false) {
 
         sideSheetDialog = SideSheetDialog(requireContext())
         sideSheetDialog.setContentView(R.layout.fragment_erp_sidesheet)
@@ -121,17 +114,17 @@ class ErpFragment : Fragment() {
             }
         }
 
-        erpViewModel.erpStudentId.observe(viewLifecycleOwner) {
+        evm.erpStudentId.observe(viewLifecycleOwner) {
             tvStuId?.text = it
         }
-        erpViewModel.erpStudentName.observe(viewLifecycleOwner) {
+        evm.erpStudentName.observe(viewLifecycleOwner) {
             tvStuName?.text = it
         }
-        erpViewModel.erpStudentImg.observe(viewLifecycleOwner) {
+        evm.erpStudentImg.observe(viewLifecycleOwner) {
             val bitmap = BitmapHelper.stringToBitmap(it)
             tvStuImg?.setImageBitmap(bitmap)
         }
-        erpViewModel.studentData.observe(viewLifecycleOwner) {
+        evm.studentData.observe(viewLifecycleOwner) {
             if (it != null) {
                 tvStuId?.text = it.studentID
                 tvStuName?.text = it.studentName
@@ -142,7 +135,7 @@ class ErpFragment : Fragment() {
             sideSheetDialog.dismiss()
             Toast.makeText(requireContext(), "Student", Toast.LENGTH_SHORT).show()
             childFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerView2, erpViewModel.erpOptionStudent).commit()
+                .replace(R.id.fragmentContainerView2, evm.erpOptionStudent).commit()
         }
 
         btnAttendance?.setOnClickListener {

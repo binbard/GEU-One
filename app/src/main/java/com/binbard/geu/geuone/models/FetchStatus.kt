@@ -1,13 +1,19 @@
 package com.binbard.geu.geuone.models
 
 enum class FetchStatus {
-    LOADING,
-    SUCCESS,
-    ERROR
+    NOT_FETCHED,
+    LOCAL_FETCHED,
+    REMOTE_FETCHED,
+    FULL_FETCHED,
 }
 
 enum class LoginStatus {
-    LOADING,
-    SUCCESS,
-    ERROR
+    LOGIN_SUCCESS,
+    LOGIN_FAILED,
+    LOGOUT,
+    PREV_LOGGED_IN,
+    PREV_LOGGED_OUT,
+    LOGGED_IN,
+    NOT_LOGGED_IN,
+    UNKNOWN,
 }

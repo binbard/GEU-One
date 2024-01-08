@@ -1,9 +1,14 @@
 package com.binbard.geu.geuone.ui.erp
 
 import android.content.Context
+import com.binbard.geu.geuone.models.LoginStatus
+import com.binbard.geu.geuone.ui.erp.menu.Student
+import com.google.gson.Gson
 
 class ErpCacheHelper(context: Context) {
     private val sharedPreferences = context.getSharedPreferences("erp", Context.MODE_PRIVATE)
+    private val spStudentData = context.getSharedPreferences("student_data", Context.MODE_PRIVATE)
+    private val spStudentImg = context.getSharedPreferences("student_image", Context.MODE_PRIVATE)
 
     fun saveCookies(value: String) {
         sharedPreferences.edit().putString("cookies", value).apply()
@@ -46,26 +51,39 @@ class ErpCacheHelper(context: Context) {
     }
 
     fun saveStudentImage(value: String) {
-        sharedPreferences.edit().putString("image", value).apply()
+        spStudentImg.edit().putString("image", value).apply()
     }
 
     fun getStudentImage(): String {
-        return sharedPreferences.getString("image", "") ?: ""
+        return spStudentImg.getString("image", "") ?: ""
     }
 
-    fun getLoginStatus(): Int {
-        return sharedPreferences.getInt("loginStatus", 0)
+    fun saveLoginStatus(loginStatus: LoginStatus) {
+        sharedPreferences.edit().putInt("loginStatus", loginStatus.ordinal).apply()
     }
 
-    fun saveLoginStatus(value: Int) {
-        sharedPreferences.edit().putInt("loginStatus", value).apply()
+    fun getLoginStatus(): LoginStatus {
+        val statusOrdinal = sharedPreferences.getInt("loginStatus", LoginStatus.PREV_LOGGED_OUT.ordinal)
+        return LoginStatus.values()[statusOrdinal]
     }
 
-    fun loadLocalData(erpViewModel: ErpViewModel) {
+
+    fun loadLocalStudentData(erpViewModel: ErpViewModel) {
         erpViewModel.erpStudentId.value = getStudentId()
         erpViewModel.erpPassword.value = getPassword()
         erpViewModel.erpStudentName.value = getStudentName()
         erpViewModel.erpStudentImg.value = getStudentImage()
+
+        val studentJson = spStudentData.getString("studentData", "")
+        if(studentJson!=""){
+            val student = Gson().fromJson(studentJson, Student::class.java)
+            erpViewModel.studentData.value = student
+        }
+    }
+
+    fun saveLocalStudentData(student: Student) {
+        val studentJson = Gson().toJson(student)
+        spStudentData.edit().putString("studentData", studentJson).apply()
     }
 
     fun clearLocalData(){

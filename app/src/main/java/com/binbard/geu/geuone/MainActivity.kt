@@ -16,6 +16,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.binbard.geu.geuone.databinding.ActivityMainBinding
+import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.ui.erp.ErpCacheHelper
 import com.binbard.geu.geuone.ui.erp.ErpRepository
 import com.binbard.geu.geuone.ui.erp.ErpViewModel
@@ -112,7 +113,7 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
-                erpViewModel.loginStatus.value = -2
+                erpViewModel.loginStatus.value = LoginStatus.LOGOUT
                 return true
             }
             else -> return super.onOptionsItemSelected(item)

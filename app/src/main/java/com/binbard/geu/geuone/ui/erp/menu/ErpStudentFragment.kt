@@ -88,11 +88,6 @@ class ErpStudentFragment: Fragment() {
             }
         }
 
-        val erpCacheHelper = ErpCacheHelper(requireContext())
-        val erpRepository = ErpRepository(erpCacheHelper)
-
-        erpRepository.getStudentDetails(erpViewModel)
-
         return binding.root
     }
 }

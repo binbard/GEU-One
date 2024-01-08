@@ -2,6 +2,7 @@ package com.binbard.geu.geuone.ui.erp
 
 import android.util.Log
 import android.widget.Toast
+import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.utils.BitmapHelper
 import kotlinx.coroutines.*
 import java.util.*
@@ -37,30 +38,16 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
             val loginResponse = ErpNetUtils.login(id, password, token, captchaTxt, cookies)
             withContext(Dispatchers.Main) {
                 if(loginResponse=="x"){
-                    erpViewModel.loginStatus.value = 0
+                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
                     Log.d("ErpRepository", "Login Failed")
                 }
                 else{
-                    erpViewModel.loginStatus.value = 1
+                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_SUCCESS
                     Log.d("ErpRepository", "Login Successful")
                 }
             }
 
             Log.d("ErpNetUtils", "$loginResponse $id $password $captchaTxt $token\n$cookies")
-        }
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun getStudentDetails(vm: ErpViewModel){
-        GlobalScope.launch(Dispatchers.IO) {
-            val studentDetails = ErpNetUtils.getStudentDetails(cookies)
-            withContext(Dispatchers.Main) {
-                if(studentDetails==null){
-                    vm.comments.value = "Failed to Load Details"
-                    return@withContext
-                }
-                vm.studentData.value = studentDetails
-            }
         }
     }
 
@@ -84,6 +71,10 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
             if(studentDetails!=null){
                 erpCacheHelper.saveStudentName(studentDetails.studentName)
                 erpCacheHelper.saveStudentId(studentDetails.studentID)
+
+                erpCacheHelper.saveLocalStudentData(studentDetails)
+            } else{
+                erpViewModel.comments.postValue("Failed to Sync Student Details")
             }
         }
     }
