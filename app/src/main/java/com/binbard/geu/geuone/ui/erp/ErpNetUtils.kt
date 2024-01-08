@@ -3,6 +3,7 @@ package com.binbard.geu.geuone.ui.erp
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import com.binbard.geu.geuone.ui.erp.ErpNetUtils.client
 import com.binbard.geu.geuone.ui.erp.menu.StateData
 import com.binbard.geu.geuone.ui.erp.menu.Student
 import com.binbard.geu.geuone.utils.BitmapHelper
@@ -80,35 +81,41 @@ object ErpNetUtils {
     suspend fun login(id: String, password: String, token: String, captchaText: String, cookies: String): String =
         withContext(Dispatchers.IO) {
 
-            val fill = FormBody.Builder()
-                .add("hdnMsg","GEU")
-                .add("checkOnline", "0")
-                .add("__RequestVerificationToken", token)
-                .add("UserName", id)
-                .add("Password", password)
-                .add("clientIP", "")
-                .add("captcha", captchaText)
-                .build()
+        val fill = FormBody.Builder()
+            .add("hdnMsg","GEU")
+            .add("checkOnline", "0")
+            .add("__RequestVerificationToken", token)
+            .add("UserName", id)
+            .add("Password", password)
+            .add("clientIP", "")
+            .add("captcha", captchaText)
+            .build()
 
-            val client1 = client.newBuilder().followRedirects(false).build()
+        val client1 = client.newBuilder().followRedirects(false).build()
 
-            val request = okhttp3.Request.Builder()
-                .url(erpUrl)
-                .header("Cookie", cookies)
-                .post(fill)
-                .build()
+        val request = okhttp3.Request.Builder()
+            .url(erpUrl)
+            .header("Cookie", cookies)
+            .post(fill)
+            .build()
 
-            val response = client1.newCall(request).execute()
+        val response = client1.newCall(request).execute()
 
-            if(response.code == 302){
-                val cookiesList = response.headers("Set-Cookie")
-                if(cookiesList.isEmpty()) return@withContext "x"
-                val uid = cookiesList[0].split("=")[2].split("&")[0]
-                return@withContext uid
+        if(response.code == 302){
+            val cookiesList = response.headers("Set-Cookie")
+            if(cookiesList.isEmpty()){
+                if(response.body?.string()?.contains("Captcha does not match") == true){
+                    return@withContext "INVALID_CAPTCHA"
+                } else return@withContext "x"
             }
-            return@withContext "x"
-
+            val uid = cookiesList[0].split("=")[2].split("&")[0]
+            return@withContext uid
         }
+        return@withContext "x"
+
+    }
+
+
 
     fun getStudentDetails(cookies: String): Student? {
         val request = okhttp3.Request.Builder()

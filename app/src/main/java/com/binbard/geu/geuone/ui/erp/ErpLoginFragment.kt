@@ -22,31 +22,20 @@ class ErpLoginFragment : Fragment() {
 
         erpViewModel = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
-        val btLogin = binding.btLogin
-        val etId = binding.etId
-        val etPass = binding.etPass
 
-        etId.doOnTextChanged { text, start, before, count ->
-            erpViewModel.erpStudentId.value = text.toString()
-        }
-
-        etPass.doOnTextChanged { text, start, before, count ->
-            erpViewModel.erpPassword.value = text.toString()
-        }
-
-        btLogin.setOnClickListener {
+        binding.btLogin.setOnClickListener {
 
             val imm = requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
             imm.hideSoftInputFromWindow(view?.windowToken, 0)
 
-            val id = etId.text.toString()
-            val pass = etPass.text.toString()
+            val id = binding.etId.text.toString()
+            val pass = binding.etPass.text.toString()
             val erpCacheHelper = ErpCacheHelper(requireContext())
             if (id == "") {
-                etId.error = "Please enter your ID"
+                binding.etId.error = "Please enter your ID"
             }
             if (pass == "") {
-                etPass.error = "Please enter your password"
+                binding.etPass.error = "Please enter your password"
             }
 
             if (id != "" && pass != "") {

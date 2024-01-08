@@ -49,7 +49,6 @@ class ErpStudentFragment: Fragment() {
 
                 binding.tblStudentDetails.visibility = View.VISIBLE
 
-                erpViewModel.erpCacheHelper!!.saveStudentName(it.studentName)
                 erpViewModel.erpCacheHelper!!.saveStudentId(it.studentID)
 
                 tvStuName?.text = it.studentName

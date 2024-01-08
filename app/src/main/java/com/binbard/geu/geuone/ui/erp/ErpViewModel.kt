@@ -13,15 +13,6 @@ class ErpViewModel: ViewModel() {
     val loginStatus = MutableLiveData<LoginStatus>().apply {
         value = LoginStatus.UNKNOWN
     }
-    val erpStudentId = MutableLiveData<String>().apply {
-        value = ""
-    }
-    val erpPassword = MutableLiveData<String>().apply {
-        value = ""
-    }
-    val erpStudentName = MutableLiveData<String>().apply {
-        value = ""
-    }
     val erpStudentImg = MutableLiveData<String>().apply {
         value = ""
     }

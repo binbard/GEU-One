@@ -13,7 +13,7 @@ import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.databinding.FragmentErpBinding
  import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.ui.Snack
-import com.binbard.geu.geuone.ui.erp.menu.ErpDefaultPage
+import com.binbard.geu.geuone.ui.erp.menu.ErpAttendanceFragment
  import com.binbard.geu.geuone.utils.BitmapHelper
 import com.google.android.material.sidesheet.SideSheetDialog
 
@@ -114,17 +114,13 @@ class ErpFragment : Fragment() {
             }
         }
 
-        evm.erpStudentId.observe(viewLifecycleOwner) {
-            tvStuId?.text = it
-        }
-        evm.erpStudentName.observe(viewLifecycleOwner) {
-            tvStuName?.text = it
-        }
         evm.erpStudentImg.observe(viewLifecycleOwner) {
             val bitmap = BitmapHelper.stringToBitmap(it)
             tvStuImg?.setImageBitmap(bitmap)
         }
         evm.studentData.observe(viewLifecycleOwner) {
+            tvStuId?.text = it?.studentID
+            tvStuName?.text = it?.studentName
             if (it != null) {
                 tvStuId?.text = it.studentID
                 tvStuName?.text = it.studentName
@@ -142,7 +138,7 @@ class ErpFragment : Fragment() {
             sideSheetDialog.dismiss()
             Toast.makeText(requireContext(), "Attendance", Toast.LENGTH_SHORT).show()
             childFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerView2, ErpDefaultPage()).commit()
+                .replace(R.id.fragmentContainerView2, ErpAttendanceFragment()).commit()
         }
     }
 

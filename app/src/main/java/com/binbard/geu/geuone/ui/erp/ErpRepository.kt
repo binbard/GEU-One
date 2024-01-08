@@ -37,7 +37,10 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
             val captchaTxt = ocrUtils.getText(captchaImg)
             val loginResponse = ErpNetUtils.login(id, password, token, captchaTxt, cookies)
             withContext(Dispatchers.Main) {
-                if(loginResponse=="x"){
+                if(loginResponse=="INVALID_CAPTCHA"){
+                    preLogin(erpViewModel)
+                }
+                else if(loginResponse=="x"){
                     erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
                     Log.d("ErpRepository", "Login Failed")
                 }
@@ -69,7 +72,6 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
             val studentDetails = ErpNetUtils.getStudentDetails(cookies)
             erpViewModel.studentData.postValue(studentDetails)
             if(studentDetails!=null){
-                erpCacheHelper.saveStudentName(studentDetails.studentName)
                 erpCacheHelper.saveStudentId(studentDetails.studentID)
 
                 erpCacheHelper.saveLocalStudentData(studentDetails)
