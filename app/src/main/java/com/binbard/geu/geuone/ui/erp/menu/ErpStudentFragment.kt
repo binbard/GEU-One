@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.geuone.R

@@ -37,20 +37,45 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
             val captchaTxt = ocrUtils.getText(captchaImg)
             val loginResponse = ErpNetUtils.login(id, password, token, captchaTxt, cookies)
             withContext(Dispatchers.Main) {
-                if(loginResponse=="INVALID_CAPTCHA"){
-                    preLogin(erpViewModel)
-                }
-                else if(loginResponse=="x"){
-                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
-                    Log.d("ErpRepository", "Login Failed")
-                }
-                else{
+                Log.d("ErpRepository", "$loginResponse $id $password $captchaTxt $token\n$cookies")
+
+                if(loginResponse=="SUCCESS"){
+                    if(erpViewModel.loginStatus.value==LoginStatus.PREV_LOGGED_IN){
+                        Log.d("ErpRepository", "Auto Login Successful")
+                    } else{
+                        Log.d("ErpRepository", "Login Successful")
+                    }
                     erpViewModel.loginStatus.value = LoginStatus.LOGIN_SUCCESS
-                    Log.d("ErpRepository", "Login Successful")
+                }
+                else if(loginResponse=="INVALID_CAPTCHA"){
+                    Log.d("ErpRepository", "Login Failed (Invalid Captcha). Retrying...")
+                    preLogin(erpViewModel)
+                } else if(loginResponse=="INVALID_CREDENTIALS"){
+                    Log.d("ErpRepository", "Login Failed")
+                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
+                } else{
+                    Log.d("ErpRepository", "Login Failed")
+                    erpViewModel.comments.value = "Something went wrong"
+                    erpViewModel.erpCacheHelper?.saveLog(loginResponse)
+                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
                 }
             }
 
-            Log.d("ErpNetUtils", "$loginResponse $id $password $captchaTxt $token\n$cookies")
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun fetchAttendance(erpViewModel: ErpViewModel){
+        GlobalScope.launch(Dispatchers.IO) {
+            val attendance = ErpNetUtils.getAttendance(cookies, erpViewModel.studentData.value!!.regID)
+            erpViewModel.attendanceData.postValue(attendance)
+            if(attendance!=null){
+                erpCacheHelper.saveLocalAttendanceData(attendance)
+                Log.d("ErpRepository", "Attendance Synced")
+            } else{
+                Log.d("ErpRepository", "Failed to Sync Attendance")
+                erpViewModel.comments.postValue("Failed to Sync Attendance")
+            }
         }
     }
 

@@ -54,4 +54,4 @@ data class Student(
     )
 }
 
-data class StateData(@SerializedName("state") val state: List<Student>)
+data class StudentGson(@SerializedName("state") val state: List<Student>)

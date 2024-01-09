@@ -1,35 +1,39 @@
 package com.binbard.geu.geuone.ui.erp
 
 import android.content.Context
+import com.binbard.geu.geuone.models.Attendance
 import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.ui.erp.ErpNetUtils.getStudentImage
 import com.binbard.geu.geuone.ui.erp.menu.Student
 import com.google.gson.Gson
 
 class ErpCacheHelper(context: Context) {
-    private val sharedPreferences = context.getSharedPreferences("erp", Context.MODE_PRIVATE)
+    private val spErp = context.getSharedPreferences("erp", Context.MODE_PRIVATE)
     private val spStudentData = context.getSharedPreferences("student_data", Context.MODE_PRIVATE)
     private val spStudentImg = context.getSharedPreferences("student_image", Context.MODE_PRIVATE)
+    private val spAttendance = context.getSharedPreferences("attendance", Context.MODE_PRIVATE)
+    private val spLog = context.getSharedPreferences("log", Context.MODE_PRIVATE)
+
 
     fun getCookies(): String {
-        return sharedPreferences.getString("cookies", "") ?: ""
+        return spErp.getString("cookies", "") ?: ""
     }
     fun saveCookies(value: String) {
-        sharedPreferences.edit().putString("cookies", value).apply()
+        spErp.edit().putString("cookies", value).apply()
     }
 
     fun getStudentId(): String {
-        return sharedPreferences.getString("id", "") ?: ""
+        return spErp.getString("id", "") ?: ""
     }
     fun saveStudentId(value: String) {
-        sharedPreferences.edit().putString("id", value).apply()
+        spErp.edit().putString("id", value).apply()
     }
 
     fun getPassword(): String {
-        return sharedPreferences.getString("password", "") ?: ""
+        return spErp.getString("password", "") ?: ""
     }
     fun savePassword(value: String) {
-        sharedPreferences.edit().putString("password", value).apply()
+        spErp.edit().putString("password", value).apply()
     }
 
     private fun getStudentImage(): String {
@@ -40,11 +44,11 @@ class ErpCacheHelper(context: Context) {
     }
 
     fun getLoginStatus(): LoginStatus {
-        val statusOrdinal = sharedPreferences.getInt("loginStatus", LoginStatus.PREV_LOGGED_OUT.ordinal)
+        val statusOrdinal = spErp.getInt("loginStatus", LoginStatus.PREV_LOGGED_OUT.ordinal)
         return LoginStatus.values()[statusOrdinal]
     }
     fun saveLoginStatus(loginStatus: LoginStatus) {
-        sharedPreferences.edit().putInt("loginStatus", loginStatus.ordinal).apply()
+        spErp.edit().putInt("loginStatus", loginStatus.ordinal).apply()
     }
 
 
@@ -62,14 +66,17 @@ class ErpCacheHelper(context: Context) {
         }
     }
 
+    fun saveLocalAttendanceData(attendance: Attendance) {
+        val attendanceJson = Gson().toJson(attendance)
+        spStudentData.edit().putString("attendanceData", attendanceJson).apply()
+    }
+
+    fun saveLog(log: String){
+        spLog.edit().putString("log", log).apply()
+    }
+
     fun clearLocalData(){
-//        sharedPreferences.edit().clear().apply()
-        sharedPreferences.edit().remove("id").apply()
-        sharedPreferences.edit().remove("password").apply()
-        sharedPreferences.edit().remove("uid").apply()
-        sharedPreferences.edit().remove("name").apply()
-        sharedPreferences.edit().remove("image").apply()
-        sharedPreferences.edit().remove("loginStatus").apply()
+        spErp.edit().clear().apply()
     }
 
 }

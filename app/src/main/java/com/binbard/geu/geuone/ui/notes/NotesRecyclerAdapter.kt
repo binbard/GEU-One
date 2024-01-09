@@ -66,7 +66,7 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
     }
 
     override fun getItemCount(): Int{
-        return nvm.notesCount()
+        return nvm.notes.value!!.children.size
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {

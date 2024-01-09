@@ -3,11 +3,14 @@ package com.binbard.geu.geuone.ui.erp
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.binbard.geu.geuone.ui.erp.ErpNetUtils.client
-import com.binbard.geu.geuone.ui.erp.menu.StateData
+import com.binbard.geu.geuone.models.Attendance
+import com.binbard.geu.geuone.models.AttendanceGson
+import com.binbard.geu.geuone.models.LoginStatus
+import com.binbard.geu.geuone.ui.erp.menu.StudentGson
 import com.binbard.geu.geuone.ui.erp.menu.Student
 import com.binbard.geu.geuone.utils.BitmapHelper
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
@@ -103,15 +106,17 @@ object ErpNetUtils {
 
         if(response.code == 302){
             val cookiesList = response.headers("Set-Cookie")
-            if(cookiesList.isEmpty()){
-                if(response.body?.string()?.contains("Captcha does not match") == true){
-                    return@withContext "INVALID_CAPTCHA"
-                } else return@withContext "x"
-            }
             val uid = cookiesList[0].split("=")[2].split("&")[0]
-            return@withContext uid
+            return@withContext "SUCCESS"
+        } else{
+            val body = response.body?.string() ?: ""
+            if(body.contains("Captcha does not match")){
+                return@withContext "INVALID_CAPTCHA"
+            } else if(body.contains("The user name or password provided is incorrect.")){
+                return@withContext "INVALID_CREDENTIALS"
+            }
         }
-        return@withContext "x"
+        return@withContext "xAB"
 
     }
 
@@ -130,8 +135,8 @@ object ErpNetUtils {
 
             val json = body?.replace("\\", "")?.replace("\"[", "[")?.replace("]\"", "]")
 
-            val stateData: StateData = Gson().fromJson(json, StateData::class.java)
-            val details = stateData.state
+            val studentGson: StudentGson = Gson().fromJson(json, StudentGson::class.java)
+            val details = studentGson.state
 
             if(details.isEmpty()) return null
 
@@ -159,6 +164,26 @@ object ErpNetUtils {
         try {
             val response = client.newCall(request).execute()
             return BitmapHelper.decodeBase64(response.body?.byteStream()!!)
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
+    fun getAttendance(cookies: String, regID: String): Attendance? {
+        val request = okhttp3.Request.Builder()
+            .url("$erpUrl/Web_StudentAcademic/GetSubjectDetailStudentAcademicFromLive")
+            .header("Cookie", cookies)
+            .post(FormBody.Builder().add("RegID", regID).build())
+            .build()
+        try {
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+
+            val json = body?.replace("\\", "")?.replace("\"[", "[")?.replace("]\"", "]")
+            val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
+            val attendanceGson = gson.fromJson(json, AttendanceGson::class.java)
+            val attendance = Attendance(attendanceGson.subjectAttendance, attendanceGson.totalAttendance[0])
+            return attendance
         } catch (e: Exception) {
             return null
         }

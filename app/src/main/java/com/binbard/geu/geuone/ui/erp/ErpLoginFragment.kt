@@ -11,7 +11,7 @@ import com.binbard.geu.geuone.databinding.FragmentErpLoginBinding
 
 class ErpLoginFragment : Fragment() {
     private lateinit var binding: FragmentErpLoginBinding
-    private lateinit var erpViewModel: ErpViewModel
+    private lateinit var evm: ErpViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -20,8 +20,15 @@ class ErpLoginFragment : Fragment() {
     ): View? {
         binding = FragmentErpLoginBinding.inflate(inflater, container, false)
 
-        erpViewModel = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
+        evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
+
+        binding.etId.doOnTextChanged { text, start, before, count ->
+            evm.loginId.value = text.toString()
+        }
+        binding.etPass.doOnTextChanged { text, start, before, count ->
+            evm.loginPass.value = text.toString()
+        }
 
         binding.btLogin.setOnClickListener {
 
@@ -30,6 +37,7 @@ class ErpLoginFragment : Fragment() {
 
             val id = binding.etId.text.toString()
             val pass = binding.etPass.text.toString()
+
             val erpCacheHelper = ErpCacheHelper(requireContext())
             if (id == "") {
                 binding.etId.error = "Please enter your ID"
@@ -41,11 +49,17 @@ class ErpLoginFragment : Fragment() {
             if (id != "" && pass != "") {
                 erpCacheHelper.saveStudentId(id)
                 erpCacheHelper.savePassword(pass)
-                erpViewModel.erpRepository!!.preLogin(erpViewModel)
+                evm.erpRepository!!.preLogin(evm)
             }
 
         }
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.etId.setText(evm.loginId.value)
+        binding.etPass.setText(evm.loginPass.value)
     }
 }

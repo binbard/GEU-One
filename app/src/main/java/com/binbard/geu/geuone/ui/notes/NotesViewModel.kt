@@ -40,13 +40,8 @@ class NotesViewModel(application: Application): AndroidViewModel(application) {
         return false
     }
 
-    fun gotoPath(path: String) {
+    private fun gotoPath(path: String) {
         notes.value = notes.value!!.gotoPath(path)
-    }
-
-    fun notesCount(): Int{
-        if(notes.value == null) return 0
-        return notes.value!!.children.size
     }
 
     init{
