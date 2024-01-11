@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/tvStuName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:maxWidth="200dp"
+        android:text="David Singh Rolson"
+        android:textAllCaps="true"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvStuId"
+        android:layout_width="141dp"
+        android:layout_height="23dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:minWidth="150dp"
+        android:text="20219330"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvStuName" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/tvStuImg"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="2dp"
+        android:padding="2dp"
+        android:scaleType="centerCrop"
+        android:src="@android:drawable/btn_star_big_on"
+        android:strokeWidth="4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvStuName"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
+        app:strokeColor="@color/material_dynamic_secondary50"
+        app:strokeWidth="1dp" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvStuImg" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

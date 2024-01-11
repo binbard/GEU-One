@@ -1,7 +1,6 @@
 package com.binbard.geu.geuone.ui.feed
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
@@ -19,14 +18,14 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
     }
     val feedText: LiveData<String> = _text
 
-    var someError = MutableLiveData<String>().apply {
+    var comments = MutableLiveData<String>().apply {
         value = ""
     }
 
     private val _feedList = MutableLiveData<List<Feed>>()
     val feedList: LiveData<List<Feed>> = _feedList
 
-    private lateinit var repository: FeedRepository
+    private var repository: FeedRepository
 
     init{
         val feedDao = AppDatabase.getInstance(application).feedDao()
@@ -66,18 +65,18 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
         try{
             val response = client.newCall(request).execute()
             if (!response.isSuccessful) {
-                someError.postValue("Could not fetch Feeds")
+                comments.postValue("Could not fetch Feeds")
                 return ""
             }
             return response.body?.string() ?: ""
         } catch (e: UnknownHostException) {
-            someError.postValue("No Internet Connection")
+            comments.postValue("No Internet Connection")
             return ""
         } catch (e: IOException) {
-            someError.postValue("IO Error")
+            comments.postValue("IO Error")
             return ""
         } catch (e: Exception) {
-            someError.postValue("Something went wrong")
+            comments.postValue("Something went wrong")
             return ""
         }
 

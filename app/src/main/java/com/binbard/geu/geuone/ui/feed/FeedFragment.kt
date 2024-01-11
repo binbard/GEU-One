@@ -32,7 +32,7 @@ class FeedFragment: Fragment() {
             rvFeed.adapter = FeedRecyclerAdapter(it)
         }
 
-        feedViewModel.someError.observe(viewLifecycleOwner) {
+        feedViewModel.comments.observe(viewLifecycleOwner) {
             if(!it.isEmpty()){
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             }

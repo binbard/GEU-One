@@ -2,151 +2,15 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <LinearLayout
-        android:id="@+id/standard_side_sheet"
-        style="@style/Widget.Material3.SideSheet"
-        android:layout_width="256dp"
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:gravity="start"
-        android:orientation="vertical"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="232dp"
-            android:layout_height="84dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingLeft="10dp">
-
-            <TextView
-                android:id="@+id/tvStuName"
-                android:layout_width="151dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:gravity="center_vertical"
-                android:minWidth="180dp"
-                android:text="David Singh Rolson"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvStuId"
-                android:layout_width="141dp"
-                android:layout_height="27dp"
-                android:gravity="center_vertical"
-                android:minWidth="150dp"
-                android:text="20219330"
-                android:textSize="14sp"
-                android:textStyle="italic"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvStuName" />
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/tvStuImg"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="20dp"
-                android:scaleType="centerCrop"
-                android:src="@android:drawable/btn_star_big_on"
-                app:layout_constraintStart_toEndOf="@+id/tvStuName"
-                app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
-                app:strokeWidth="1dp" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/divider" />
-
-
-        <TextView
-            android:id="@+id/btnStudent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:minHeight="48dp"
-            android:paddingLeft="10dp"
-            android:text="Student"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/btnAttendance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:minHeight="48dp"
-            android:paddingLeft="10dp"
-            android:text="Attendance"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/btnTimetable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:minHeight="48dp"
-            android:paddingLeft="10dp"
-            android:text="Timetable"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/btnSyllabus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:minHeight="48dp"
-            android:paddingLeft="10dp"
-            android:text="Syllabus"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/btnExam"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:minHeight="48dp"
-            android:paddingLeft="10dp"
-            android:text="Exam"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/btnMarks"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:minHeight="48dp"
-            android:paddingLeft="10dp"
-            android:text="Marks"
-            android:textSize="20sp" />
-    </LinearLayout>
+        app:headerLayout="@layout/erp_sidenav_header"
+        app:menu="@menu/erp_sidenav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

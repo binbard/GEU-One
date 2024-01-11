@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/item_erp_student"
+        android:icon="@drawable/ic_folder_with_files"
+        android:title="Student" />
+    <item
+        android:id="@+id/item_erp_attendance"
+        android:icon="@drawable/ic_folder_with_files"
+        android:title="Attendance" />
+    <item
+        android:id="@+id/item_erp_timetable"
+        android:icon="@drawable/ic_folder_with_files"
+        android:title="Timetable" />
+    <item
+        android:id="@+id/item_erp_syllabus"
+        android:icon="@drawable/ic_folder_with_files"
+        android:title="Syllabus" />
+    <item
+        android:id="@+id/item_erp_marks"
+        android:icon="@drawable/ic_folder_with_files"
+        android:title="Marks" />
+    <item
+        android:id="@+id/item_erp_exam"
+        android:icon="@drawable/ic_folder_with_files"
+        android:title="Exam" />
+</menu>

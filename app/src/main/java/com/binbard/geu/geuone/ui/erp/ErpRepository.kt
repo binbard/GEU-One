@@ -73,7 +73,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
                 erpCacheHelper.saveLocalAttendanceData(attendance)
                 Log.d("ErpRepository", "Attendance Synced")
             } else{
-                Log.d("ErpRepository", "Failed to Sync Attendance")
+//                Log.d("ErpRepository", "Failed to Sync Attendance")
                 erpViewModel.comments.postValue("Failed to Sync Attendance")
             }
         }

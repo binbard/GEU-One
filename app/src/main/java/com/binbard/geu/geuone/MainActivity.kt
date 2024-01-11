@@ -73,6 +73,8 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
         supportActionBar?.show()
 
         bottomNavController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
             when (destination.id) {
                 R.id.bottomNavFeed -> {
                     changeToolbar(findViewById(R.id.toolbarFeed))
@@ -85,6 +87,7 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
                 }
                 R.id.bottomNavErp -> {
                     changeToolbar(findViewById(R.id.toolbarErp))
+                    binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED)
                 }
                 R.id.erpLoginFragment -> {
                     supportActionBar?.hide()
