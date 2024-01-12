@@ -1,27 +1,21 @@
 package com.binbard.geu.geuone.ui.erp.menu
 
-import android.app.ProgressDialog
 import android.os.Bundle
-import android.os.Handler
 import android.text.SpannableString
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.ProgressBar
+import android.view.*
 import android.widget.TableRow
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.databinding.FragmentErpAttendanceBinding
 import com.binbard.geu.geuone.ui.erp.ErpViewModel
+import com.google.android.material.navigation.NavigationView
 import java.util.*
 
 
-class ErpAttendanceFragment: Fragment() {
+class ErpAttendanceFragment : Fragment() {
     private lateinit var binding: FragmentErpAttendanceBinding
     private lateinit var evm: ErpViewModel
 
@@ -34,14 +28,18 @@ class ErpAttendanceFragment: Fragment() {
 
         evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
+        if(!evm.isCacheEnabled){
+//            Toast.makeText(requireContext(), "Cache Disabled", Toast.LENGTH_SHORT).show()
+            evm.attendanceData.value = null
+        }
 
-        if(evm.attendanceData.value==null){
+        if (evm.attendanceData.value == null) {
             binding.tvAttendance.visibility = View.GONE
             binding.progressBar.visibility = View.VISIBLE
         }
 
         evm.attendanceData.observe(viewLifecycleOwner) {
-            if(it == null){
+            if (it == null) {
                 evm.erpRepository?.fetchAttendance(evm)
                 return@observe
             }
@@ -54,36 +52,53 @@ class ErpAttendanceFragment: Fragment() {
             val totalPercentage = it.totalAttendance.totalPercentage
 
             val txt = "Total Attendance: $totalPercentage%\nFrom $dateFrom to $dateTo"
-            val spannableString = SpannableString(txt)
-            spannableString.setSpan(android.text.style.RelativeSizeSpan(1.4f),0, txt.indexOf("\n"), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-            spannableString.setSpan(android.text.style.UnderlineSpan(),0, txt.indexOf("\n"), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-            spannableString.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD),0, txt.indexOf("\n"), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-            spannableString.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD),txt.indexOf(":")+2, txt.indexOf(":")+2+totalPercentage.toString().length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-            binding.tvAttendance.text = spannableString
+            binding.tvAttendance.text = getSpannableString(txt)
 
             binding.tblAttendance.removeAllViews()
 
-            val attendanceList = it.subjectAttendance
-            var count=0
-
+            var count = 0
             val separator = View(context)
             separator.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1)
             separator.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
             binding.tblAttendance.addView(separator)
 
-            val header = Helper.createAttendanceRow(requireContext(),count, null)
+            val header = Helper.createAttendanceRow(requireContext(), count, null)
             header.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
             binding.tblAttendance.addView(header)
 
-            for(attendance in attendanceList){
-                val row = Helper.createAttendanceRow(requireContext(),++count, attendance)
+            for (attendance in it.subjectAttendance) {
+                val row = Helper.createAttendanceRow(requireContext(), ++count, attendance)
                 binding.tblAttendance.addView(row)
             }
 
         }
 
         return binding.root
+    }
+
+    private fun getSpannableString(txt: String): SpannableString {
+        val spannableString = SpannableString(txt)
+
+        spannableString.setSpan(
+            android.text.style.RelativeSizeSpan(1.4f),
+            0,
+            txt.indexOf("\n"),
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        spannableString.setSpan(
+            android.text.style.UnderlineSpan(),
+            0,
+            txt.indexOf("\n"),
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        spannableString.setSpan(
+            android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+            0,
+            txt.indexOf("\n"),
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return spannableString
     }
 
 }

@@ -13,7 +13,6 @@ import java.net.UnknownHostException
 object FeedNetUtils {
 
     fun makeHttpRequest(url: String): Pair<StatusCode,String> {
-        Log.d("BIN_X", "HALO FeedNetUtils.makeHttpRequest: $url")
         val client = OkHttpClient()
         val request = Request.Builder().url(url).build()
 

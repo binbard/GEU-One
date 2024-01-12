@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.geuone.databinding.FragmentErpLoginBinding
+import com.binbard.geu.geuone.models.LoginStatus
 
 class ErpLoginFragment : Fragment() {
     private lateinit var binding: FragmentErpLoginBinding
@@ -50,8 +52,20 @@ class ErpLoginFragment : Fragment() {
                 erpCacheHelper.saveStudentId(id)
                 erpCacheHelper.savePassword(pass)
                 evm.erpRepository!!.preLogin(evm)
+                binding.btLogin.isEnabled = false
+                binding.etId.isEnabled = false
+                binding.etPass.isEnabled = false
+                binding.pbErpLogin.visibility = View.VISIBLE
             }
+        }
 
+        evm.loginStatus.observe(viewLifecycleOwner) {
+            if (it == LoginStatus.NOT_LOGGED_IN) {
+                binding.btLogin.isEnabled = true
+                binding.etId.isEnabled = true
+                binding.etPass.isEnabled = true
+                binding.pbErpLogin.visibility = View.GONE
+            }
         }
 
         return binding.root

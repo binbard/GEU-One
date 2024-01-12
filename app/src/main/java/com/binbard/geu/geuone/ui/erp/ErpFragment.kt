@@ -36,6 +36,7 @@ class ErpFragment : Fragment(){
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_erp_top, menu)
+                menu.findItem(R.id.item_erp_top_cache).isChecked = evm.isCacheEnabled
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -44,12 +45,13 @@ class ErpFragment : Fragment(){
                         Toast.makeText(requireContext(), "Profile", Toast.LENGTH_SHORT).show()
                         true
                     }
-                    R.id.item_erp_top_feedback -> {
-                        Toast.makeText(requireContext(), "Feedback", Toast.LENGTH_SHORT).show()
+                    R.id.item_erp_top_cache -> {
+                        menuItem.isChecked = !evm.isCacheEnabled
+                        evm.isCacheEnabled = !evm.isCacheEnabled
                         true
                     }
                     R.id.item_erp_top_logout -> {
-                        Toast.makeText(requireContext(), "Logout", Toast.LENGTH_SHORT).show()
+                        evm.loginStatus.value = LoginStatus.LOGOUT
                         true
                     }
                     else -> false

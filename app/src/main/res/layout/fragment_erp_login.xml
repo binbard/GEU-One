@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     android:paddingBottom="100dp">
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/pbErpLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="274dp"

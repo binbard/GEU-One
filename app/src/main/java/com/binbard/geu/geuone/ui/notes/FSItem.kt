@@ -6,7 +6,6 @@ data class FSItem(
     val children: MutableSet<FSItem> = mutableSetOf(),
     val parent: FSItem? = null
 ){
-
     fun add(path: String, url: String){
         val parts = path.split("/")
         var current = getRoot()
