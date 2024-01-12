@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.databinding.FragmentResBinding
 
 class ResFragment: Fragment() {
@@ -21,6 +23,8 @@ class ResFragment: Fragment() {
         resViewModel.resText.observe(viewLifecycleOwner) {
             binding.textRes.text = it
         }
+
+        requireActivity().findViewById<ImageView>(R.id.imgErpMenu).setOnClickListener(null)
 
         return binding.root
     }

@@ -3,25 +3,32 @@
     <item
         android:id="@+id/item_erp_student"
         android:icon="@drawable/ic_folder_with_files"
+        android:checkable="true"
+        android:checked="true"
         android:title="Student" />
     <item
         android:id="@+id/item_erp_attendance"
         android:icon="@drawable/ic_folder_with_files"
+        android:checkable="true"
         android:title="Attendance" />
     <item
         android:id="@+id/item_erp_timetable"
         android:icon="@drawable/ic_folder_with_files"
+        android:checkable="true"
         android:title="Timetable" />
     <item
         android:id="@+id/item_erp_syllabus"
         android:icon="@drawable/ic_folder_with_files"
+        android:checkable="true"
         android:title="Syllabus" />
     <item
         android:id="@+id/item_erp_marks"
         android:icon="@drawable/ic_folder_with_files"
+        android:checkable="true"
         android:title="Marks" />
     <item
         android:id="@+id/item_erp_exam"
         android:icon="@drawable/ic_folder_with_files"
+        android:checkable="true"
         android:title="Exam" />
 </menu>

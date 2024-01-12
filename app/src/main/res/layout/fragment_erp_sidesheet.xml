@@ -11,6 +11,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/erp_sidenav_header"
-        app:menu="@menu/erp_sidenav_menu" />
+        app:menu="@menu/menu_erp_sidenav" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

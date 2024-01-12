@@ -1,30 +1,26 @@
 package com.binbard.geu.geuone.ui.erp
 
 import android.os.Bundle
-import android.text.TextUtils.replace
-import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.GravityCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.geuone.R
-import androidx.fragment.app.Fragment
 import com.binbard.geu.geuone.databinding.FragmentErpBinding
-import com.binbard.geu.geuone.models.ErpPage
 import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.ui.Snack
 import com.binbard.geu.geuone.ui.erp.menu.ErpAttendanceFragment
 import com.binbard.geu.geuone.ui.erp.menu.ErpStudentFragment
 import com.binbard.geu.geuone.utils.BitmapHelper
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.sidesheet.SideSheetDialog
 
 
-class ErpFragment : Fragment() {
+class ErpFragment : Fragment(){
     private lateinit var binding: FragmentErpBinding
     private lateinit var evm: ErpViewModel
 
@@ -35,26 +31,54 @@ class ErpFragment : Fragment() {
 
         evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
+        val menuHost: MenuHost = requireActivity()
+
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_erp_top, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.item_erp_top_profile -> {
+                        Toast.makeText(requireContext(), "Profile", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    R.id.item_erp_top_feedback -> {
+                        Toast.makeText(requireContext(), "Feedback", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    R.id.item_erp_top_logout -> {
+                        Toast.makeText(requireContext(), "Logout", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+
         if(evm.loginStatus.value==LoginStatus.LOGGED_IN){
             setupErpFeatures()
-            if(childFragmentManager.fragments.size==0) showErpPage(ErpPage.STUDENT)
+            if(childFragmentManager.fragments.size==0) showErpPage(R.id.item_erp_student)
         }
 
         evm.loginStatus.observe(viewLifecycleOwner) {
             if (it == LoginStatus.UNKNOWN) {
                 evm.loginStatus.value = evm.erpCacheHelper?.getLoginStatus()
             } else if (it == LoginStatus.PREV_LOGGED_IN) {
-                showErpPage(ErpPage.STUDENT)
+                showErpPage(R.id.item_erp_student)
                 evm.erpCacheHelper?.loadLocalStudentData(evm)
                 evm.erpRepository?.preLogin(evm)
                 setupErpFeatures()
             } else if (it == LoginStatus.PREV_LOGGED_OUT) {
                 evm.loginStatus.value = LoginStatus.NOT_LOGGED_IN
-                showErpPage(ErpPage.LOGIN)
+                showErpPage(0)
                 setupErpFeatures(unset = true)
             } else if (it == LoginStatus.LOGIN_SUCCESS) {
                 evm.loginStatus.value = LoginStatus.LOGGED_IN
-                if(evm.currentErpPage.value==ErpPage.LOGIN) showErpPage(ErpPage.STUDENT)                // Redirect to student page
+                setupErpFeatures()
+                if(evm.currentErpPage.value==0) showErpPage(R.id.item_erp_student)      // Redirect to student page
                 evm.erpCacheHelper!!.saveLoginStatus(LoginStatus.PREV_LOGGED_IN)
                 evm.erpRepository?.syncStudentData(evm)
             } else if (it == LoginStatus.LOGIN_FAILED) {
@@ -77,7 +101,7 @@ class ErpFragment : Fragment() {
                 evm.erpCacheHelper!!.saveLoginStatus(LoginStatus.PREV_LOGGED_OUT)
                 evm.erpCacheHelper!!.clearLocalData()
                 setupErpFeatures(unset = true)
-                showErpPage(ErpPage.LOGIN)
+                showErpPage(0)
                 evm.loginStatus.value = LoginStatus.NOT_LOGGED_IN
             }
         }
@@ -89,14 +113,14 @@ class ErpFragment : Fragment() {
         return binding.root
     }
 
-    private fun showErpPage(erpPage: ErpPage) {
-        evm.currentErpPage.value = erpPage
+    private fun showErpPage(pageId: Int) {
+        evm.currentErpPage.value = pageId
         childFragmentManager.clearBackStack("xyz")
         val transaction = childFragmentManager.beginTransaction()
-        when(erpPage){
-            ErpPage.LOGIN -> transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
-            ErpPage.STUDENT -> transaction.replace(R.id.fragmentContainerView2, ErpStudentFragment())
-            ErpPage.ATTENDANCE -> transaction.replace(R.id.fragmentContainerView2, ErpAttendanceFragment())
+        when(pageId){
+            0 -> transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
+            R.id.item_erp_student -> transaction.replace(R.id.fragmentContainerView2, ErpStudentFragment())
+            R.id.item_erp_attendance -> transaction.replace(R.id.fragmentContainerView2, ErpAttendanceFragment())
             else -> transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
         }
         transaction.commit()
@@ -107,15 +131,11 @@ class ErpFragment : Fragment() {
 
         val drawerLayout: DrawerLayout = requireActivity().findViewById(R.id.drawer_layout)
 
-        drawerLayout.findViewById<NavigationView>(R.id.nav_view).setNavigationItemSelectedListener { menuItem ->
-            drawerLayout.closeDrawers()
-            when (menuItem.itemId) {
-                R.id.item_erp_student -> showErpPage(ErpPage.STUDENT)
-                R.id.item_erp_attendance -> showErpPage(ErpPage.ATTENDANCE)
-                R.id.item_erp_timetable -> showErpPage(ErpPage.STUDENT)
-                else -> showErpPage(ErpPage.STUDENT)
-            }
-            true
+        if (unset) {
+            btnErpMenu.setOnClickListener(null)
+            requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout).setDrawerLockMode(
+                DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            return
         }
 
         btnErpMenu.setOnClickListener{
@@ -126,11 +146,15 @@ class ErpFragment : Fragment() {
             }
         }
 
-        if (unset) {
-            btnErpMenu.setOnClickListener(null)
-            requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout).setDrawerLockMode(
-                DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-            return
+        drawerLayout.findViewById<NavigationView>(R.id.nav_view).setNavigationItemSelectedListener { menuItem ->
+            drawerLayout.closeDrawers()
+            when (menuItem.itemId) {
+                R.id.item_erp_student -> showErpPage(R.id.item_erp_student)
+                R.id.item_erp_attendance -> showErpPage(R.id.item_erp_attendance)
+                R.id.item_erp_timetable -> showErpPage(R.id.item_erp_student)
+                else -> showErpPage(R.id.item_erp_student)
+            }
+            true
         }
 
         evm.erpStudentImg.observe(viewLifecycleOwner) {

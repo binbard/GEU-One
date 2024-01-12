@@ -7,6 +7,15 @@ enum class FetchStatus {
     FULL_FETCHED,
 }
 
+enum class StatusCode{
+    NA,
+    SUCCESS,
+    FAILED,
+    NO_INTERNET,
+    IO_ERROR,
+    UNKNOWN,
+}
+
 enum class LoginStatus {
     LOGIN_SUCCESS,
     LOGIN_FAILED,

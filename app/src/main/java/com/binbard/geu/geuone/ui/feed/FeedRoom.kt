@@ -49,16 +49,16 @@ abstract class AppDatabase : RoomDatabase() {
 
 class FeedRepository(private val feedDao: FeedDao) {
 
-    suspend fun getAllFeeds(): List<FeedEntity> {
+    fun getAllFeeds(): List<FeedEntity> {
         return feedDao.getAllFeeds()
     }
 
-    suspend fun getSomeFeeds(): List<FeedEntity> {
+    fun getSomeFeeds(): List<FeedEntity> {
         return feedDao.getSomeFeeds()
     }
 
-    suspend fun insertFeeds(feeds: List<FeedEntity>) {
-        feedDao.insertFeeds(feeds)
+    fun insertFeeds(feeds: List<FeedEntity>) {
+        feedDao.insertFeeds(feeds.mapIndexed { index, feedEntity -> feedEntity.copy(id = index.toLong()) })
     }
 }
 

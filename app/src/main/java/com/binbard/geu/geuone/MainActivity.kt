@@ -3,12 +3,13 @@ package com.binbard.geu.geuone
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -54,24 +55,6 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
             )
         )
 
-        val toolbarFeed: Toolbar = findViewById(R.id.toolbarFeed)
-        val feedSearchView: SearchView = toolbarFeed.findViewById(R.id.feedSearchView)
-        feedSearchView.queryHint = "Search Feeds"
-        feedSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                Toast.makeText(this@MainActivity, "Search", Toast.LENGTH_SHORT).show()
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return true
-            }
-        })
-
-        supportActionBar?.hide()
-        setSupportActionBar(findViewById(R.id.toolbarFeed))
-        supportActionBar?.show()
-
         bottomNavController.addOnDestinationChangedListener { _, destination, _ ->
             binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
@@ -80,7 +63,7 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
                     changeToolbar(findViewById(R.id.toolbarFeed))
                 }
                 R.id.bottomNavRes -> {
-                    changeToolbar(findViewById(R.id.toolbarErp))
+                    changeToolbar(findViewById(R.id.toolbarRes))
                 }
                 R.id.bottomNavNotes -> {
                     changeToolbar(findViewById(R.id.toolbarNotes))
@@ -107,22 +90,6 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
         bottomNavView.visibility = View.VISIBLE
         supportActionBar?.show()
     }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_settings -> {
-                erpViewModel.loginStatus.value = LoginStatus.LOGOUT
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
-    }
-
 
     override fun updateTitle(title: String) {
         supportActionBar?.title = title

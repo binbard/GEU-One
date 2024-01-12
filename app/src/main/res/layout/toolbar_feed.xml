@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:iconifiedByDefault="false"
-            android:queryHint="Search..."
+            app:queryHint="Search Feeds"
             app:iconifiedByDefault="false"
             app:searchHintIcon="@drawable/ic_search"
             app:queryBackground="@android:color/transparent"/>
