@@ -23,7 +23,7 @@ class FeedFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentFeedBinding.inflate(inflater, container, false)
 
         fvm = ViewModelProvider(requireActivity())[FeedViewModel::class.java]

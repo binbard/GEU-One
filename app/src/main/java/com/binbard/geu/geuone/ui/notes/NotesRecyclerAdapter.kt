@@ -46,7 +46,7 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
                 nvm.gotoNextDir(item.name)
             }
             else{
-                PdfHelper.openOrDownloadPdf(context,item.url!!, item.getFileName())
+                PdfUtils.openOrDownloadPdf(context,item.url!!, item.getFileName())
                 changeAlpha(holder.imgNoteItem, item.getFileName()+".pdf")
             }
         }
@@ -71,12 +71,12 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
-        context.unregisterReceiver(PdfHelper.onComplete)
+        context.unregisterReceiver(PdfUtils.onComplete)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        context.registerReceiver(PdfHelper.onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+        context.registerReceiver(PdfUtils.onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
     }
 
 }
