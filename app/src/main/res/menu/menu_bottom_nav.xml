@@ -4,18 +4,18 @@
 
     <item
         android:id="@+id/bottomNavFeed"
-        android:icon="@android:drawable/btn_star"
+        android:icon="@drawable/ic_feeds"
         android:title="Feed" />
     <item
         android:id="@+id/bottomNavRes"
-        android:icon="@android:drawable/btn_star_big_on"
+        android:icon="@drawable/ic_book"
         android:title="Res" />
     <item
         android:id="@+id/bottomNavNotes"
-        android:icon="@android:drawable/checkbox_on_background"
+        android:icon="@drawable/ic_notes"
         android:title="Notes" />
     <item
         android:id="@+id/bottomNavErp"
-        android:icon="@android:drawable/ic_delete"
+        android:icon="@drawable/ic_educap"
         android:title="ERP" />
 </menu>
