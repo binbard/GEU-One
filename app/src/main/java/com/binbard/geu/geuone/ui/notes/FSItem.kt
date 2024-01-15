@@ -21,7 +21,7 @@ data class FSItem(
                 }
             }
             if(!found){
-                val newChild = FSItem(part, "", mutableSetOf(), current)
+                val newChild = FSItem(part, null, mutableSetOf(), current)
                 current.children.add(newChild)
                 current = newChild
             }
@@ -64,7 +64,7 @@ data class FSItem(
     }
 
     fun isFolder(): Boolean {
-        return url == ""
+        return url == null || url == ""
     }
 
     fun getFileName(): String {
@@ -81,6 +81,20 @@ data class FSItem(
 
     override fun hashCode(): Int {
         return name.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as FSItem
+
+        if (name != other.name) return false
+        if (url != other.url) return false
+        if (children != other.children) return false
+        if (parent != other.parent) return false
+
+        return true
     }
 
 }

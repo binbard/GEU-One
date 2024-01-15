@@ -53,7 +53,7 @@ class ErpAttendanceFragment : Fragment() {
 
             val txt = "Total Attendance: $totalPercentage%\nFrom $dateFrom to $dateTo"
 
-            binding.tvAttendance.text = getSpannableString(txt)
+            binding.tvAttendance.text = getSpannableAttendanceTitle(txt)
 
             binding.tblAttendance.removeAllViews()
 
@@ -77,7 +77,7 @@ class ErpAttendanceFragment : Fragment() {
         return binding.root
     }
 
-    private fun getSpannableString(txt: String): SpannableString {
+    private fun getSpannableAttendanceTitle(txt: String): SpannableString {
         val spannableString = SpannableString(txt)
 
         spannableString.setSpan(

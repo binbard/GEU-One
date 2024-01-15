@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Tasks
 
 

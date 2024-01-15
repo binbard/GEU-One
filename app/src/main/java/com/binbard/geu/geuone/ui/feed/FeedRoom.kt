@@ -69,4 +69,3 @@ fun FeedEntity.toFeed(): Feed {
 fun Feed.toFeedEntity(): FeedEntity {
     return FeedEntity(link = this.link, title = this.title, date = this.date)
 }
-

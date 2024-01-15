@@ -26,10 +26,14 @@ class ErpFragment : Fragment(){
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentErpBinding.inflate(inflater, container, false)
 
         evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
+
+        if(evm.loginStatus.value==LoginStatus.NOT_LOGGED_IN){
+            showErpPage(0)
+        }
 
         val menuHost: MenuHost = requireActivity()
 
@@ -153,7 +157,6 @@ class ErpFragment : Fragment(){
             when (menuItem.itemId) {
                 R.id.item_erp_student -> showErpPage(R.id.item_erp_student)
                 R.id.item_erp_attendance -> showErpPage(R.id.item_erp_attendance)
-                R.id.item_erp_timetable -> showErpPage(R.id.item_erp_student)
                 else -> showErpPage(R.id.item_erp_student)
             }
             true

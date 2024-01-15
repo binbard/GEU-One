@@ -125,6 +125,14 @@ object PdfUtils{
         ActivityCompat.requestPermissions(context as Activity, arrayOf(permission), requestCode)
     }
 
+    fun clearAllFiles(context: Context){
+        val folder = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), context.getString(
+            R.string.app_name))
+        if(folder.exists()){
+            folder.deleteRecursively()
+        }
+    }
+
     val onComplete: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val fileName = intent.getStringExtra(DownloadManager.COLUMN_TITLE)
