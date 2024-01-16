@@ -13,7 +13,8 @@ enum class StatusCode{
     FAILED,
     NO_INTERNET,
     IO_ERROR,
-    UNKNOWN,
+    UNKNOWN_ERROR,
+    DONE,
 }
 
 enum class LoginStatus {

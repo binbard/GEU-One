@@ -88,6 +88,18 @@ class ErpAttendanceFragment : Fragment() {
         )
         spannableString.setSpan(
             android.text.style.UnderlineSpan(),
+            txt.indexOf(":") + 2,
+            txt.indexOf("\n") - 1,
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        spannableString.setSpan(
+            android.text.style.ForegroundColorSpan(resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text)),
+            txt.indexOf("\n"),
+            txt.length,
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        spannableString.setSpan(
+            android.text.style.ForegroundColorSpan(resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text)),
             0,
             txt.indexOf("\n"),
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -96,6 +108,12 @@ class ErpAttendanceFragment : Fragment() {
             android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
             0,
             txt.indexOf("\n"),
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        spannableString.setSpan(
+            android.text.style.ForegroundColorSpan(resources.getColor(com.google.android.material.R.color.m3_ref_palette_dynamic_neutral70)),
+            txt.indexOf("\n"),
+            txt.length,
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         return spannableString

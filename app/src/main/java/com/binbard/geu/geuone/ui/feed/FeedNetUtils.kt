@@ -1,5 +1,6 @@
 package com.binbard.geu.geuone.ui.feed
 
+import android.text.TextUtils.replace
 import android.util.Log
 import com.binbard.geu.geuone.models.StatusCode
 import okhttp3.OkHttpClient
@@ -9,6 +10,8 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.StringReader
 import java.net.UnknownHostException
+import java.text.SimpleDateFormat
+import java.util.*
 
 object FeedNetUtils {
 
@@ -27,51 +30,30 @@ object FeedNetUtils {
         } catch (e: IOException) {
             return Pair(StatusCode.IO_ERROR, "")
         } catch (e: Exception) {
-            return Pair(StatusCode.UNKNOWN, "")
+            return Pair(StatusCode.UNKNOWN_ERROR, "")
         }
 
     }
 
-    fun parseXml(xmlData: String): List<Feed> {
+    fun parsePostsJson(jsonData: String): List<Feed> {
         val dataList = mutableListOf<Feed>()
+        // jsonData: {"status":"ok","count":2,"count_total":773,"pages":387,"posts":[{"id":4257,"slug":"notice-5th-semester-mini-project-external-evaluation-schedule-2","date":"2024-01-10 15:31:25"},{"id":4249,"slug":"debarred-students-time-table-of-b-tech-cse-iiird-vth-semester-2023-24","date":"2024-01-04 20:19:20"}]}
+        val posts = jsonData.substringAfter("posts\":[{").substringBefore("}]").split("},{")
+        for (post in posts) {
+            val id = post.substringAfter("id\":").substringBefore(",").toInt()
+            val slug = post.substringAfter("slug\":\"").substringBefore("\"")
+            val title = post.substringAfter("title\":\"").substringBefore("\"")
+            val date = post.substringAfter("date\":\"").substringBefore("\"")
 
-        val factory = XmlPullParserFactory.newInstance()
-        val parser = factory.newPullParser()
-        parser.setInput(StringReader(xmlData))
-
-        var eventType = parser.eventType
-        var feedLink = ""
-
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            when (eventType) {
-                XmlPullParser.START_TAG -> {
-                    when (parser.name) {
-                        "url" -> feedLink = ""
-                        "loc" -> feedLink = parser.nextText()
-                    }
-                }
-                XmlPullParser.END_TAG -> {
-                    if (parser.name == "url") {
-                        val arr = feedLink.split("/")
-                        try{
-                            val feedDate = Feed.FDate(arr[6].toInt(), arr[5].toInt(), arr[4].toInt())
-
-                            val slug = arr[arr.size-2]
-                            val feedTitle = slug.split("-").map { it.capitalize() }.joinToString(" ")
-
-                            dataList.add(0, Feed(feedLink, feedTitle, feedDate))
-                        } catch (e: Exception) {
-                            Log.e("BIN_X_ERROR", "FeedViewModel.parseXml: $e")
-                            break
-                        }
-
-                    } else if (parser.name == "urlset") {
-                        // End of the document
-                    }
-                }
+            val mTitle = title.replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {     // Decode unicode
+                String(Character.toChars(it.groupValues[1].toInt(radix = 16)))
             }
-            eventType = parser.next()
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT)
+            val feedDate = sdf.parse(date) ?: continue
+
+            dataList.add(Feed(id, slug, mTitle, feedDate))
         }
+
         return dataList
     }
 }

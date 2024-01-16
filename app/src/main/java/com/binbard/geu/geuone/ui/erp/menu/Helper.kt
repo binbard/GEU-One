@@ -52,7 +52,6 @@ object Helper {
         if(count!=0) percentage.setTypeface(null, android.graphics.Typeface.BOLD)
         present.setPadding(6, 0, 6, 0)
         employee.setPadding(6, 0, 6, 0)
-        if(count!=0) employee.setTypeface(null, android.graphics.Typeface.BOLD)
 
         counter.textSize = 17f
         subject.textSize = 17f
@@ -80,6 +79,11 @@ object Helper {
             present.text = "${attendance.totalPresent}/${attendance.totalLecture}"
             subjectCode.text = attendance.subjectCode
             employee.text = attendance.employee
+
+            counter.setTextColor(context.resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text))
+            if(subject.text.endsWith("(L)")) subject.setTextColor(context.resources.getColor(com.google.android.material.R.color.m3_ref_palette_dynamic_neutral50))
+            else subject.setTextColor(context.resources.getColor(com.google.android.material.R.color.m3_ref_palette_dynamic_neutral60))
+            percentage.setTextColor(context.resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text))
         }
 
         row.addView(counter)

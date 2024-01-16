@@ -8,8 +8,14 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import android.widget.Toast
+import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.view.MenuCompat
+import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -33,6 +39,25 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_general_top, menu)
+                MenuCompat.setGroupDividerEnabled(menu, true)
+            }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when(menuItem.itemId){
+                    R.id.item_gen_settings -> {
+                        Toast.makeText(this@MainActivity, "Settings", Toast.LENGTH_SHORT).show()
+                    }
+                    R.id.item_gen_feedback -> {
+                        Toast.makeText(this@MainActivity, "Feedback", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                return true
+            }
+        })
+
 
         bottomNavView = binding.bottomNavView
         val bottomNavHost = supportFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
@@ -94,5 +119,18 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
     override fun updateTitle(title: String) {
         supportActionBar?.title = title
     }
+}
 
+fun Fragment.addMenuProvider(@MenuRes menuRes: Int, callback: (id: Int) -> Boolean) {
+    val menuProvider = object : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(menuRes, menu)
+        }
+        override fun onMenuItemSelected(menuItem: MenuItem) = callback(menuItem.itemId)
+    }
+    (requireActivity() as MenuHost).addMenuProvider(
+        menuProvider,
+        viewLifecycleOwner,
+        Lifecycle.State.RESUMED
+    )
 }

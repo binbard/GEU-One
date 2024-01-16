@@ -15,10 +15,10 @@ import com.binbard.geu.geuone.R
 import java.io.File
 import java.util.*
 
-class FeedRecyclerAdapter(private val feeds: List<Feed>) :
-    RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder>(), Filterable {
-
-    private val filteredFeeds = feeds.toMutableList()
+class FeedRecyclerAdapter() :
+    RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder>() {
+    private var feeds = mutableListOf<Feed>()
+    private val hostUrl = "https://csitgeu.in/wp/"
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvFeedTitle: TextView = itemView.findViewById(R.id.tvFeedTitle)
@@ -32,44 +32,23 @@ class FeedRecyclerAdapter(private val feeds: List<Feed>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val feed = filteredFeeds[position]
+        val feed = feeds[position]
         holder.tvFeedTitle.text = feed.title
-        holder.tvFeedDate.text = feed.date.diff()
+        holder.tvFeedDate.text = feed.date.toString()
 
         holder.itemView.setOnClickListener {
             val intent = CustomTabsIntent.Builder().build()
-            intent.launchUrl(it.context, feed.link.toUri())
+            intent.launchUrl(it.context, "$hostUrl${feed.slug}".toUri())
         }
     }
 
     override fun getItemCount(): Int {
-        return filteredFeeds.size
+        return feeds.size
     }
 
-    override fun getFilter(): Filter {
-        return object : Filter() {
-            override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val filteredList = mutableListOf<Feed>()
-                if (constraint == null || constraint.isEmpty()) {
-                    filteredList.addAll(feeds)
-                } else {
-                    val filterPattern = constraint.toString().lowercase().trim()
-                    for (feed in feeds) {
-                        if (feed.title.lowercase().contains(filterPattern)) {
-                            filteredList.add(feed)
-                        }
-                    }
-                }
-                val results = FilterResults()
-                results.values = filteredList
-                return results
-            }
-
-            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                filteredFeeds.clear()
-                filteredFeeds.addAll(results?.values as MutableList<Feed>)
-                notifyDataSetChanged()
-            }
-        }
+    fun addFeeds(feeds: List<Feed>) {
+        val startPos = this.feeds.size
+        this.feeds.addAll(feeds)
+        notifyItemRangeInserted(startPos, feeds.size)
     }
 }

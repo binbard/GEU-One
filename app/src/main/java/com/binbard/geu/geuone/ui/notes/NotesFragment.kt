@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.R
+import com.binbard.geu.geuone.addMenuProvider
 import com.binbard.geu.geuone.databinding.FragmentNotesBinding
 import com.binbard.geu.geuone.ui.feed.FeedFragment
 
@@ -77,6 +78,28 @@ class NotesFragment : Fragment() {
             titleListener = context
         } else {
             throw ClassCastException("$context must implement FragmentTitleListener")
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        addMenuProvider(R.menu.menu_erp_top) {
+            when (it) {
+                R.id.item_res_top_check-> {
+                    Toast.makeText(requireContext(), "Notes Upload", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.item_res_top_feedback -> {
+                    true
+                }
+                R.id.item_res_top_clearfiles -> {
+                    PdfUtils.clearAllFiles(requireContext())
+                    Toast.makeText(requireContext(), "Cleared All Notes", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> false
+            }
         }
     }
 
