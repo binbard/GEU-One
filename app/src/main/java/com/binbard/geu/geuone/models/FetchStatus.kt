@@ -1,19 +1,18 @@
 package com.binbard.geu.geuone.models
 
 enum class FetchStatus {
-    NOT_FETCHED,
-    LOCAL_FETCHED,
-    REMOTE_FETCHED,
-    FULL_FETCHED,
+    NA,
+    SUCCESS,
+    FAILED,
+    NO_NEW_DATA_FOUND,
+    NEW_DATA_FOUND,
+    DONE,
 }
 
 enum class StatusCode{
     NA,
     SUCCESS,
     FAILED,
-    NO_INTERNET,
-    IO_ERROR,
-    UNKNOWN_ERROR,
     DONE,
 }
 

@@ -16,7 +16,7 @@ class ErpMidtermMarksFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentErpMidtermMarksBinding.inflate(inflater, container, false)
 
         val evm: ErpViewModel = ViewModelProvider(requireActivity())[ErpViewModel::class.java]

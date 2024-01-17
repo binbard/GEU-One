@@ -3,6 +3,7 @@ package com.binbard.geu.geuone.ui.feed
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.binbard.geu.geuone.models.FetchStatus
 import com.binbard.geu.geuone.models.StatusCode
 
 class FeedViewModel: ViewModel() {
@@ -15,11 +16,11 @@ class FeedViewModel: ViewModel() {
         value = ""
     }
 
-    val fetchStatus = MutableLiveData<StatusCode>().apply {
-        value = StatusCode.NA
+    val fetchStatus = MutableLiveData<FetchStatus>().apply {
+        value = FetchStatus.NA
     }
 
-    val feedList = MutableLiveData<List<Feed>>()
+    val feeds = mutableListOf<Feed>()
 
     var feedHelper: FeedHelper? = null
     var feedRepository: FeedRepository? = null

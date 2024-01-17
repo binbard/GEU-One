@@ -4,53 +4,48 @@ import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.binbard.geu.geuone.models.FetchStatus
 import com.binbard.geu.geuone.models.StatusCode
 import kotlinx.coroutines.*
+import java.text.SimpleDateFormat
+import java.util.*
 
-class FeedHelper(private val fvm: FeedViewModel){
+object FeedHelper{
     private val hostUrl = "https://csitgeu.in/wp/"
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun fetchData() {
+    fun fetchData(fvm: FeedViewModel) {
         GlobalScope.launch(Dispatchers.IO) {
-            var cachedFeeds = fvm.feedRepository?.getSomeFeeds()
-            if (cachedFeeds?.isNotEmpty() == true) {
-                withContext(Dispatchers.Main) {
-                    fvm.feedList.value = cachedFeeds?.map { it.toFeed() }
-                }
-            }
+            val latestFeedDate = fvm.feedRepository?.getLatestFeedDate()
+            val sdf = SimpleDateFormat("yyyyMMdd", Locale.ROOT)
+            val latestDate = latestFeedDate?.let { sdf.format(it) }
 
-            var response =
-                FeedNetUtils.makeHttpRequest("$hostUrl?json=posts&exclude=attachments,author,categories,comment_count,comment_status,comments,content,custom_fields,date,excerpt,modified,slug,status,tags,title,title_plain,type,url&count=1")
-            val (status1, data1) = response
-            // response:    {"status":"ok","count":1,"count_total":773,"pages":773,"posts":[{"id":4257}]}
-            val id = data1.substringAfter("id\":").substringBefore("}")
-            if(status1 != StatusCode.SUCCESS || id==fvm.feedRepository?.getLatestPostId().toString()){
-                cachedFeeds = fvm.feedRepository?.getAllFeeds()
+            val response =
+                FeedNetUtils.makeHttpRequest("$hostUrl?json=get_posts&count=-1&exclude=attachments,author,categories,comment_count,comment_status,comments,content,custom_fields,excerpt,modified,status,tags,title_plain,type,url&date_query[0][after]=$latestDate")
+            val (status, data) = response
+
+            if (status != FetchStatus.SUCCESS || data.isEmpty()) {
                 withContext(Dispatchers.Main) {
-                    fvm.fetchStatus.value = status1
-                    fvm.feedList.value = cachedFeeds?.map { it.toFeed() }
+                    fvm.fetchStatus.value = FetchStatus.FAILED
                 }
                 return@launch
             }
 
-            response =
-                FeedNetUtils.makeHttpRequest("$hostUrl?json=posts&count=-1&exclude=attachments,author,categories,comment_count,comment_status,comments,content,custom_fields,excerpt,modified,status,tags,title_plain,type,url")
-            val (status, data) = response
-
-            withContext(Dispatchers.Main) {
-                fvm.fetchStatus.value = status
-            }
-            if (status != StatusCode.SUCCESS) return@launch
-
-            if (data.isEmpty()) return@launch
             val feedList = FeedNetUtils.parsePostsJson(data)
-            withContext(Dispatchers.Main) {
-                fvm.feedList.value = feedList
+
+            val gotNewFeeds = feedList.isNotEmpty() && feedList[0].date != latestFeedDate
+            if(!gotNewFeeds){
+                withContext(Dispatchers.Main) {
+                    fvm.fetchStatus.value = FetchStatus.NO_NEW_DATA_FOUND
+                }
+                return@launch
             }
 
-            val feedEntityList = feedList.map { it.toFeedEntity() }
-            fvm.feedRepository?.insertFeeds(feedEntityList)
+            fvm.feedRepository?.insertFeeds(feedList)
+
+            withContext(Dispatchers.Main) {
+                fvm.fetchStatus.value = FetchStatus.NEW_DATA_FOUND
+            }
         }
     }
 

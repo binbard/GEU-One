@@ -2,6 +2,7 @@ package com.binbard.geu.geuone.ui.feed
 
 import android.text.TextUtils.replace
 import android.util.Log
+import com.binbard.geu.geuone.models.FetchStatus
 import com.binbard.geu.geuone.models.StatusCode
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -15,22 +16,18 @@ import java.util.*
 
 object FeedNetUtils {
 
-    fun makeHttpRequest(url: String): Pair<StatusCode,String> {
+    fun makeHttpRequest(url: String): Pair<FetchStatus,String> {
         val client = OkHttpClient()
         val request = Request.Builder().url(url).build()
 
         try{
             val response = client.newCall(request).execute()
             if (!response.isSuccessful) {
-                return Pair(StatusCode.FAILED, "")
+                return Pair(FetchStatus.FAILED, "")
             }
-            return Pair(StatusCode.SUCCESS, response.body?.string() ?: "")
-        } catch (e: UnknownHostException) {
-            return Pair(StatusCode.NO_INTERNET, "")
-        } catch (e: IOException) {
-            return Pair(StatusCode.IO_ERROR, "")
+            return Pair(FetchStatus.SUCCESS, response.body?.string() ?: "")
         } catch (e: Exception) {
-            return Pair(StatusCode.UNKNOWN_ERROR, "")
+            return Pair(FetchStatus.FAILED, "")
         }
 
     }
@@ -45,13 +42,18 @@ object FeedNetUtils {
             val title = post.substringAfter("title\":\"").substringBefore("\"")
             val date = post.substringAfter("date\":\"").substringBefore("\"")
 
-            val mTitle = title.replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {     // Decode unicode
+            var feedTitle = title.replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {     // Decode unicode
                 String(Character.toChars(it.groupValues[1].toInt(radix = 16)))
             }
+            feedTitle = feedTitle.replace("&#[0-9]+;".toRegex()) {                  // Decode html entities
+                String(Character.toChars(it.value.substringAfter("&#").substringBefore(";").toInt()))
+            }
+            feedTitle = feedTitle.replace("\\/", "/")                           // Handle escaped forward slash
+
             val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT)
             val feedDate = sdf.parse(date) ?: continue
 
-            dataList.add(Feed(id, slug, mTitle, feedDate))
+            dataList.add(Feed(id, slug, feedTitle, feedDate))
         }
 
         return dataList

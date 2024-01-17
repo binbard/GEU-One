@@ -9,8 +9,7 @@ import java.util.Date
 
 @Entity(tableName = "feeds")
 data class FeedEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    @PrimaryKey val id: Int,
     val slug: String,
     val title: String,
     val date: Long
@@ -27,9 +26,11 @@ interface FeedDao {
     @Query("SELECT id FROM feeds ORDER BY date DESC LIMIT 1")
     fun getLatestPostId(): Int
 
-    @Query("SELECT * FROM feeds ORDER BY date DESC LIMIT :limit OFFSET :skip")
-    fun getSearchFeedsPaginated(skip: Int,limit: Int): List<FeedEntity>
-    // WHERE slug LIKE :search
+    @Query("SELECT date FROM feeds ORDER BY date DESC LIMIT 1")
+    fun getLatestFeedDate(): Long
+
+    @Query("SELECT * FROM feeds WHERE title LIKE :search ORDER BY date DESC LIMIT :limit OFFSET :skip")
+    fun getSearchFeedsPaginated(search: String,skip: Int,limit: Int): List<FeedEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertFeeds(feeds: List<FeedEntity>)
@@ -59,28 +60,30 @@ abstract class AppDatabase : RoomDatabase() {
 
 class FeedRepository(private val feedDao: FeedDao) {
 
-    fun getAllFeeds(): List<FeedEntity> {
-        return feedDao.getAllFeeds()
+    fun getAllFeeds(): List<Feed> {
+        return feedDao.getAllFeeds().map { it.toFeed() }
     }
 
-    fun getSomeFeeds(): List<FeedEntity> {
-        return feedDao.getSomeFeeds()
+    fun getSomeFeeds(): List<Feed> {
+        return feedDao.getSomeFeeds().map { it.toFeed() }
     }
 
     fun getLatestPostId(): Int {
         return feedDao.getLatestPostId()
     }
 
-    suspend fun getSearchFeedsPaginated(search: String,page: Int, limit: Int): List<Feed> {
-        val text = search.split(" ").map { it.lowercase() }.joinToString("-")
-        val skip = page * limit
+    fun getLatestFeedDate(): Date {
+        return Date(feedDao.getLatestFeedDate())
+    }
+
+    suspend fun getSearchFeedsPaginated(search: String,skip: Int, limit: Int): List<Feed> {
         return withContext(Dispatchers.IO) {
-            feedDao.getSearchFeedsPaginated(skip,limit).map { it.toFeed() }     //"%$text%"
+            feedDao.getSearchFeedsPaginated("%$search%",skip,limit).map { it.toFeed() }
         }
     }
 
-    fun insertFeeds(feeds: List<FeedEntity>) {
-        feedDao.insertFeeds(feeds)
+    fun insertFeeds(feeds: List<Feed>) {
+        feedDao.insertFeeds(feeds.map { it.toFeedEntity() })
     }
 }
 

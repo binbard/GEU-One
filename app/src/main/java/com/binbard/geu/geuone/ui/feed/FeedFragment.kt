@@ -11,11 +11,13 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.addMenuProvider
 import com.binbard.geu.geuone.databinding.FragmentFeedBinding
+import com.binbard.geu.geuone.models.FetchStatus
 import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.models.StatusCode
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -23,10 +25,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class FeedFragment: Fragment() {
+class FeedFragment : Fragment() {
     private lateinit var binding: FragmentFeedBinding
     private lateinit var fvm: FeedViewModel
     private lateinit var adapter: FeedRecyclerAdapter
+    private lateinit var toolbarFeed: Toolbar
+    private lateinit var layoutManager: LinearLayoutManager
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,19 +40,47 @@ class FeedFragment: Fragment() {
 
         fvm = ViewModelProvider(requireActivity())[FeedViewModel::class.java]
 
-        fvm.feedRepository = fvm.feedRepository ?: FeedRepository(AppDatabase.getInstance(requireActivity().application).feedDao())
-        fvm.feedHelper = fvm.feedHelper ?: FeedHelper(fvm)
+        toolbarFeed = requireActivity().findViewById(R.id.toolbarFeed)
+        layoutManager = LinearLayoutManager(context)
+
+        fvm.feedRepository = fvm.feedRepository ?: FeedRepository(
+            AppDatabase.getInstance(
+                requireActivity().application
+            ).feedDao()
+        )
 
         binding.srlFeed.setProgressViewOffset(true, 50, 200)
         binding.srlFeed.setOnRefreshListener {
-            fvm.feedHelper?.fetchData()
+            FeedHelper.fetchData(fvm)
         }
 
-        adapter = FeedRecyclerAdapter()
+        if(fvm.fetchStatus.value == FetchStatus.DONE) {
+            binding.srlFeed.isRefreshing = false
+            binding.pbFeed.visibility = View.GONE
+        }
+
+        fvm.fetchStatus.observe(viewLifecycleOwner) {
+            if (fvm.fetchStatus.value == FetchStatus.NA){
+                FeedHelper.fetchData(fvm)
+            } else if (it == FetchStatus.FAILED) {
+                Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
+            } else if (it == FetchStatus.NO_NEW_DATA_FOUND) {
+                binding.srlFeed.isRefreshing = false
+                binding.pbFeed.visibility = View.GONE
+                fvm.fetchStatus.value = FetchStatus.DONE
+            } else if (it == FetchStatus.NEW_DATA_FOUND) {
+                binding.srlFeed.isRefreshing = false
+                binding.pbFeed.visibility = View.GONE
+                adapter.clearFeeds()
+                adapter.addFeeds(fvm.feeds)
+                fvm.fetchStatus.value = FetchStatus.DONE
+            }
+        }
+
+        adapter = FeedRecyclerAdapter(fvm.feeds)
         binding.rvFeed.adapter = adapter
         binding.rvFeed.layoutManager = LinearLayoutManager(context)
 
-        handleFeeds()
         setupFeeds()
 
         return binding.root
@@ -68,61 +100,38 @@ class FeedFragment: Fragment() {
         }
     }
 
-    private fun handleFeeds() {
-        fvm.fetchStatus.observe(viewLifecycleOwner) {
-            if (fvm.fetchStatus.value == StatusCode.NA) fvm.feedHelper?.fetchData()
-            else if(it == StatusCode.SUCCESS){
-                binding.pbFeed.visibility = View.GONE
-                binding.srlFeed.isRefreshing = false
+    fun addFeeds(skip: Int = 0, limit: Int = 10) {
+        val feedSearchView: SearchView = toolbarFeed.findViewById(R.id.feedSearchView)
+        lifecycleScope.launch {
+            val result = fvm.feedRepository?.getSearchFeedsPaginated(feedSearchView.query.toString() , skip, limit)
+            if(skip==0) adapter.clearFeeds()
+            adapter.addFeeds(result ?: emptyList())
+        }
+    }
+
+    private fun setupFeeds() {
+        val feedSearchView: SearchView = toolbarFeed.findViewById(R.id.feedSearchView)
+        layoutManager = binding.rvFeed.layoutManager as LinearLayoutManager
+
+        addFeeds()
+
+        feedSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
             }
-        }
-    }
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText == null) return false
+                addFeeds()
+                return true
+            }
+        })
 
-    class ItemSpacingDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
-        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-            outRect.left = space
-            outRect.right = space
-            outRect.top = space
-            outRect.bottom = space
-        }
-    }
-
-    private fun setupToolbar(adapter: FeedRecyclerAdapter){
-//        val toolbarFeed: Toolbar = requireActivity().findViewById(R.id.toolbarFeed)
-//        val feedSearchView: SearchView = toolbarFeed.findViewById(R.id.feedSearchView)
-//        feedSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-//            override fun onQueryTextSubmit(query: String?): Boolean {
-//                return true
-//            }
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                adapter.filter.filter(newText)
-//                return true
-//            }
-//        })
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun setupFeeds(){
-        GlobalScope.launch(Dispatchers.Main) {
-//            val result = fvm.feedRepository?.getSearchFeedsPaginated("", 0, 10)
-//            adapter.addFeeds(result ?: emptyList())
-//            adapter.addFeeds(fvm.feedRepository?.getSomeFeeds() ?: emptyList())
-        }
-//        binding.rvFeed.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-//            override fun onScrollStateChanged(rv: RecyclerView, newState: Int) {
-//                val llm = rv.layoutManager as LinearLayoutManager
-//                val visibleItemCount = llm.childCount
-//                val totalItemCount = llm.itemCount
-//                val firstVisibleItemPosition = llm.findFirstVisibleItemPosition()
-//                if (visibleItemCount + firstVisibleItemPosition >= totalItemCount && firstVisibleItemPosition >= 0) {
-//                    GlobalScope.launch(Dispatchers.Main) {
-//                        val result = fvm.feedRepository?.getSearchFeedsPaginated("", adapter.itemCount, 10)
-//                        adapter.addFeeds(result ?: emptyList())
-//                    }
-//                }
-//            }
-//        })
+        binding.rvFeed.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                val lastPosition = layoutManager.findLastVisibleItemPosition()
+                if (lastPosition >= adapter.itemCount - 10) addFeeds(adapter.itemCount, 20)
+            }
+        })
     }
 
 }

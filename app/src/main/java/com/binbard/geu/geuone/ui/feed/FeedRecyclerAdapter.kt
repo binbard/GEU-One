@@ -15,9 +15,8 @@ import com.binbard.geu.geuone.R
 import java.io.File
 import java.util.*
 
-class FeedRecyclerAdapter() :
+class FeedRecyclerAdapter(private var feeds: MutableList<Feed>) :
     RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder>() {
-    private var feeds = mutableListOf<Feed>()
     private val hostUrl = "https://csitgeu.in/wp/"
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -34,7 +33,7 @@ class FeedRecyclerAdapter() :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val feed = feeds[position]
         holder.tvFeedTitle.text = feed.title
-        holder.tvFeedDate.text = feed.date.toString()
+        holder.tvFeedDate.text = feed.getDiff()
 
         holder.itemView.setOnClickListener {
             val intent = CustomTabsIntent.Builder().build()
@@ -44,6 +43,11 @@ class FeedRecyclerAdapter() :
 
     override fun getItemCount(): Int {
         return feeds.size
+    }
+
+    fun clearFeeds() {
+        feeds.clear()
+        notifyDataSetChanged()
     }
 
     fun addFeeds(feeds: List<Feed>) {

@@ -2,6 +2,7 @@ package com.binbard.geu.geuone.ui.notes
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.addMenuProvider
 import com.binbard.geu.geuone.databinding.FragmentNotesBinding
-import com.binbard.geu.geuone.ui.feed.FeedFragment
 
 class NotesFragment : Fragment() {
     private lateinit var binding: FragmentNotesBinding
@@ -37,7 +37,7 @@ class NotesFragment : Fragment() {
         notesViewModel = ViewModelProvider(this)[NotesViewModel::class.java]
         rvNotes = binding.rvNotes
 
-        rvNotes.addItemDecoration(FeedFragment.ItemSpacingDecoration(10))
+        rvNotes.addItemDecoration(ItemSpacingDecoration(10))
         rvNotes.adapter = NotesRecyclerAdapter(requireContext(), notesViewModel)
 
         val layoutManager = GridLayoutManager(context, 2)
@@ -100,6 +100,20 @@ class NotesFragment : Fragment() {
                 }
                 else -> false
             }
+        }
+    }
+
+    class ItemSpacingDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(
+            outRect: Rect,
+            view: View,
+            parent: RecyclerView,
+            state: RecyclerView.State
+        ) {
+            outRect.left = space
+            outRect.right = space
+            outRect.top = space
+            outRect.bottom = space
         }
     }
 
