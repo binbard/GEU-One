@@ -23,4 +23,16 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="Theme.GEUOne.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.GEUOne.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorPrimary">@color/material_dynamic_primary40</item>
+    </style>
+
+    <style name="Theme.GEUOne.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark">
+    </style>
+
 </resources>

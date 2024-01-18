@@ -16,6 +16,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GEUOne"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.feed.FeedViewActivity"
+            android:exported="false"
+            android:label="@string/title_activity_feed_view"
+            android:theme="@style/Theme.GEUOne.NoActionBar" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -26,7 +31,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
 
         <activity
             android:name=".MainActivity"

@@ -1,5 +1,6 @@
 package com.binbard.geu.geuone.ui.feed
 
+import android.content.Intent
 import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
@@ -36,8 +37,9 @@ class FeedRecyclerAdapter(private var feeds: MutableList<Feed>) :
         holder.tvFeedDate.text = feed.getDiff()
 
         holder.itemView.setOnClickListener {
-            val intent = CustomTabsIntent.Builder().build()
-            intent.launchUrl(it.context, "$hostUrl${feed.slug}".toUri())
+            val intent = Intent(it.context, FeedViewActivity::class.java)
+            intent.putExtra("feedSlug", feed.slug)
+            it.context.startActivity(intent)
         }
     }
 

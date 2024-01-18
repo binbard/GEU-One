@@ -29,7 +29,9 @@ object PdfUtils{
         )
     }
 
-    fun openOrDownloadPdf(context: Context, url: String, fileName: String) {
+    fun openOrDownloadPdf(context: Context, url: String, myfileName: String="") {
+        var fileName = myfileName
+        if(fileName=="") fileName = url.substring(url.lastIndexOf('/') + 1, url.lastIndexOf('.'))
         val file = getFilesFromName(context, fileName)
 
         if (file.exists()) {

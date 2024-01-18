@@ -1,11 +1,8 @@
 package com.binbard.geu.geuone.ui.feed
 
-import android.app.Application
-import android.widget.Toast
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import com.binbard.geu.geuone.models.FeedPost
 import com.binbard.geu.geuone.models.FetchStatus
-import com.binbard.geu.geuone.models.StatusCode
+import com.binbard.geu.geuone.ui.feed.FeedNetUtils.parsePostJson
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,7 +28,7 @@ object FeedHelper{
                 return@launch
             }
 
-            val feedList = FeedNetUtils.parsePostsJson(data)
+            val feedList = FeedNetUtils.parseFeedListJson(data)
 
             val gotNewFeeds = feedList.isNotEmpty() && feedList[0].date != latestFeedDate
             if(!gotNewFeeds){
@@ -47,6 +44,13 @@ object FeedHelper{
                 fvm.fetchStatus.value = FetchStatus.NEW_DATA_FOUND
             }
         }
+    }
+
+    fun fetchFeed(slug: String): FeedPost?{
+        val feedLink = "$hostUrl$slug?json=get_post?json=post&exclude=author,comment_count,comment_status,comments,custom_fields,status,title_plain,type,url"
+
+        val feedPost = parsePostJson(feedLink)
+        return feedPost
     }
 
 }
