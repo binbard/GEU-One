@@ -113,7 +113,10 @@ class ErpFragment : Fragment(){
         }
 
         evm.comments.observe(viewLifecycleOwner) {
-            if (it != "") Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+            if (it != ""){
+                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                evm.comments.value = ""
+            }
         }
 
         return binding.root

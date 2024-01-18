@@ -17,4 +17,19 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
+    <style name="Theme.GEUOne.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:tint">@color/material_dynamic_primary90</item>
+        <item name="colorPrimary">@color/material_dynamic_primary50</item>
+        <item name="contentScrim">@color/material_dynamic_primary30</item>
+    </style>
+
+    <style name="Theme.GEUOne.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark">
+    </style>
+
+    <style name="MyCard" parent="CardView">
+        <item name="cardCornerRadius">8dp</item>
+        <item name="cardBackgroundColor">@android:color/transparent</item>
+    </style>
+
 </resources>

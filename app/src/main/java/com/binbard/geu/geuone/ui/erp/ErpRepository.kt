@@ -67,13 +67,13 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     @OptIn(DelicateCoroutinesApi::class)
     fun fetchAttendance(erpViewModel: ErpViewModel){
         GlobalScope.launch(Dispatchers.IO) {
-            val attendance = ErpNetUtils.getAttendance(cookies, erpViewModel.studentData.value!!.regID)
+            val attendance = erpViewModel.studentData.value?.regID?.let { ErpNetUtils.getAttendance(cookies, it) }
             erpViewModel.attendanceData.postValue(attendance)
             if(attendance!=null){
                 erpCacheHelper.saveLocalAttendanceData(attendance)
                 Log.d("ErpRepository", "Attendance Synced")
             } else{
-//                Log.d("ErpRepository", "Failed to Sync Attendance")
+                Log.d("ErpRepository", "Failed to Sync Attendance")
                 erpViewModel.comments.postValue("Failed to Sync Attendance")
             }
         }
@@ -92,6 +92,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun syncStudentData(erpViewModel: ErpViewModel){
+        Log.d("ErpRepository", "ZZZ syncStudentData")
         fetchImage(erpViewModel)
         GlobalScope.launch(Dispatchers.IO) {
             val studentDetails = ErpNetUtils.getStudentDetails(cookies)

@@ -18,7 +18,6 @@ import java.util.*
 
 class FeedRecyclerAdapter(private var feeds: MutableList<Feed>) :
     RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder>() {
-    private val hostUrl = "https://csitgeu.in/wp/"
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvFeedTitle: TextView = itemView.findViewById(R.id.tvFeedTitle)

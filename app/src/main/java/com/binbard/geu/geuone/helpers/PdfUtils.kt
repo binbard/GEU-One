@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.app.DownloadManager
 import android.content.ActivityNotFoundException
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,107 +13,38 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
-import com.binbard.geu.geuone.R
+import androidx.core.net.toUri
 import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+import kotlin.io.path.Path
 
-object PdfUtils{
-    private val downloadingFiles = mutableListOf<String>()
-    fun getFilesFromName(context: Context, fileName: String): File{
-        return File(
-            Environment.getExternalStoragePublicDirectory("${Environment.DIRECTORY_DOWNLOADS}/${context.getString(
-                R.string.app_name)}"),
-            "$fileName.pdf"
-        )
+object PdfUtils {
+    private const val REQUEST_WRITE_EXTERNAL_STORAGE = 123
+
+    private fun getParentDir(context: Context): File {
+        val pdfPath = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "GEU One")
+        if (!pdfPath.exists()) pdfPath.mkdirs()
+        return pdfPath
     }
 
-    fun openOrDownloadPdf(context: Context, url: String, myfileName: String="") {
-        var fileName = myfileName
-        if(fileName=="") fileName = url.substring(url.lastIndexOf('/') + 1, url.lastIndexOf('.'))
-        val file = getFilesFromName(context, fileName)
-
-        if (file.exists()) {
-            openPdf(context,file)
-        } else {
-            if (downloadingFiles.contains(url)) {
-                Toast.makeText(context, "File is already being downloaded", Toast.LENGTH_SHORT).show()
-            } else {
-                downloadPdf(context,url, "$fileName.pdf")
-            }
-        }
+    fun getFile(context: Context, fileName: String): File {
+        return File(getParentDir(context), "$fileName.pdf")
     }
 
-    fun openPdfWithName(context: Context, fileName: String){
-        val file = getFilesFromName(context, fileName)
-        openPdf(context, file)
-    }
-
-    fun openPdf(context: Context,file: File) {
-        Log.d("PdfUtils", "openPdf: ${file.absolutePath}")
-        if(hasPermission(context,Manifest.permission.READ_EXTERNAL_STORAGE)){
-            Log.d("PdfUtils", "Already Granted. Opening")
-            launchPdfApp(context, file)
-        } else{
-            requestPermission(context,Manifest.permission.READ_EXTERNAL_STORAGE) { granted ->
-                if (granted) {
-                    Log.d("PdfUtils", "Granted. Opening")
-                    launchPdfApp(context, file)
-                } else {
-                    Toast.makeText(context, "Permission denied. Cannot open PDF.", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    intent.data = Uri.parse("package:${context.packageName}")
-                    startActivity(context, intent, null)
-                }
-            }
-        }
-    }
-
-    private fun launchPdfApp(context: Context,file: File){
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+    private fun openPdf(context: Context, file: File){
+        Log.d("PdfUtils", "Opening File: ${file.absolutePath}")
+        val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", file)
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, "application/pdf")
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, "No PDF reader found", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun downloadPdf(context: Context,url: String, fileName: String) {
-        if (hasPermission(context,Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            val request = DownloadManager.Request(Uri.parse(url))
-                .setTitle(fileName)
-                .setDescription("Downloading")
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-
-            val folder = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), context.getString(
-                R.string.app_name))
-            if (!folder.exists()) {
-                folder.mkdirs()
-            }
-
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/${context.getString(
-                R.string.app_name)}/$fileName")
-
-            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-
-            downloadManager.enqueue(request)
-            downloadingFiles.add(url)
-
-        } else {
-            requestPermission(context,Manifest.permission.WRITE_EXTERNAL_STORAGE) { granted ->
-                if (granted) {
-                    downloadPdf(context, url, fileName)
-                } else {
-                    Toast.makeText(context, "Permission denied. Cannot download PDF.", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    intent.data = Uri.parse("package:${context.packageName}")
-                    startActivity(context, intent, null)
-                }
-            }
+            Toast.makeText(context, "No Application available to view pdf", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -122,25 +52,43 @@ object PdfUtils{
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun requestPermission(context: Context, permission: String, callback: (Boolean) -> Unit) {
-        val requestCode = 1
-        ActivityCompat.requestPermissions(context as Activity, arrayOf(permission), requestCode)
+    private fun requestPermission(activity: Activity, permission: String, requestCode: Int) {
+        ActivityCompat.requestPermissions(activity, arrayOf(permission), requestCode)
     }
 
-    fun clearAllFiles(context: Context){
-        val folder = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), context.getString(
-            R.string.app_name))
-        if(folder.exists()){
-            folder.deleteRecursively()
+    private fun downloadPdf(context: Context, url: String, file: File){
+        Log.d("PdfUtils", "Will download File: ${file.absolutePath}")
+        if (file.exists()) {
+            Toast.makeText(context, "File already exists", Toast.LENGTH_LONG).show()
+            return
         }
+        val request = DownloadManager.Request(Uri.parse(url))
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+        request.setTitle(file.name)
+        request.setDescription("Downloading ${file.name}...")
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        request.setDestinationInExternalFilesDir(context, "GEU One", file.name)
+        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        manager.enqueue(request)
+        Log.d("PdfUtils", "Downloading File: ${file.absolutePath}")
+        Toast.makeText(context, "Downloading file...", Toast.LENGTH_LONG).show()
     }
 
-    val onComplete: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val fileName = intent.getStringExtra(DownloadManager.COLUMN_TITLE)
-            fileName?.let {
-                downloadingFiles.remove(fileName)
+    fun openOrDownloadPdf(context: Context, url: String, pdfTitle: String) {
+        val file = getFile(context, pdfTitle)
+
+        if (hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if (file.exists()) {
+                openPdf(context, file)
+            } else { // File does not exist. Download it
+                if (hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    downloadPdf(context, url, file)
+                } else {
+                    requestPermission(context as Activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_EXTERNAL_STORAGE)
+                }
             }
+        } else {
+            requestPermission(context as Activity, Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_WRITE_EXTERNAL_STORAGE)
         }
     }
 }

@@ -7,12 +7,15 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.feed.FeedViewActivity">
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/pbPost"
-        android:visibility="gone"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="150dp"
+        android:visibility="visible"
+        app:showDelay="1000"
+        android:indeterminate="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -27,7 +30,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:contentScrim="@color/material_dynamic_primary30"
             app:expandedTitleGravity="center_vertical"
             app:titleCollapseMode="scale"
             app:maxLines="1"

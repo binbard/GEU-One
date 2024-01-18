@@ -29,9 +29,6 @@ class ResFragment: Fragment() {
         binding = FragmentResBinding.inflate(inflater, container, false)
 
         val rvm = ViewModelProvider(this).get(ResViewModel::class.java)
-        rvm.resText.observe(viewLifecycleOwner) {
-            binding.textRes.text = it
-        }
 
         val intent = CustomTabsIntent.Builder().build()
 
@@ -49,7 +46,7 @@ class ResFragment: Fragment() {
         }
         binding.btMiniproject.setOnClickListener {
 //            PdfUtils.openPdfWithName(it.context, "MiniProject")
-            PdfUtils.openOrDownloadPdf(it.context, "https://github.com/geu-one-static/files/blob/main/Mini%20Project%205th%20sem%20all.pdf?raw=true", "MiniProject5thSem")
+            PdfUtils.openOrDownloadPdf(requireContext(), "https://github.com/geu-one-static/files/blob/main/Mini%20Project%205th%20sem%20all.pdf?raw=true", "MiniProject5thSem")
         }
 
         requireActivity().findViewById<ImageView>(R.id.imgErpMenu).setOnClickListener(null)
@@ -70,7 +67,7 @@ class ResFragment: Fragment() {
                     true
                 }
                 R.id.item_res_top_clearfiles -> {
-                    PdfUtils.clearAllFiles(requireContext())
+//                    PdfUtils.clearAllFiles(requireContext())
                     Toast.makeText(requireContext(), "Cleared Downloaded Files", Toast.LENGTH_SHORT).show()
                     true
                 }

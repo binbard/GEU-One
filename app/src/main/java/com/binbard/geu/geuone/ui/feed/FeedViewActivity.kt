@@ -37,7 +37,6 @@ class FeedViewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFeedViewBinding
 
-    @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

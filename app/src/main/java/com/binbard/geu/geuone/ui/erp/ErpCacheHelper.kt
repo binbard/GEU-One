@@ -1,6 +1,7 @@
 package com.binbard.geu.geuone.ui.erp
 
 import android.content.Context
+import android.util.Log
 import com.binbard.geu.geuone.models.Attendance
 import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.ui.erp.ErpNetUtils.getStudentImage
@@ -57,6 +58,7 @@ class ErpCacheHelper(context: Context) {
         spStudentData.edit().putString("studentData", studentJson).apply()
     }
     fun loadLocalStudentData(erpViewModel: ErpViewModel) {
+        Log.d("ErpCacheHelper", "ZZZ loadLocalStudentData")
         erpViewModel.erpStudentImg.value = getStudentImage()
 
         val studentJson = spStudentData.getString("studentData", "")

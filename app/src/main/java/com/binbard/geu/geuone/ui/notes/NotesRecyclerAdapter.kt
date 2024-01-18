@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.R
 import kotlinx.coroutines.NonCancellable.children
 import java.io.File
+import java.nio.file.Files.exists
 
 class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesViewModel): RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -56,9 +57,7 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
         if(!fileName.endsWith(".pdf")){
             img.alpha = 1f
         }
-        val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "/${context.getString(
-            R.string.app_name)}/$fileName")
-        if (file.exists()) {
+        if (PdfUtils.getFile(context,fileName).exists()) {
             img.alpha = 1f
         } else {
             img.alpha = 0.5f
@@ -69,14 +68,14 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
         return nvm.notes.value!!.children.size
     }
 
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        context.unregisterReceiver(PdfUtils.onComplete)
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        context.registerReceiver(PdfUtils.onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-    }
+//    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+//        super.onDetachedFromRecyclerView(recyclerView)
+//        context.unregisterReceiver(PdfUtils.onComplete)
+//    }
+//
+//    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+//        super.onAttachedToRecyclerView(recyclerView)
+//        context.registerReceiver(PdfUtils.onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+//    }
 
 }

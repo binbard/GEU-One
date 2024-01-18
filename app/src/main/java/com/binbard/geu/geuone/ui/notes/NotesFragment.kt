@@ -94,7 +94,7 @@ class NotesFragment : Fragment() {
                     true
                 }
                 R.id.item_res_top_clearfiles -> {
-                    PdfUtils.clearAllFiles(requireContext())
+//                    PdfUtils.clearAllFiles(requireContext())
                     Toast.makeText(requireContext(), "Cleared All Notes", Toast.LENGTH_SHORT).show()
                     true
                 }

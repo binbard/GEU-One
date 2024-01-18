@@ -5,13 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="8dp"
+    android:layout_marginStart="25dp"
+    android:layout_marginEnd="25dp"
+    style="@style/MyCard"
     android:clickable="true"
     android:focusable="true"
-    android:elevation="4dp"
-    app:cardBackgroundColor="#00FFFFFF"
-    android:layout_marginStart="20dp"
-    android:layout_marginEnd="20dp">
+    app:cardCornerRadius="8dp">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,8 +24,8 @@
             android:id="@+id/tvFeedTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:text="Winter Internship on IoT – Organized by GEU IEEE Student Branch"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,8 +37,6 @@
             android:id="@+id/tvFeedDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="-4dp"
             android:text="3 days ago"
             android:textColor="#757575"
             android:textStyle="italic"

@@ -20,6 +20,7 @@ import com.binbard.geu.geuone.databinding.FragmentFeedBinding
 import com.binbard.geu.geuone.models.FetchStatus
 import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.models.StatusCode
+import com.binbard.geu.geuone.ui.notes.NotesFragment
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -113,7 +114,9 @@ class FeedFragment : Fragment() {
         val feedSearchView: SearchView = toolbarFeed.findViewById(R.id.feedSearchView)
         layoutManager = binding.rvFeed.layoutManager as LinearLayoutManager
 
-        addFeeds()
+        binding.rvFeed.addItemDecoration(NotesFragment.ItemSpacingDecoration(5))
+
+        if(fvm.fetchStatus.value!=FetchStatus.DONE || feedSearchView.query!="") addFeeds()
 
         feedSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
