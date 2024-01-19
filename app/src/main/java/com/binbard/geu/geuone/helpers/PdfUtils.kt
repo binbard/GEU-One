@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import com.binbard.geu.geuone.PdfViewActivity
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -24,7 +25,7 @@ object PdfUtils {
     private const val REQUEST_WRITE_EXTERNAL_STORAGE = 123
 
     private fun getParentDir(context: Context): File {
-        val pdfPath = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "GEU One")
+        val pdfPath = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "GEU One")
         if (!pdfPath.exists()) pdfPath.mkdirs()
         return pdfPath
     }
@@ -34,18 +35,38 @@ object PdfUtils {
     }
 
     private fun openPdf(context: Context, file: File){
-        Log.d("PdfUtils", "Opening File: ${file.absolutePath}")
         val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", file)
+
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, "application/pdf")
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val chooser = Intent.createChooser(intent, "Open File")
         try {
-            context.startActivity(intent)
+            context.startActivity(chooser)
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(context, "No Application available to view pdf", Toast.LENGTH_LONG).show()
         }
+
+//        openInPdfViewer(context, file.toUri().toString())
+
+//        Log.d("PdfUtils", "Opening File: ${file.absolutePath}")
+//        val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", file)
+//        val intent = Intent(Intent.ACTION_VIEW)
+//        intent.setDataAndType(uri, "application/pdf")
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        try {
+//            context.startActivity(intent)
+//        } catch (e: ActivityNotFoundException) {
+//            Toast.makeText(context, "No Application available to view pdf", Toast.LENGTH_LONG).show()
+//        }
+    }
+
+    fun openInPdfViewer(context: Context, url: String) {
+        val intent = Intent(context, PdfViewActivity::class.java)
+        intent.putExtra("url", url)
+        context.startActivity(intent)
     }
 
     private fun hasPermission(context: Context, permission: String): Boolean {
@@ -67,7 +88,7 @@ object PdfUtils {
         request.setTitle(file.name)
         request.setDescription("Downloading ${file.name}...")
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        request.setDestinationInExternalFilesDir(context, "GEU One", file.name)
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "GEU One/${file.name}")
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         manager.enqueue(request)
         Log.d("PdfUtils", "Downloading File: ${file.absolutePath}")

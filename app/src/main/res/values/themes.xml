@@ -34,7 +34,6 @@
         <item name="contentScrim">@color/material_dynamic_primary60</item>
     </style>
 
-    <style name="Theme.GEUOne.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
-    </style>
+    <style name="Theme.GEUOne.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"></style>
 
 </resources>
