@@ -33,11 +33,11 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/tvStuImg"
+        app:srcCompat="@android:drawable/btn_star_big_on"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:padding="2dp"
         android:scaleType="centerCrop"
-        android:src="@android:drawable/btn_star_big_on"
         android:strokeWidth="4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

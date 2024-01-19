@@ -67,6 +67,8 @@ class ErpFragment : Fragment(){
         if(evm.loginStatus.value==LoginStatus.LOGGED_IN){
             setupErpFeatures()
             if(childFragmentManager.fragments.size==0) showErpPage(R.id.item_erp_student)
+        } else{
+            setupErpFeatures(unset = true)
         }
 
         evm.loginStatus.observe(viewLifecycleOwner) {
@@ -80,7 +82,6 @@ class ErpFragment : Fragment(){
             } else if (it == LoginStatus.PREV_LOGGED_OUT) {
                 evm.loginStatus.value = LoginStatus.NOT_LOGGED_IN
                 showErpPage(0)
-                setupErpFeatures(unset = true)
             } else if (it == LoginStatus.LOGIN_SUCCESS) {
                 evm.loginStatus.value = LoginStatus.LOGGED_IN
                 setupErpFeatures()
@@ -146,6 +147,9 @@ class ErpFragment : Fragment(){
                 DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             return
         }
+
+        requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout).setDrawerLockMode(
+            DrawerLayout.LOCK_MODE_UNLOCKED)
 
         btnErpMenu.setOnClickListener{
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {

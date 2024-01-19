@@ -7,8 +7,9 @@
     tools:layout_editor_absoluteX="1dp"
     android:clickable="true"
     android:focusable="true"
+    app:cardElevation="0dp"
     android:foreground="?android:attr/selectableItemBackground"
-    app:cardBackgroundColor="#00FFFFFF"
+    app:cardBackgroundColor="@android:color/transparent"
     tools:layout_editor_absoluteY="135dp" >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,15 +20,13 @@
 
         <ImageView
             android:id="@+id/imgNoteItem"
+            app:srcCompat="@drawable/ic_pdf_file_2"
             android:layout_width="120dp"
             android:layout_height="100dp"
-            android:src="@drawable/ic_pdf_file_2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:alpha="0.5"
-            app:srcCompat="@drawable/ic_pdf_file_2" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvNoteItem"

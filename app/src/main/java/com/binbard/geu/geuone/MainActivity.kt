@@ -95,7 +95,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.bottomNavErp -> {
                     changeToolbar(findViewById(R.id.toolbarErp))
-                    binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED)
                 }
                 R.id.erpLoginFragment -> {
                     supportActionBar?.hide()

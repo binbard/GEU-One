@@ -37,11 +37,11 @@
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/sivErpStuImg"
+                    app:srcCompat="@android:drawable/btn_star_big_on"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:padding="2dp"
                     android:scaleType="centerCrop"
-                    android:src="@android:drawable/btn_star_big_on"
                     app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
                     app:strokeColor="@color/material_dynamic_neutral90"
                     app:strokeWidth="2dp" />

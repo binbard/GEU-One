@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbarErp"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="?attr/actionBarSize"
     android:elevation="4dp">
 
     <LinearLayout
@@ -13,17 +13,17 @@
 
         <ImageView
             android:id="@+id/imgErpMenu"
+            app:srcCompat="@drawable/ic_menu_alt_2"
             android:layout_width="80dp"
             android:layout_height="48dp"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:background="?attr/actionBarItemBackground"
-            android:clickable="true"
             android:contentDescription="ERP Menu"
             android:focusable="true"
+            android:clickable="true"
             android:paddingStart="5dp"
             android:paddingEnd="5dp"
-            app:srcCompat="@drawable/ic_menu_alt_2" />
+            app:tint="?attr/colorControlNormal" />
 
         <TextView
             android:id="@+id/textView3"
