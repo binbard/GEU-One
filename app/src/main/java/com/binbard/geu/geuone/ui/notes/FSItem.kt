@@ -59,6 +59,14 @@ data class FSItem(
         return current
     }
 
+    fun getChildIndex(name: String): Int {
+        for((index, child) in children.withIndex()){
+            if(child.name == name)
+                return index
+        }
+        return -1
+    }
+
     fun add(item: FSItem){
         children.add(item)
     }

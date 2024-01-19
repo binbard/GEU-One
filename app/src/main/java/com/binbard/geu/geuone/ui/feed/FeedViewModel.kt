@@ -10,7 +10,6 @@ class FeedViewModel: ViewModel() {
     private val _text = MutableLiveData<String>().apply {
         value = "The Feed"
     }
-    val feedText: LiveData<String> = _text
 
     var comments = MutableLiveData<String>().apply {
         value = ""
@@ -22,7 +21,6 @@ class FeedViewModel: ViewModel() {
 
     val feeds = mutableListOf<Feed>()
 
-    var feedHelper: FeedHelper? = null
     var feedRepository: FeedRepository? = null
 
 }

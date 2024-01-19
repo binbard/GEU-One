@@ -30,7 +30,7 @@ import com.binbard.geu.geuone.ui.erp.ErpViewModel
 import com.binbard.geu.geuone.ui.notes.FragmentTitleListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity(), FragmentTitleListener {
+class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var bottomNavView: BottomNavigationView
     private lateinit var erpViewModel: ErpViewModel
@@ -114,10 +114,6 @@ class MainActivity : AppCompatActivity(), FragmentTitleListener {
         setSupportActionBar(toolbar)
         bottomNavView.visibility = View.VISIBLE
         supportActionBar?.show()
-    }
-
-    override fun updateTitle(title: String) {
-        supportActionBar?.title = title
     }
 }
 

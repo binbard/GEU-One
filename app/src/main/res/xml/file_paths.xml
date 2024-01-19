@@ -5,17 +5,14 @@
         path="." />
     <external-files-path
         name="external_files"
-        path="GEUOne/" />
+        path="." />
     <cache-path
         name="cache"
-        path="GEUOne/" />
+        path="." />
     <external-cache-path
         name="external_cache"
-        path="GEUOne/" />
+        path="." />
     <files-path
         name="files"
-        path="GEUOne/" />
-    <files-path
-        name="my_pdfs"
-        path="pdfs/" />
+        path="." />
 </paths>

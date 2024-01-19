@@ -9,11 +9,13 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 class NotesViewModel(application: Application): AndroidViewModel(application) {
-    private val notesCacheHelper = NotesCacheHelper(application)
+    val notesCacheHelper = NotesCacheHelper(application)
 
     private var _text = MutableLiveData<String>().apply {
         value = notesCacheHelper.getLastPath()
     }
+    var rvAdapter: NotesRecyclerAdapter? = null
+
     val notesTitle: LiveData<String> = _text
 
     var notes = MutableLiveData<FSItem>().apply {

@@ -69,16 +69,18 @@ class FeedFragment : Fragment() {
                 binding.srlFeed.isRefreshing = false
                 binding.pbFeed.visibility = View.GONE
                 fvm.fetchStatus.value = FetchStatus.DONE
+                Toast.makeText(requireContext(), "No new data found", Toast.LENGTH_SHORT).show()
             } else if (it == FetchStatus.NEW_DATA_FOUND) {
                 binding.srlFeed.isRefreshing = false
                 binding.pbFeed.visibility = View.GONE
                 adapter.clearFeeds()
-                adapter.addFeeds(fvm.feeds)
+                addFeeds()
                 fvm.fetchStatus.value = FetchStatus.DONE
+                Toast.makeText(requireContext(), "new data found", Toast.LENGTH_SHORT).show()
             }
         }
 
-        adapter = FeedRecyclerAdapter(fvm.feeds)
+        adapter = FeedRecyclerAdapter()
         binding.rvFeed.adapter = adapter
         binding.rvFeed.layoutManager = LinearLayoutManager(context)
 

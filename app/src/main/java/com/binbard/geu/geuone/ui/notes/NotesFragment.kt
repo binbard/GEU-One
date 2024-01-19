@@ -1,7 +1,11 @@
 package com.binbard.geu.geuone.ui.notes
 
 import android.annotation.SuppressLint
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,22 +29,23 @@ class NotesFragment : Fragment() {
     private lateinit var binding: FragmentNotesBinding
     lateinit var notesViewModel: NotesViewModel
     lateinit var rvNotes: RecyclerView
-    private var titleListener: FragmentTitleListener? = null
+    lateinit var tvTitleNotes: TextView
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentNotesBinding.inflate(inflater, container, false)
 
         notesViewModel = ViewModelProvider(this)[NotesViewModel::class.java]
+
+        if(notesViewModel.rvAdapter == null) notesViewModel.rvAdapter = NotesRecyclerAdapter(requireContext(), notesViewModel)
         rvNotes = binding.rvNotes
+        rvNotes.adapter = notesViewModel.rvAdapter
 
         rvNotes.addItemDecoration(ItemSpacingDecoration(10))
-        rvNotes.adapter = NotesRecyclerAdapter(requireContext(), notesViewModel)
-
         val layoutManager = GridLayoutManager(context, 2)
         rvNotes.layoutManager = layoutManager
 
@@ -47,18 +53,23 @@ class NotesFragment : Fragment() {
             rvNotes.adapter?.notifyDataSetChanged()
         }
 
-        val notesCacheHelper = NotesCacheHelper(requireContext())
+        tvTitleNotes = requireActivity().findViewById(R.id.tvTitleNotes)
 
         notesViewModel.notesTitle.observe(viewLifecycleOwner) {
-            titleListener?.updateTitle(it)
-            notesCacheHelper.setLastPath(it)
-        }
-
-        val tvTitleNotes: TextView = requireActivity().findViewById(R.id.tvTitleNotes)
-
-        notesViewModel.notesTitle.observe(viewLifecycleOwner) {
+            notesViewModel.notesCacheHelper.setLastPath(it)
             tvTitleNotes.text = it
         }
+
+        val onComplete = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                if (id != null && id != -1L) {
+                    val fileName = PdfUtils.removeDownloading(id)
+                    if (fileName!=null) notesViewModel.rvAdapter?.notifyDataSetChanged()
+                }
+            }
+        }
+        requireActivity().registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         requireActivity()
             .onBackPressedDispatcher
@@ -66,19 +77,9 @@ class NotesFragment : Fragment() {
                 override fun handleOnBackPressed() {
                     notesViewModel.gotoPrevDir()
                 }
-            }
-            )
+            })
 
         return binding.root
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is FragmentTitleListener) {
-            titleListener = context
-        } else {
-            throw ClassCastException("$context must implement FragmentTitleListener")
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,7 +95,7 @@ class NotesFragment : Fragment() {
                     true
                 }
                 R.id.item_res_top_clearfiles -> {
-//                    PdfUtils.clearAllFiles(requireContext())
+                    PdfUtils.clearAllFiles(requireContext())
                     Toast.makeText(requireContext(), "Cleared All Notes", Toast.LENGTH_SHORT).show()
                     true
                 }

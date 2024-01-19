@@ -1,11 +1,8 @@
 package com.binbard.geu.geuone.ui.notes
 
-import android.Manifest
 import android.app.Activity
 import android.app.DownloadManager
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
@@ -13,19 +10,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.registerReceiver
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import com.binbard.geu.geuone.PdfViewActivity
 import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
-import kotlin.io.path.Path
 
 object PdfUtils {
-    private const val REQUEST_WRITE_EXTERNAL_STORAGE = 123
+    private val downloadingFiles = mutableListOf<Pair<Long,String>>()
 
     private fun getParentDir(context: Context): File {
-        val pdfPath = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "GEU One")
+        val pdfPath = File(context.getExternalFilesDir(null), "pdf_files")
         if (!pdfPath.exists()) pdfPath.mkdirs()
         return pdfPath
     }
@@ -36,37 +30,14 @@ object PdfUtils {
 
     private fun openPdf(context: Context, file: File){
         val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", file)
-
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, "application/pdf")
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        val chooser = Intent.createChooser(intent, "Open File")
         try {
-            context.startActivity(chooser)
+            context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(context, "No Application available to view pdf", Toast.LENGTH_LONG).show()
         }
-
-//        openInPdfViewer(context, file.toUri().toString())
-
-//        Log.d("PdfUtils", "Opening File: ${file.absolutePath}")
-//        val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", file)
-//        val intent = Intent(Intent.ACTION_VIEW)
-//        intent.setDataAndType(uri, "application/pdf")
-//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        try {
-//            context.startActivity(intent)
-//        } catch (e: ActivityNotFoundException) {
-//            Toast.makeText(context, "No Application available to view pdf", Toast.LENGTH_LONG).show()
-//        }
-    }
-
-    fun openInPdfViewer(context: Context, url: String) {
-        val intent = Intent(context, PdfViewActivity::class.java)
-        intent.putExtra("url", url)
-        context.startActivity(intent)
     }
 
     private fun hasPermission(context: Context, permission: String): Boolean {
@@ -78,38 +49,51 @@ object PdfUtils {
     }
 
     private fun downloadPdf(context: Context, url: String, file: File){
-        Log.d("PdfUtils", "Will download File: ${file.absolutePath}")
-        if (file.exists()) {
-            Toast.makeText(context, "File already exists", Toast.LENGTH_LONG).show()
-            return
-        }
         val request = DownloadManager.Request(Uri.parse(url))
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
         request.setTitle(file.name)
-        request.setDescription("Downloading ${file.name}...")
+        request.setDescription("Downloading ${file.name}")
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "GEU One/${file.name}")
+        request.setDestinationUri(file.toUri())
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        manager.enqueue(request)
-        Log.d("PdfUtils", "Downloading File: ${file.absolutePath}")
-        Toast.makeText(context, "Downloading file...", Toast.LENGTH_LONG).show()
+        val id = manager.enqueue(request)
+        downloadingFiles.add(Pair(id, file.nameWithoutExtension))
     }
 
     fun openOrDownloadPdf(context: Context, url: String, pdfTitle: String) {
         val file = getFile(context, pdfTitle)
 
-        if (hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            if (file.exists()) {
-                openPdf(context, file)
-            } else { // File does not exist. Download it
-                if (hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    downloadPdf(context, url, file)
-                } else {
-                    requestPermission(context as Activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_EXTERNAL_STORAGE)
-                }
+        if (file.exists()) {
+            openPdf(context, file)
+        }
+        else{
+            if(!isDownloading(pdfTitle)){
+                downloadPdf(context, url, file)
+            } else{
+                Toast.makeText(context, "Already downloading...", Toast.LENGTH_SHORT).show()
             }
-        } else {
-            requestPermission(context as Activity, Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_WRITE_EXTERNAL_STORAGE)
         }
     }
+
+    private fun isDownloading(fileName: String): Boolean {
+        return downloadingFiles.indexOfFirst { it.second == fileName } != -1
+    }
+
+    fun removeDownloading(id: Long): String? {
+        val index = downloadingFiles.indexOfFirst { it.first == id }
+        if (index != -1){
+            val fileName = downloadingFiles[index].second
+            downloadingFiles.removeAt(index)
+            return fileName
+        }
+        return null
+    }
+
+    fun clearAllFiles(context: Context) {
+        val dir = getParentDir(context)
+        dir.listFiles()?.forEach {
+            it.delete()
+        }
+    }
+
 }

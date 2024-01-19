@@ -16,8 +16,8 @@ import com.binbard.geu.geuone.R
 import java.io.File
 import java.util.*
 
-class FeedRecyclerAdapter(private var feeds: MutableList<Feed>) :
-    RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder>() {
+class FeedRecyclerAdapter: RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder>() {
+    private var feeds: MutableList<Feed> = mutableListOf()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvFeedTitle: TextView = itemView.findViewById(R.id.tvFeedTitle)
