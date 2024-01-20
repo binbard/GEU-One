@@ -36,6 +36,9 @@ class FeedFragment : Fragment() {
         fvm = ViewModelProvider(requireActivity())[FeedViewModel::class.java]
 
         toolbarFeed = requireActivity().findViewById(R.id.toolbarFeed)
+
+        setHasOptionsMenu(true)
+
         layoutManager = LinearLayoutManager(context)
 
         fvm.feedRepository = fvm.feedRepository ?: FeedRepository(
@@ -82,35 +85,25 @@ class FeedFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupToolbar()
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_feed_top, menu)
+        MenuCompat.setGroupDividerEnabled(menu, true)
     }
-
-    private fun setupToolbar(){
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_feed_top, menu)
-                MenuCompat.setGroupDividerEnabled(menu, true)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.item_feed_top_site -> {
+                val intent = CustomTabsIntent.Builder().build()
+                intent.launchUrl(requireContext(), getString(R.string.feedsHostUrl).toUri())
+                true
             }
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.item_feed_top_site -> {
-                        val intent = CustomTabsIntent.Builder().build()
-                        intent.launchUrl(requireContext(), getString(R.string.feedsHostUrl).toUri())
-                        true
-                    }
-                    R.id.item_feed_show_only -> {
-                        val allFeedsShow = fvm.feedHelper!!.getBoolShowAllFeeds()
-                        menuItem.isChecked = !allFeedsShow
-                        fvm.feedHelper!!.setBoolShowAllFeeds(!allFeedsShow)
-                        true
-                    }
-                    else -> false
-                }
+            R.id.item_feed_show_only -> {
+                val allFeedsShow = fvm.feedHelper!!.getBoolShowAllFeeds()
+                item.isChecked = !allFeedsShow
+                fvm.feedHelper!!.setBoolShowAllFeeds(!allFeedsShow)
+                true
             }
-        })
+            else -> false
+        }
     }
 
     fun addFeeds(skip: Int = 0, limit: Int = 10) {

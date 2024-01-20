@@ -32,11 +32,11 @@ class ErpFragment : Fragment(){
 
         evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
+        setHasOptionsMenu(true)
+
         if(evm.loginStatus.value==LoginStatus.NOT_LOGGED_IN){
             showErpPage(0)
         }
-
-        setupToolbar()
 
         if(evm.loginStatus.value==LoginStatus.LOGGED_IN){
             setupErpFeatures()
@@ -97,35 +97,30 @@ class ErpFragment : Fragment(){
         return binding.root
     }
 
-    private fun setupToolbar(){
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_erp_top, menu)
-                menu.findItem(R.id.item_erp_top_cache_data).isChecked = evm.isCacheEnabled
-                MenuCompat.setGroupDividerEnabled(menu, true)
-            }
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.item_erp_top_visit_site -> {
-                        val intent = CustomTabsIntent.Builder().build()
-                        intent.launchUrl(requireContext(), getString(R.string.erpHostUrl).toUri())
-                        true
-                    }
-                    R.id.item_erp_top_cache_data -> {
-                        menuItem.isChecked = !menuItem.isChecked
-                        evm.isCacheEnabled = !evm.isCacheEnabled
-                        true
-                    }
-                    R.id.item_erp_top_logout -> {
-                        evm.loginStatus.value = LoginStatus.LOGOUT
-                        true
-                    }
-                    else -> false
-                }
-            }
-        })
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_erp_top, menu)
+        MenuCompat.setGroupDividerEnabled(menu, true)
     }
-
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.item_erp_top_visit_site -> {
+                val intent = CustomTabsIntent.Builder().build()
+                intent.launchUrl(requireContext(), getString(R.string.erpHostUrl).toUri())
+                true
+            }
+            R.id.item_erp_top_cache_data -> {
+                item.isChecked = !item.isChecked
+                evm.isCacheEnabled = !evm.isCacheEnabled
+                true
+            }
+            R.id.item_erp_top_logout -> {
+                evm.loginStatus.value = LoginStatus.LOGOUT
+                true
+            }
+            else -> false
+        }
+    }
 
     private fun showErpPage(pageId: Int) {
         evm.currentErpPage.value = pageId

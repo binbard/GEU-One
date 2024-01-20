@@ -52,17 +52,15 @@ data class FSItem(
                     break
                 }
             }
-            if(!found)
-                return null
+            if(!found) return null
             currPart++
         }
         return current
     }
 
-    fun getChildIndex(name: String): Int {
+    fun getChildFileIndex(name: String): Int {
         for((index, child) in children.withIndex()){
-            if(child.name == name)
-                return index
+            if(child.getFileName() == name) return index
         }
         return -1
     }
@@ -76,14 +74,16 @@ data class FSItem(
     }
 
     fun getFileName(): String {
-        return if(isFolder())
-            name
+        return if(isFolder()) name
         else name.split("_").last().split(".").first()
+    }
+    fun getFileNamex(): String {
+        return if(isFolder()) name
+        else name.split("_").last().split(".").first() + ".pdf"
     }
 
     fun getPath(): String {
-        return if(parent == null)
-            name
+        return if(parent == null) name
         else "${parent.getPath()}/$name"
     }
 

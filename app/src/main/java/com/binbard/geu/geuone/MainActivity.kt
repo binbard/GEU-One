@@ -29,7 +29,6 @@ import com.binbard.geu.geuone.models.LoginStatus
 import com.binbard.geu.geuone.ui.erp.ErpCacheHelper
 import com.binbard.geu.geuone.ui.erp.ErpRepository
 import com.binbard.geu.geuone.ui.erp.ErpViewModel
-import com.binbard.geu.geuone.ui.notes.FragmentTitleListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -64,7 +63,6 @@ class MainActivity : AppCompatActivity() {
         )
 
         bottomNavController.addOnDestinationChangedListener { _, destination, _ ->
-            setupToolbar()
             binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             when (destination.id) {
                 R.id.bottomNavFeed -> {
@@ -91,27 +89,23 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun setupToolbar(){
-        addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menu.clear()
-                menuInflater.inflate(R.menu.menu_general_top, menu)
-                MenuCompat.setGroupDividerEnabled(menu, true)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_general_top, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.item_gen_settings -> {
+                Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
+                true
             }
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.item_gen_settings -> {
-                        Toast.makeText(this@MainActivity, "Settings", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    R.id.item_gen_feedback -> {
-                        Toast.makeText(this@MainActivity, "Feedback", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    else -> false
-                }
+            R.id.item_gen_feedback -> {
+                Toast.makeText(this, "Feedback", Toast.LENGTH_SHORT).show()
+                true
             }
-        })
+            else -> false
+        }
     }
 
     private fun changeToolbar(toolbar: Toolbar){

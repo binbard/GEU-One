@@ -63,7 +63,7 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
     }
 
     fun updateItem(fileName: String){
-        val ind = nvm.notes.value!!.getChildIndex(fileName)
+        val ind = nvm.notes.value!!.getChildFileIndex(fileName)
         if(ind != -1) notifyItemChanged(ind)
     }
 

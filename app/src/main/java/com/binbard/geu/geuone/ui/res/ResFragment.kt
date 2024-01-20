@@ -16,6 +16,7 @@ import com.binbard.geu.geuone.ui.notes.PdfUtils
 
 class ResFragment: Fragment() {
     private lateinit var binding: FragmentResBinding
+    private lateinit var rvm: ResViewModel
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -23,10 +24,11 @@ class ResFragment: Fragment() {
     ): View {
         binding = FragmentResBinding.inflate(inflater, container, false)
 
-        val rvm = ViewModelProvider(this).get(ResViewModel::class.java)
+        rvm = ViewModelProvider(this).get(ResViewModel::class.java)
+
+        setHasOptionsMenu(true)
 
         val intent = CustomTabsIntent.Builder().build()
-
         binding.btAcmClub.setOnClickListener {
             intent.launchUrl(it.context, "https://geu-acm.surge.sh/".toUri())
         }
@@ -49,27 +51,20 @@ class ResFragment: Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setupToolbar()
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_res_top, menu)
+        MenuCompat.setGroupDividerEnabled(menu, true)
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.item_res_clearfiles -> {
+                PdfUtils.clearAllFiles(requireContext())
+                Toast.makeText(requireActivity(), "Cleared Files", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> false
+        }
     }
 
-    private fun setupToolbar(){
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_res_top, menu)
-                MenuCompat.setGroupDividerEnabled(menu, true)
-            }
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.item_res_clearfiles -> {
-                        PdfUtils.clearAllFiles(requireContext())
-                        Toast.makeText(requireContext(), "Cleared Files", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    else -> false
-                }
-            }
-        })
-    }
 }

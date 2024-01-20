@@ -23,7 +23,7 @@ import com.binbard.geu.geuone.databinding.FragmentNotesBinding
 
 class NotesFragment : Fragment() {
     private lateinit var binding: FragmentNotesBinding
-    lateinit var notesViewModel: NotesViewModel
+    lateinit var nvm: NotesViewModel
     lateinit var rvNotes: RecyclerView
     lateinit var tvTitleNotes: TextView
 
@@ -35,24 +35,31 @@ class NotesFragment : Fragment() {
     ): View {
         binding = FragmentNotesBinding.inflate(inflater, container, false)
 
-        notesViewModel = ViewModelProvider(this)[NotesViewModel::class.java]
+        nvm = ViewModelProvider(this)[NotesViewModel::class.java]
 
-        if(notesViewModel.rvAdapter == null) notesViewModel.rvAdapter = NotesRecyclerAdapter(requireContext(), notesViewModel)
+        setHasOptionsMenu(true)
+
+        if(nvm.notesRepository == null){
+            nvm.notesRepository = NotesRepository(requireContext(),nvm)
+            nvm.notesRepository!!.fetchData()
+        }
+
+        if(nvm.rvAdapter == null) nvm.rvAdapter = NotesRecyclerAdapter(requireContext(), nvm)
         rvNotes = binding.rvNotes
-        rvNotes.adapter = notesViewModel.rvAdapter
+        rvNotes.adapter = nvm.rvAdapter
 
         rvNotes.addItemDecoration(ItemSpacingDecoration(10))
         val layoutManager = GridLayoutManager(context, 2)
         rvNotes.layoutManager = layoutManager
 
-        notesViewModel.notes.observe(viewLifecycleOwner) {
+        nvm.notes.observe(viewLifecycleOwner) {
             rvNotes.adapter?.notifyDataSetChanged()
         }
 
         tvTitleNotes = requireActivity().findViewById(R.id.tvTitleNotes)
 
-        notesViewModel.notesTitle.observe(viewLifecycleOwner) {
-            notesViewModel.notesCacheHelper.setLastPath(it)
+        nvm.notesTitle.observe(viewLifecycleOwner) {
+            nvm.notesCacheHelper.setLastPath(it)
             tvTitleNotes.text = it
         }
 
@@ -61,7 +68,7 @@ class NotesFragment : Fragment() {
                 val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
                 if (id != null && id != -1L) {
                     val fileName = PdfUtils.removeDownloading(id)
-                    if (fileName!=null) notesViewModel.rvAdapter?.notifyDataSetChanged()
+                    if (fileName!=null) nvm.rvAdapter?.updateItem(fileName)
                 }
             }
         }
@@ -71,38 +78,28 @@ class NotesFragment : Fragment() {
             .onBackPressedDispatcher
             .addCallback(this, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    notesViewModel.gotoPrevDir()
+                    nvm.gotoPrevDir()
                 }
             })
 
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupToolbar()
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_notes_top, menu)
+        MenuCompat.setGroupDividerEnabled(menu, true)
     }
-
-    private fun setupToolbar(){
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_notes_top, menu)
-                MenuCompat.setGroupDividerEnabled(menu, true)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.item_notes_clearfiles -> {
+                PdfUtils.clearAllFiles(requireContext())
+                nvm.rvAdapter?.notifyDataSetChanged()
+                Toast.makeText(requireActivity(), "Cleared Files", Toast.LENGTH_SHORT).show()
+                true
             }
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.item_res_clearfiles -> {
-                        PdfUtils.clearAllFiles(requireContext())
-                        notesViewModel.rvAdapter!!.notifyDataSetChanged()
-                        Toast.makeText(requireContext(), "Cleared Files", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    else -> false
-                }
-            }
-        })
+            else -> false
+        }
     }
 
     class ItemSpacingDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
