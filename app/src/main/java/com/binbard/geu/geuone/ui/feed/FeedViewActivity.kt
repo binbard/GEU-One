@@ -1,32 +1,24 @@
 package com.binbard.geu.geuone.ui.feed
 
-import android.annotation.SuppressLint
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.Html
 import android.text.SpannableString
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.MenuCompat
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import com.binbard.geu.geuone.R
-import com.binbard.geu.geuone.addMenuProvider
 import com.binbard.geu.geuone.databinding.ActivityFeedViewBinding
-import com.binbard.geu.geuone.ui.notes.PdfUtils.openOrDownloadPdf
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
+import com.binbard.geu.geuone.models.FeedPost
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -36,6 +28,7 @@ import java.util.*
 class FeedViewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFeedViewBinding
+    private lateinit var hostUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +58,7 @@ class FeedViewActivity : AppCompatActivity() {
         binding.webViewPost.setBackgroundColor(Color.TRANSPARENT)
         binding.webViewPost.settings.defaultFontSize = 18
 
-        val hostUrl = resources.getString(R.string.hostUrl)
+        hostUrl = resources.getString(R.string.feedsHostUrl)
         binding.fabOpenInBrowser.setOnClickListener {
             val intent = CustomTabsIntent.Builder().build()
             intent.launchUrl(this@FeedViewActivity, android.net.Uri.parse("$hostUrl$feedSlug"))
@@ -73,7 +66,7 @@ class FeedViewActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val feedPost = FeedHelper.fetchFeed(feedSlug)
+                val feedPost = fetchFeed(feedSlug)
                 if (feedPost == null) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
@@ -102,6 +95,13 @@ class FeedViewActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    fun fetchFeed(slug: String): FeedPost?{
+        val feedLink = "$hostUrl$slug?json=get_post?json=post&exclude=author,comment_count,comment_status,comments,custom_fields,status,title_plain,type,url"
+
+        val feedPost = FeedNetUtils.parsePostJson(feedLink)
+        return feedPost
     }
 
     private fun getSpannedToolbarTitle(title: String): SpannableString {

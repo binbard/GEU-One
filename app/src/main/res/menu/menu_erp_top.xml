@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/item_erp_top_profile"
-        android:title="Profile" />
+        android:id="@+id/item_erp_top_visit_site"
+        android:title="Visit Site" />
     <item
-        android:id="@+id/item_erp_top_cache"
+        android:id="@+id/item_erp_top_cache_data"
         android:checkable="true"
         android:title="Cache Data" />
     <item

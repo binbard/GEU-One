@@ -3,12 +3,13 @@ package com.binbard.geu.geuone.ui.erp
 import android.os.Bundle
 import android.view.*
 import android.widget.*
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
-import androidx.core.view.MenuHost
+import androidx.core.view.MenuCompat
 import androidx.core.view.MenuProvider
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.databinding.FragmentErpBinding
@@ -35,34 +36,7 @@ class ErpFragment : Fragment(){
             showErpPage(0)
         }
 
-        val menuHost: MenuHost = requireActivity()
-
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_erp_top, menu)
-                menu.findItem(R.id.item_erp_top_cache).isChecked = evm.isCacheEnabled
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.item_erp_top_profile -> {
-                        Toast.makeText(requireContext(), "Profile", Toast.LENGTH_SHORT).show()
-                        true
-                    }
-                    R.id.item_erp_top_cache -> {
-                        menuItem.isChecked = !evm.isCacheEnabled
-                        evm.isCacheEnabled = !evm.isCacheEnabled
-                        true
-                    }
-                    R.id.item_erp_top_logout -> {
-                        evm.loginStatus.value = LoginStatus.LOGOUT
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
+        setupToolbar()
 
         if(evm.loginStatus.value==LoginStatus.LOGGED_IN){
             setupErpFeatures()
@@ -122,6 +96,36 @@ class ErpFragment : Fragment(){
 
         return binding.root
     }
+
+    private fun setupToolbar(){
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_erp_top, menu)
+                menu.findItem(R.id.item_erp_top_cache_data).isChecked = evm.isCacheEnabled
+                MenuCompat.setGroupDividerEnabled(menu, true)
+            }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.item_erp_top_visit_site -> {
+                        val intent = CustomTabsIntent.Builder().build()
+                        intent.launchUrl(requireContext(), getString(R.string.erpHostUrl).toUri())
+                        true
+                    }
+                    R.id.item_erp_top_cache_data -> {
+                        menuItem.isChecked = !menuItem.isChecked
+                        evm.isCacheEnabled = !evm.isCacheEnabled
+                        true
+                    }
+                    R.id.item_erp_top_logout -> {
+                        evm.loginStatus.value = LoginStatus.LOGOUT
+                        true
+                    }
+                    else -> false
+                }
+            }
+        })
+    }
+
 
     private fun showErpPage(pageId: Int) {
         evm.currentErpPage.value = pageId

@@ -1,14 +1,15 @@
 package com.binbard.geu.geuone.ui.feed
 
-import com.binbard.geu.geuone.models.FeedPost
+import android.content.Context
+import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.models.FetchStatus
-import com.binbard.geu.geuone.ui.feed.FeedNetUtils.parsePostJson
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-object FeedHelper{
-    private val hostUrl = "https://csitgeu.in/wp/"
+class FeedHelper(context: Context){
+    private var hostUrl = context.resources.getString(R.string.feedsHostUrl)
+    private val sp = context.getSharedPreferences("feeds", Context.MODE_PRIVATE)
 
     @OptIn(DelicateCoroutinesApi::class)
     fun fetchData(fvm: FeedViewModel) {
@@ -46,11 +47,11 @@ object FeedHelper{
         }
     }
 
-    fun fetchFeed(slug: String): FeedPost?{
-        val feedLink = "$hostUrl$slug?json=get_post?json=post&exclude=author,comment_count,comment_status,comments,custom_fields,status,title_plain,type,url"
-
-        val feedPost = parsePostJson(feedLink)
-        return feedPost
+    fun getBoolShowAllFeeds(): Boolean {
+        return sp.getBoolean("showAllFeeds", false)
+    }
+    fun setBoolShowAllFeeds(value: Boolean) {
+        sp.edit().putBoolean("showAllFeeds", value).apply()
     }
 
 }

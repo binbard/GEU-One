@@ -18,6 +18,10 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="MyLinearTheme">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
     <style name="roundedImageViewRounded">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>

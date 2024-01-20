@@ -10,7 +10,9 @@ import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.net.toUri
 import androidx.core.view.MenuCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -40,25 +42,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_general_top, menu)
-                MenuCompat.setGroupDividerEnabled(menu, true)
-            }
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                when(menuItem.itemId){
-                    R.id.item_gen_settings -> {
-                        Toast.makeText(this@MainActivity, "Settings", Toast.LENGTH_SHORT).show()
-                    }
-                    R.id.item_gen_feedback -> {
-                        Toast.makeText(this@MainActivity, "Feedback", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                return true
-            }
-        })
-
-
         bottomNavView = binding.bottomNavView
         val bottomNavHost = supportFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
         val bottomNavController = bottomNavHost.findNavController()
@@ -81,8 +64,8 @@ class MainActivity : AppCompatActivity() {
         )
 
         bottomNavController.addOnDestinationChangedListener { _, destination, _ ->
+            setupToolbar()
             binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-
             when (destination.id) {
                 R.id.bottomNavFeed -> {
                     changeToolbar(findViewById(R.id.toolbarFeed))
@@ -108,24 +91,33 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun setupToolbar(){
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menu.clear()
+                menuInflater.inflate(R.menu.menu_general_top, menu)
+                MenuCompat.setGroupDividerEnabled(menu, true)
+            }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.item_gen_settings -> {
+                        Toast.makeText(this@MainActivity, "Settings", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    R.id.item_gen_feedback -> {
+                        Toast.makeText(this@MainActivity, "Feedback", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        })
+    }
+
     private fun changeToolbar(toolbar: Toolbar){
         supportActionBar?.hide()
         setSupportActionBar(toolbar)
         bottomNavView.visibility = View.VISIBLE
         supportActionBar?.show()
     }
-}
-
-fun Fragment.addMenuProvider(@MenuRes menuRes: Int, callback: (id: Int) -> Boolean) {
-    val menuProvider = object : MenuProvider {
-        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(menuRes, menu)
-        }
-        override fun onMenuItemSelected(menuItem: MenuItem) = callback(menuItem.itemId)
-    }
-    (requireActivity() as MenuHost).addMenuProvider(
-        menuProvider,
-        viewLifecycleOwner,
-        Lifecycle.State.RESUMED
-    )
 }

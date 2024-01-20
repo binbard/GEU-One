@@ -1,29 +1,23 @@
 package com.binbard.geu.geuone.ui.feed
 
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.MenuHost
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
+import androidx.core.view.MenuCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.R
-import com.binbard.geu.geuone.addMenuProvider
 import com.binbard.geu.geuone.databinding.FragmentFeedBinding
 import com.binbard.geu.geuone.models.FetchStatus
-import com.binbard.geu.geuone.models.LoginStatus
-import com.binbard.geu.geuone.models.StatusCode
 import com.binbard.geu.geuone.ui.notes.NotesFragment
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class FeedFragment : Fragment() {
@@ -49,10 +43,11 @@ class FeedFragment : Fragment() {
                 requireActivity().application
             ).feedDao()
         )
+        fvm.feedHelper = fvm.feedHelper ?: FeedHelper(requireContext())
 
         binding.srlFeed.setProgressViewOffset(true, 50, 200)
         binding.srlFeed.setOnRefreshListener {
-            FeedHelper.fetchData(fvm)
+            fvm.feedHelper!!.fetchData(fvm)
         }
 
         if(fvm.fetchStatus.value == FetchStatus.DONE) {
@@ -62,7 +57,7 @@ class FeedFragment : Fragment() {
 
         fvm.fetchStatus.observe(viewLifecycleOwner) {
             if (fvm.fetchStatus.value == FetchStatus.NA){
-                FeedHelper.fetchData(fvm)
+                fvm.feedHelper!!.fetchData(fvm)
             } else if (it == FetchStatus.FAILED) {
                 Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
             } else if (it == FetchStatus.NO_NEW_DATA_FOUND) {
@@ -90,15 +85,32 @@ class FeedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        addMenuProvider(R.menu.menu_erp_top) {
-            when (it) {
-                R.id.item_erp_top_profile -> {
-                    Toast.makeText(requireContext(), "Search", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                else -> false
+        setupToolbar()
+    }
+
+    private fun setupToolbar(){
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_feed_top, menu)
+                MenuCompat.setGroupDividerEnabled(menu, true)
             }
-        }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.item_feed_top_site -> {
+                        val intent = CustomTabsIntent.Builder().build()
+                        intent.launchUrl(requireContext(), getString(R.string.feedsHostUrl).toUri())
+                        true
+                    }
+                    R.id.item_feed_show_only -> {
+                        val allFeedsShow = fvm.feedHelper!!.getBoolShowAllFeeds()
+                        menuItem.isChecked = !allFeedsShow
+                        fvm.feedHelper!!.setBoolShowAllFeeds(!allFeedsShow)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        })
     }
 
     fun addFeeds(skip: Int = 0, limit: Int = 10) {

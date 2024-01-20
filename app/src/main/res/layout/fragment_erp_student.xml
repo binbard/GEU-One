@@ -30,6 +30,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                style="@style/MyLinearTheme"
                 android:background="@color/material_dynamic_primary40"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
@@ -77,6 +78,7 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:text="Update Photo"
+                        android:textColor="@color/material_dynamic_neutral90"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -90,15 +92,17 @@
                     android:gravity="center"
                     android:maxLines="1"
                     android:paddingTop="5dp"
-                    android:text="David Singh Rolson"
+                    android:contentDescription="David Singh Rolson"
                     android:textAllCaps="true"
                     android:textSize="16sp"
+                    android:textColor="@color/material_dynamic_neutral90"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvErpStuId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/material_dynamic_neutral90"
                     android:text="20124023"
                     android:textStyle="bold" />
 
@@ -123,7 +127,8 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center_vertical"
-                        android:text="davidsmalpalgd@gmail.com"
+                        android:contentDescription="davidsmalpalgd@gmail.com"
+                        android:textColor="@color/material_dynamic_neutral90"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -143,7 +148,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
-                        android:text="9230492945"
+                        android:contentDescription="9230492945"
+                        android:textColor="@color/material_dynamic_neutral90"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -170,9 +176,10 @@
 
             <ImageView
                 android:id="@+id/imageView7"
+                app:srcCompat="@drawable/ic_idcard"
                 android:layout_width="match_parent"
                 android:layout_height="24dp"
-                app:srcCompat="@drawable/ic_idcard" />
+                app:tint="?attr/colorAccent" />
 
             <TextView
                 android:id="@+id/textView9"

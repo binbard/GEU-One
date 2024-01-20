@@ -8,21 +8,17 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.view.MenuCompat
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.R
-import com.binbard.geu.geuone.addMenuProvider
 import com.binbard.geu.geuone.databinding.FragmentNotesBinding
 
 class NotesFragment : Fragment() {
@@ -85,23 +81,28 @@ class NotesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        addMenuProvider(R.menu.menu_erp_top) {
-            when (it) {
-                R.id.item_res_top_check-> {
-                    Toast.makeText(requireContext(), "Notes Upload", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                R.id.item_res_top_feedback -> {
-                    true
-                }
-                R.id.item_res_top_clearfiles -> {
-                    PdfUtils.clearAllFiles(requireContext())
-                    Toast.makeText(requireContext(), "Cleared All Notes", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                else -> false
+        setupToolbar()
+    }
+
+    private fun setupToolbar(){
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_notes_top, menu)
+                MenuCompat.setGroupDividerEnabled(menu, true)
             }
-        }
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.item_res_clearfiles -> {
+                        PdfUtils.clearAllFiles(requireContext())
+                        notesViewModel.rvAdapter!!.notifyDataSetChanged()
+                        Toast.makeText(requireContext(), "Cleared Files", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        })
     }
 
     class ItemSpacingDecoration(private val space: Int) : RecyclerView.ItemDecoration() {

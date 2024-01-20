@@ -22,5 +22,6 @@ class FeedViewModel: ViewModel() {
     val feeds = mutableListOf<Feed>()
 
     var feedRepository: FeedRepository? = null
+    var feedHelper: FeedHelper? = null
 
 }

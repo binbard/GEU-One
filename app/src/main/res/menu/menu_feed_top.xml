@@ -5,17 +5,7 @@
         android:title="Visit Site" />
     <item
         android:id="@+id/item_feed_show_only"
-        android:title="Show Feeds">
-        <menu>
-            <item
-                android:id="@+id/item_feed_show_only_past_6m"
-                android:title="Past 6m Only" />
-            <item
-                android:id="@+id/item_feed_show_only_past_year"
-                android:title="Past Year Only" />
-            <item
-                android:id="@+id/item_feed_show_only_all"
-                android:title="All Feeds" />
-        </menu>
-    </item>
+        android:checkable="true"
+        android:checked="false"
+        android:title="All Feeds" />
 </menu>

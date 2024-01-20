@@ -15,7 +15,6 @@ class ErpCacheHelper(context: Context) {
     private val spAttendance = context.getSharedPreferences("attendance", Context.MODE_PRIVATE)
     private val spLog = context.getSharedPreferences("log", Context.MODE_PRIVATE)
 
-
     fun getCookies(): String {
         return spErp.getString("cookies", "") ?: ""
     }
@@ -51,7 +50,6 @@ class ErpCacheHelper(context: Context) {
     fun saveLoginStatus(loginStatus: LoginStatus) {
         spErp.edit().putInt("loginStatus", loginStatus.ordinal).apply()
     }
-
 
     fun saveLocalStudentData(student: Student) {
         val studentJson = Gson().toJson(student)
