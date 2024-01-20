@@ -32,8 +32,7 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val fsItems = nvm.notes.value!!.children.toList()
         val item = fsItems[position]
-        val fileName = item.getFileName()
-        holder.tvNoteItem.text = fileName
+        holder.tvNoteItem.text = item.getFileDisplayName()
 
         if(item.isFolder()) {
             holder.imgNoteItem.setImageResource(R.drawable.ic_folder_with_files)
@@ -47,14 +46,14 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
                 nvm.gotoNextDir(item.name)
             }
             else{
-                PdfUtils.openOrDownloadPdf(context,item.url!!, fileName)
+                PdfUtils.openOrDownloadPdf(context,item.url!!, item.getFileDisplayName())
                 changeAlpha(holder.imgNoteItem, item)
             }
         }
     }
 
     private fun changeAlpha(img: ImageView, item: FSItem){
-        if(item.isFolder() || PdfUtils.getFile(context, item.getFileName()).exists()) img.alpha = 1.0f
+        if(item.isFolder() || PdfUtils.getFile(context, item.getFileDisplayName()).exists()) img.alpha = 1.0f
         else img.alpha = 0.5f
     }
 

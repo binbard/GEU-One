@@ -28,6 +28,24 @@ object PdfUtils {
         return File(getParentDir(context), "$fileName.pdf")
     }
 
+    fun getFileThumb(context: Context, fileName: String): File {
+        return File(getParentDir(context), "$fileName.pdf.jpg")
+    }
+
+    fun downloadThumb(context: Context, url: String, fileName: String){
+        val file = getFileThumb(context, fileName)
+        if(!file.exists()){
+            val request = DownloadManager.Request(Uri.parse(url))
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+            request.setTitle(file.name)
+            request.setDescription("Downloading ${file.name}")
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            request.setDestinationUri(file.toUri())
+            val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            manager.enqueue(request)
+        }
+    }
+
     private fun openPdf(context: Context, file: File){
         val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", file)
         val intent = Intent(Intent.ACTION_VIEW)
@@ -60,14 +78,17 @@ object PdfUtils {
         downloadingFiles.add(Pair(id, file.nameWithoutExtension))
     }
 
-    fun openOrDownloadPdf(context: Context, url: String, pdfTitle: String) {
+    fun openOrDownloadPdf(context: Context, url: String, saveName: String = "") {
+        val fileName = url.substringAfterLast("/").substringBeforeLast(".pdf")
+        val pdfTitle = if(saveName == "") fileName else saveName
+
         val file = getFile(context, pdfTitle)
 
         if (file.exists()) {
             openPdf(context, file)
         }
         else{
-            if(!isDownloading(pdfTitle)){
+            if(!isDownloading(fileName)){
                 downloadPdf(context, url, file)
             } else{
                 Toast.makeText(context, "Already downloading...", Toast.LENGTH_SHORT).show()

@@ -60,7 +60,7 @@ data class FSItem(
 
     fun getChildFileIndex(name: String): Int {
         for((index, child) in children.withIndex()){
-            if(child.getFileName() == name) return index
+            if(child.getFileDisplayName() == name) return index
         }
         return -1
     }
@@ -73,13 +73,9 @@ data class FSItem(
         return url == null || url == ""
     }
 
-    fun getFileName(): String {
+    fun getFileDisplayName(): String {
         return if(isFolder()) name
-        else name.split("_").last().split(".").first()
-    }
-    fun getFileNamex(): String {
-        return if(isFolder()) name
-        else name.split("_").last().split(".").first() + ".pdf"
+        else name.substringAfterLast("_").substringBeforeLast(".pdf")
     }
 
     fun getPath(): String {
