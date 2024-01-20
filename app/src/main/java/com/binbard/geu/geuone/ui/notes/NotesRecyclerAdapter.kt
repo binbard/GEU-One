@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.geuone.R
@@ -37,7 +38,7 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
         if(item.isFolder()) {
             holder.imgNoteItem.setImageResource(R.drawable.ic_folder_with_files)
         } else {
-            holder.imgNoteItem.setImageResource(R.drawable.ic_pdf_file_2)
+            showThumbnail(holder.imgNoteItem, item)
         }
         changeAlpha(holder.imgNoteItem, item)
 
@@ -52,8 +53,14 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
         }
     }
 
+    private fun showThumbnail(img: ImageView, item: FSItem){
+        val thumbFile = PdfUtils.downloadThumb(context, item.url!!, item.getFileDisplayName(), nvm.thumbDownloaded)
+        if(thumbFile != null) img.setImageURI(thumbFile.toUri())
+        else img.setImageResource(R.drawable.ic_pdf_file_2)
+    }
+
     private fun changeAlpha(img: ImageView, item: FSItem){
-        if(item.isFolder() || PdfUtils.getFile(context, item.getFileDisplayName()).exists()) img.alpha = 1.0f
+        if(item.isFolder() || PdfUtils.getFile(context, item.getFileDisplayName()).exists()) img.alpha = 0.8f
         else img.alpha = 0.5f
     }
 

@@ -8,6 +8,7 @@ import com.binbard.geu.geuone.R
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.File
 
 class NotesViewModel(application: Application): AndroidViewModel(application) {
     val notesCacheHelper = NotesCacheHelper(application)
@@ -23,6 +24,10 @@ class NotesViewModel(application: Application): AndroidViewModel(application) {
 
     var notes = MutableLiveData<FSItem>().apply {
         value = FSItem("Notes", null, mutableSetOf(), null)
+    }
+
+    var thumbDownloaded = MutableLiveData<String>().apply {
+        value = ""
     }
 
     fun gotoPrevDir(): Boolean {

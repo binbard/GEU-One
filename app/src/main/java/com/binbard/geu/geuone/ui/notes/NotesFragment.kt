@@ -63,6 +63,10 @@ class NotesFragment : Fragment() {
             tvTitleNotes.text = it
         }
 
+        nvm.thumbDownloaded.observe(viewLifecycleOwner) {
+            if(it.isNotEmpty()) nvm.rvAdapter?.notifyDataSetChanged()
+        }
+
         val onComplete = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
