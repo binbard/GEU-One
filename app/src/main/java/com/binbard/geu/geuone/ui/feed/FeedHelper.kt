@@ -2,6 +2,7 @@ package com.binbard.geu.geuone.ui.feed
 
 import android.content.Context
 import com.binbard.geu.geuone.R
+import com.binbard.geu.geuone.models.FeedPost
 import com.binbard.geu.geuone.models.FetchStatus
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
@@ -45,6 +46,13 @@ class FeedHelper(context: Context){
                 fvm.fetchStatus.value = FetchStatus.NEW_DATA_FOUND
             }
         }
+    }
+
+    fun fetchFeed(slug: String): FeedPost?{
+        val feedLink = "$hostUrl$slug?json=get_post?json=post&exclude=author,comment_count,comment_status,comments,custom_fields,status,title_plain,type,url"
+
+        val feedPost = FeedNetUtils.parsePostJson(feedLink)
+        return feedPost
     }
 
     fun getBoolShowAllFeeds(): Boolean {

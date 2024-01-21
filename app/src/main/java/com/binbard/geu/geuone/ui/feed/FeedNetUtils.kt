@@ -62,7 +62,7 @@ object FeedNetUtils {
         return dataList
     }
 
-    fun parsePostJson(url: String): FeedPost?{
+    fun parsePostJson(url: String): FeedPost?{              // Single Posts
         val request = builder.url(url).build()
 
         try{

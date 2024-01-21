@@ -1,5 +1,6 @@
 package com.binbard.geu.geuone.ui.feed
 
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
@@ -18,7 +19,7 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import com.binbard.geu.geuone.R
 import com.binbard.geu.geuone.databinding.ActivityFeedViewBinding
-import com.binbard.geu.geuone.models.FeedPost
+import com.binbard.geu.geuone.ui.notes.PdfUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,11 +45,12 @@ class FeedViewActivity : AppCompatActivity() {
         addMenu()
 
         binding.webViewPost.webViewClient = object : WebViewClient() {
+            @Deprecated("Deprecated in Java")
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-//                if (url != null && url.endsWith(".pdf")) {
-//                    openOrDownloadPdf(this@FeedViewActivity,url)
-//                    return true
-//                }
+                if (url != null && url.endsWith(".pdf")) {
+                    PdfUtils.openOrDownloadPdf(this@FeedViewActivity, url)
+                    return true
+                }
                 val intent = CustomTabsIntent.Builder().build()
                 intent.launchUrl(this@FeedViewActivity, android.net.Uri.parse(url))
                 return true
@@ -64,14 +66,16 @@ class FeedViewActivity : AppCompatActivity() {
             intent.launchUrl(this@FeedViewActivity, android.net.Uri.parse("$hostUrl$feedSlug"))
         }
 
+        val feedHelper = FeedHelper(this)
+
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val feedPost = fetchFeed(feedSlug)
+                val feedPost = feedHelper.fetchFeed(feedSlug)
                 if (feedPost == null) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
                             this@FeedViewActivity,
-                            "Failed to fetch feed",
+                            "Failed to Load",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -80,6 +84,7 @@ class FeedViewActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     binding.pbPost.visibility = View.GONE
                     binding.appBar.visibility = View.VISIBLE
+                    binding.webViewPost.settings.javaScriptEnabled = true
                     binding.webViewPost.loadData(
                         getPostContent(feedPost.content),
                         "text/html",
@@ -95,13 +100,6 @@ class FeedViewActivity : AppCompatActivity() {
             }
         }
 
-    }
-
-    fun fetchFeed(slug: String): FeedPost?{
-        val feedLink = "$hostUrl$slug?json=get_post?json=post&exclude=author,comment_count,comment_status,comments,custom_fields,status,title_plain,type,url"
-
-        val feedPost = FeedNetUtils.parsePostJson(feedLink)
-        return feedPost
     }
 
     private fun getSpannedToolbarTitle(title: String): SpannableString {
@@ -132,15 +130,21 @@ class FeedViewActivity : AppCompatActivity() {
         theme.resolveAttribute(com.google.android.material.R.attr.colorAccent, typedValue1, true)
         val colorAccentHex = String.format("%06X", 0xFFFFFF and typedValue1.data)
 
-        val typedValue2 = TypedValue()
-        theme.resolveAttribute(com.google.android.material.R.attr.dividerColor, typedValue2, true)
-        val dividerColorHex = String.format("%06X", 0xFFFFFF and typedValue2.data)
+        val rootStyle = ".wrapper{overflow-x:scroll;} a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;max-width:100%;}"
+        val bodyStyle =
+            "body{color:$colorAccentHex; font-family: font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; line-height: 1.5;} a{color:0077cc;}"
 
-        val style =
-            "<style>body{color:$colorAccentHex; font-family: font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; line-height: 1.5;} a{color:0077cc;}</style>"
+        val js = """
+              var bodyElements = document.body.children;
+              for (var i = 0; i < bodyElements.length; i++) {
+                var container = document.createElement('div');
+                container.classList.add('wrapper');
+                container.appendChild(bodyElements[i]);
+                document.body.insertBefore(container, bodyElements[i]);
+              }
+        """.trimIndent()
 
-        val tableStyle = "<style>table{border-collapse: collapse; width: 100%;} th, td {text-align: left; padding: 8px;} tr:nth-child(even){background-color: $dividerColorHex}</style>"
-        val html = "<html><body>$style$tableStyle$content</body></html>";
+        val html = "<html><style>$rootStyle$bodyStyle</style><body>$content<script >$js</script></body></html>";
         return html
     }
 
