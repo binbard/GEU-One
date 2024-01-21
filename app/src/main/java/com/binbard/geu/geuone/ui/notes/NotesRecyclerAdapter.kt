@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
+import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
@@ -18,10 +20,13 @@ import kotlinx.coroutines.NonCancellable.children
 import java.io.File
 import java.nio.file.Files.exists
 
-class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesViewModel): RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder>() {
+class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesViewModel) :
+    RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val card: CardView = itemView.findViewById(R.id.card_notes_item)
         val tvNoteItem: TextView = itemView.findViewById(R.id.tvNoteItem)
         val imgNoteItem: ImageView = itemView.findViewById(R.id.imgNoteItem)
+        val imgNoteDownload: ImageView = itemView.findViewById(R.id.imgNoteDownload)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,42 +40,67 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
         val item = fsItems[position]
         holder.tvNoteItem.text = item.getFileDisplayName()
 
-        if(item.isFolder()) {
+        if (item.isFolder()) {
             holder.imgNoteItem.setImageResource(R.drawable.ic_folder_with_files)
         } else {
             showThumbnail(holder.imgNoteItem, item)
         }
-        changeAlpha(holder.imgNoteItem, item)
+        changeAlpha(holder.card, holder.imgNoteItem, holder.imgNoteDownload, item)
 
         holder.itemView.setOnClickListener {
-            if(item.isFolder()) {
+            if (item.isFolder()) {
                 nvm.gotoNextDir(item.name)
-            }
-            else{
-                PdfUtils.openOrDownloadPdf(context,item.url!!, item.getFileDisplayName())
-                changeAlpha(holder.imgNoteItem, item)
+            } else {
+                val exist =
+                    PdfUtils.openOrDownloadPdf(context, item.url!!, item.getFileDisplayName())
+                if (!exist) {
+                    holder.imgNoteItem.alpha = 0.2f
+                    holder.imgNoteDownload.visibility = View.GONE
+                }
             }
         }
     }
 
-    private fun showThumbnail(img: ImageView, item: FSItem){
-        val thumbFile = PdfUtils.downloadThumb(context, item.url!!, item.getFileDisplayName(), nvm.thumbDownloaded)
-        if(thumbFile != null) img.setImageURI(thumbFile.toUri())
-        else img.setImageResource(R.drawable.ic_pdf_file_2)
+    private fun showThumbnail(img: ImageView, item: FSItem) {
+        val thumbFile = PdfUtils.downloadThumb(
+            context,
+            item.url!!,
+            item.getFileDisplayName(),
+            nvm.thumbDownloaded
+        )
+        if (thumbFile != null) {
+            img.setImageURI(thumbFile.toUri())
+        } else img.setImageResource(R.drawable.ic_pdf_file_2)
     }
 
-    private fun changeAlpha(img: ImageView, item: FSItem){
-        if(item.isFolder() || PdfUtils.getFile(context, item.getFileDisplayName()).exists()) img.alpha = 0.8f
-        else img.alpha = 0.5f
+    private fun changeAlpha(
+        card: CardView,
+        imgNoteItem: ImageView,
+        imgNoteDownload: ImageView,
+        item: FSItem
+    ) {
+        if (item.isFolder()) {
+            card.cardBackgroundColor.withAlpha(0)
+            card.background.alpha = 0
+        } else {
+            card.cardBackgroundColor.withAlpha(0x33)
+            card.background.alpha = 0x33
+        }
+        if (item.isFolder() || PdfUtils.getFile(context, item.getFileDisplayName()).exists()) {
+            imgNoteItem.alpha = 1f
+            imgNoteDownload.visibility = View.GONE
+        } else {
+            imgNoteDownload.visibility = View.VISIBLE
+        }
     }
 
-    override fun getItemCount(): Int{
+    override fun getItemCount(): Int {
         return nvm.notes.value!!.children.size
     }
 
-    fun updateItem(fileName: String){
+    fun updateItem(fileName: String) {
         val ind = nvm.notes.value!!.getChildFileIndex(fileName)
-        if(ind != -1) notifyItemChanged(ind)
+        if (ind != -1) notifyItemChanged(ind)
     }
 
 }

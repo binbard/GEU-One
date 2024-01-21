@@ -36,6 +36,7 @@ object ErpNetUtils {
                 val mainCookie = cookie.split(";")[0]
                 cookies += mainCookie + ";"
             }
+            response.body?.close()
             cookies
         } catch (e: Exception) {
             Log.d("ErpNetUtils", "Error: ${e.message}")
@@ -53,6 +54,7 @@ object ErpNetUtils {
             val doc = Jsoup.parse(response.body?.string())
             val token =
                 doc.select("input[name=__RequestVerificationToken]").first()?.attr("value") ?: ""
+            response.body?.close()
             return@withContext token
         } catch (e: Exception) {
             return@withContext ""
@@ -107,15 +109,19 @@ object ErpNetUtils {
         if(response.code == 302){
             val cookiesList = response.headers("Set-Cookie")
             val uid = cookiesList[0].split("=")[2].split("&")[0]
+            response.body?.close()
             return@withContext "SUCCESS"
         } else{
             val body = response.body?.string() ?: ""
             if(body.contains("Captcha does not match")){
+                response.body?.close()
                 return@withContext "INVALID_CAPTCHA"
             } else if(body.contains("The user name or password provided is incorrect.")){
+                response.body?.close()
                 return@withContext "INVALID_CREDENTIALS"
             }
         }
+        response.body?.close()
         return@withContext "xAB"
 
     }
@@ -138,7 +144,10 @@ object ErpNetUtils {
             val studentGson: StudentGson = Gson().fromJson(json, StudentGson::class.java)
             val details = studentGson.state
 
-            if(details.isEmpty()) return null
+            if(details.isEmpty()){
+                response.body?.close()
+                return null
+            }
 
             var result = ""
 
@@ -148,6 +157,7 @@ object ErpNetUtils {
                 result += "${data.first}: ${data.second}\n"
             }
 
+            response.body?.close()
             return studentData
 
         } catch (e: Exception) {
@@ -163,7 +173,9 @@ object ErpNetUtils {
             .build()
         try {
             val response = client.newCall(request).execute()
-            return BitmapHelper.decodeBase64(response.body?.byteStream()!!)
+            val img = BitmapHelper.decodeBase64(response.body?.byteStream()!!)
+            response.body?.close()
+            return img
         } catch (e: Exception) {
             return null
         }
@@ -183,6 +195,7 @@ object ErpNetUtils {
             val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
             val attendanceGson = gson.fromJson(json, AttendanceGson::class.java)
             val attendance = Attendance(attendanceGson.subjectAttendance, attendanceGson.totalAttendance[0])
+            response.body?.close()
             return attendance
         } catch (e: Exception) {
             return null

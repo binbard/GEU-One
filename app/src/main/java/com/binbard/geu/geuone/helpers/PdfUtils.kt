@@ -94,21 +94,22 @@ object PdfUtils {
         downloadingFiles.add(Pair(id, file.nameWithoutExtension))
     }
 
-    fun openOrDownloadPdf(context: Context, url: String, saveName: String = "") {
+    fun openOrDownloadPdf(context: Context, url: String, saveName: String = ""): Boolean {
         val fileName = url.substringAfterLast("/").substringBeforeLast(".pdf")
         val pdfTitle = if(saveName == "") fileName else saveName
 
         val file = getFile(context, pdfTitle)
 
-        if (file.exists()) {
+        return if (file.exists()) {
             openPdf(context, file)
-        }
-        else{
+            true
+        } else{
             if(!isDownloading(pdfTitle)){
                 downloadPdf(context, url, file)
             } else{
                 Toast.makeText(context, "Already downloading...", Toast.LENGTH_SHORT).show()
             }
+            false
         }
     }
 
