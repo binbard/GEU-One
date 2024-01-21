@@ -97,9 +97,8 @@ class FeedFragment : Fragment() {
                 true
             }
             R.id.item_feed_show_only -> {
-                val allFeedsShow = fvm.feedHelper!!.getBoolShowAllFeeds()
-                item.isChecked = !allFeedsShow
-                fvm.feedHelper!!.setBoolShowAllFeeds(!allFeedsShow)
+                item.isChecked = !fvm.showAllFeeds
+                fvm.showAllFeeds = !fvm.showAllFeeds
                 true
             }
             else -> false
@@ -109,7 +108,7 @@ class FeedFragment : Fragment() {
     fun addFeeds(skip: Int = 0, limit: Int = 10) {
         val feedSearchView: SearchView = toolbarFeed.findViewById(R.id.feedSearchView)
         lifecycleScope.launch {
-            val result = fvm.feedRepository?.getSearchFeedsPaginated(feedSearchView.query.toString() , skip, limit)
+            val result = fvm.feedRepository?.getSearchFeedsPaginated(feedSearchView.query.toString() , skip, limit, fvm.showAllFeeds)
             if(skip==0) adapter.clearFeeds()
             adapter.addFeeds(result ?: emptyList())
         }

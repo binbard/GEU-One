@@ -1,5 +1,6 @@
 package com.binbard.geu.geuone.ui.feed
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
@@ -31,6 +32,7 @@ class FeedViewActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFeedViewBinding
     private lateinit var hostUrl: String
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,7 +50,7 @@ class FeedViewActivity : AppCompatActivity() {
             @Deprecated("Deprecated in Java")
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 if (url != null && url.endsWith(".pdf")) {
-                    PdfUtils.openOrDownloadPdf(this@FeedViewActivity, url)
+                    PdfUtils.openOrDownloadPdf(this@FeedViewActivity, url,"",true)
                     return true
                 }
                 val intent = CustomTabsIntent.Builder().build()

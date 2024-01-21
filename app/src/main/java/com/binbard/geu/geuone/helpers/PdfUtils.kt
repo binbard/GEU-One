@@ -49,7 +49,6 @@ object PdfUtils {
                     Log.e("PdfUtils", "Failed to download thumb for $file.name")
                 }
                 override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                    Log.d("PdfUtils", "Downloading thumb for $file.name")
                     val bytes = response.body?.bytes()
                     if (bytes != null && bytes.isNotEmpty()) {
                         file.writeBytes(bytes)
@@ -82,7 +81,7 @@ object PdfUtils {
         ActivityCompat.requestPermissions(activity, arrayOf(permission), requestCode)
     }
 
-    private fun downloadPdf(context: Context, url: String, file: File){
+    private fun downloadPdf(context: Context, url: String, file: File, isExternalSource: Boolean){
         val request = DownloadManager.Request(Uri.parse(url))
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
         request.setTitle(file.name)
@@ -91,10 +90,11 @@ object PdfUtils {
         request.setDestinationUri(file.toUri())
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val id = manager.enqueue(request)
-        downloadingFiles.add(Pair(id, file.nameWithoutExtension))
+        if(isExternalSource) Toast.makeText(context, "Downloading ${file.name}", Toast.LENGTH_SHORT).show()
+        else downloadingFiles.add(Pair(id, file.nameWithoutExtension))
     }
 
-    fun openOrDownloadPdf(context: Context, url: String, saveName: String = ""): Boolean {
+    fun openOrDownloadPdf(context: Context, url: String, saveName: String = "", isExternalSource: Boolean = false): Boolean {
         val fileName = url.substringAfterLast("/").substringBeforeLast(".pdf")
         val pdfTitle = if(saveName == "") fileName else saveName
 
@@ -105,7 +105,7 @@ object PdfUtils {
             true
         } else{
             if(!isDownloading(pdfTitle)){
-                downloadPdf(context, url, file)
+                downloadPdf(context, url, file, isExternalSource)
             } else{
                 Toast.makeText(context, "Already downloading...", Toast.LENGTH_SHORT).show()
             }

@@ -1,6 +1,7 @@
 package com.binbard.geu.geuone.ui.erp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.browser.customtabs.CustomTabsIntent
@@ -34,15 +35,11 @@ class ErpFragment : Fragment(){
 
         setHasOptionsMenu(true)
 
-        if(evm.loginStatus.value==LoginStatus.NOT_LOGGED_IN){
-            showErpPage(0)
-        }
-
         if(evm.loginStatus.value==LoginStatus.LOGGED_IN){
             setupErpFeatures()
             if(childFragmentManager.fragments.size==0) showErpPage(R.id.item_erp_student)
-        } else{
-            setupErpFeatures(unset = true)
+        } else {
+            showErpPage(0)
         }
 
         evm.loginStatus.observe(viewLifecycleOwner) {
@@ -140,6 +137,15 @@ class ErpFragment : Fragment(){
 
         val drawerLayout: DrawerLayout = requireActivity().findViewById(R.id.drawer_layout)
 
+        evm.erpStudentImg.observe(viewLifecycleOwner) {
+            val bitmap = BitmapHelper.stringToBitmap(it)
+            drawerLayout.findViewById<ImageView>(R.id.tvStuImg)?.setImageBitmap(bitmap)
+        }
+        evm.studentData.observe(viewLifecycleOwner) {
+            drawerLayout.findViewById<TextView>(R.id.tvStuId)?.text = it?.studentID
+            drawerLayout.findViewById<TextView>(R.id.tvStuName)?.text = it?.studentName
+        }
+
         if (unset) {
             btnErpMenu.setOnClickListener(null)
             requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout).setDrawerLockMode(
@@ -166,15 +172,6 @@ class ErpFragment : Fragment(){
                 else -> showErpPage(R.id.item_erp_student)
             }
             true
-        }
-
-        evm.erpStudentImg.observe(viewLifecycleOwner) {
-            val bitmap = BitmapHelper.stringToBitmap(it)
-            drawerLayout.findViewById<ImageView>(R.id.tvStuImg)?.setImageBitmap(bitmap)
-        }
-        evm.studentData.observe(viewLifecycleOwner) {
-            drawerLayout.findViewById<TextView>(R.id.tvStuId)?.text = it?.studentID
-            drawerLayout.findViewById<TextView>(R.id.tvStuName)?.text = it?.studentName
         }
     }
 

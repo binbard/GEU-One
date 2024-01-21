@@ -14,13 +14,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.GEUOne"
         tools:targetApi="31">
-        <activity
-            android:name=".PdfViewActivity"
-            android:exported="false"
-            android:label="@string/title_activity_pdf_view"
-            android:theme="@style/Theme.GEUOne.NoActionBar" />
         <activity
             android:name=".ui.feed.FeedViewActivity"
             android:exported="false"

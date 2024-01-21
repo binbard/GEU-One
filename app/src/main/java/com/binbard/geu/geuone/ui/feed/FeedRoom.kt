@@ -29,8 +29,8 @@ interface FeedDao {
     @Query("SELECT date FROM feeds ORDER BY date DESC LIMIT 1")
     fun getLatestFeedDate(): Long
 
-    @Query("SELECT * FROM feeds WHERE title LIKE :search ORDER BY date DESC LIMIT :limit OFFSET :skip")
-    fun getSearchFeedsPaginated(search: String,skip: Int,limit: Int): List<FeedEntity>
+    @Query("SELECT * FROM feeds WHERE title LIKE :search AND date > :mDate ORDER BY date DESC LIMIT :skip,:limit")
+    fun getSearchFeedsPaginated(search: String,skip: Int,limit: Int,mDate: Long): List<FeedEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertFeeds(feeds: List<FeedEntity>)
@@ -76,9 +76,10 @@ class FeedRepository(private val feedDao: FeedDao) {
         return Date(feedDao.getLatestFeedDate())
     }
 
-    suspend fun getSearchFeedsPaginated(search: String,skip: Int, limit: Int): List<Feed> {
+    suspend fun getSearchFeedsPaginated(search: String,skip: Int, limit: Int, showAllFeeds: Boolean): List<Feed> {
+        val mDate = if(showAllFeeds) 0L else Date().time - 15552000000              // 15552000000 = 6M in ms
         return withContext(Dispatchers.IO) {
-            feedDao.getSearchFeedsPaginated("%$search%",skip,limit).map { it.toFeed() }
+            feedDao.getSearchFeedsPaginated("%$search%",skip,limit,mDate).map { it.toFeed() }
         }
     }
 

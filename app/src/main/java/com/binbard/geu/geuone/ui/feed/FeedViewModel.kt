@@ -19,6 +19,8 @@ class FeedViewModel: ViewModel() {
         value = FetchStatus.NA
     }
 
+    var showAllFeeds = false
+
     val feeds = mutableListOf<Feed>()
 
     var feedRepository: FeedRepository? = null

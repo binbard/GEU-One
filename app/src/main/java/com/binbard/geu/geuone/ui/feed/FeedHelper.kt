@@ -54,12 +54,4 @@ class FeedHelper(context: Context){
         val feedPost = FeedNetUtils.parsePostJson(feedLink)
         return feedPost
     }
-
-    fun getBoolShowAllFeeds(): Boolean {
-        return sp.getBoolean("showAllFeeds", false)
-    }
-    fun setBoolShowAllFeeds(value: Boolean) {
-        sp.edit().putBoolean("showAllFeeds", value).apply()
-    }
-
 }
