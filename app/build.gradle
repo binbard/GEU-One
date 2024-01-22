@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace 'com.binbard.geu.geuone'
+    namespace 'com.binbard.geu.one'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.binbard.geu.geuone"
+        applicationId "com.binbard.geu.one"
         minSdk 26
         targetSdk 34
         versionCode 1
@@ -35,6 +35,9 @@ android {
 
     buildFeatures {
         viewBinding true
+    }
+    dataBinding {
+        enabled = true
     }
 }
 
