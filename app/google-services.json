@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "175663559076",
+    "project_id": "geu-one",
+    "storage_bucket": "geu-one.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175663559076:android:4a7bc7fb7ea9430bc99131",
+        "android_client_info": {
+          "package_name": "com.binbard.geu.one"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDM0QbvB9ZnsMxhC4NLvMjE1yORLAdddKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
