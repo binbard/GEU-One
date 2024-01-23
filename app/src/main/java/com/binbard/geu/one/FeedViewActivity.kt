@@ -1,9 +1,10 @@
-package com.binbard.geu.one.ui.feed
+package com.binbard.geu.one
 
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
+import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuInflater
@@ -17,8 +18,8 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.view.MenuCompat
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
-import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.ActivityFeedViewBinding
+import com.binbard.geu.one.ui.feed.FeedHelper
 import com.binbard.geu.one.ui.notes.PdfUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,6 +43,8 @@ class FeedViewActivity : AppCompatActivity() {
         supportActionBar?.title = ""
 
         val feedSlug = intent.getStringExtra("feedSlug") ?: ""
+
+        Log.d("FeedViewActivity", "feedSlug: $feedSlug")
 
         addMenu()
 

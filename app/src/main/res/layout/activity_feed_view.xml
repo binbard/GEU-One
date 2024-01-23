@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ui.feed.FeedViewActivity">
+    tools:context=".FeedViewActivity">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/pbPost"
@@ -50,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".ui.feed.FeedViewActivity"
+        tools:context=".FeedViewActivity"
         tools:showIn="@layout/activity_feed_view">
 
         <androidx.constraintlayout.widget.ConstraintLayout

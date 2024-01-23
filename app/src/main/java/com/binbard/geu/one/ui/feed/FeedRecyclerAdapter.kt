@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.one.R
-import java.util.*
+import com.binbard.geu.one.FeedViewActivity
 
 class FeedRecyclerAdapter: RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder>() {
     private var feeds: MutableList<Feed> = mutableListOf()

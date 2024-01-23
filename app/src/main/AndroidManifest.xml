@@ -14,14 +14,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.GEUOne"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <activity
-            android:name=".ui.feed.FeedViewActivity"
-            android:exported="false"
-            android:label="@string/title_activity_feed_view"
-            android:theme="@style/Theme.GEUOne.NoActionBar" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -38,8 +33,17 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".FeedViewActivity"
+            android:exported="false"
+            android:label="@string/title_activity_feed_view"
+            android:theme="@style/Theme.GEUOne.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.FEED_POST" />
             </intent-filter>
         </activity>
 
@@ -57,7 +61,7 @@
             android:value="124" />
 
         <service
-            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+            android:name=".NanoMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

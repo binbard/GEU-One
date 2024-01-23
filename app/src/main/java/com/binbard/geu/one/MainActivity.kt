@@ -2,6 +2,7 @@ package com.binbard.geu.one
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,7 +19,9 @@ import com.binbard.geu.one.databinding.ActivityMainBinding
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -90,7 +93,8 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.item_gen_feedback -> {
-                Toast.makeText(this, "Feedback", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "Feedback", Toast.LENGTH_SHORT).show()
+                letsDoThis2()
                 true
             }
             else -> false
@@ -102,5 +106,10 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         bottomNavView.visibility = View.VISIBLE
         supportActionBar?.show()
+    }
+
+    private fun letsDoThis2(){
+        val nanoMessagingService = NanoMessagingService()
+        nanoMessagingService.sendNotification(this,"Test Message: Feedback received")
     }
 }
