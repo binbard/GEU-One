@@ -42,9 +42,6 @@
             android:exported="false"
             android:label="@string/title_activity_feed_view"
             android:theme="@style/Theme.GEUOne.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.FEED_POST" />
-            </intent-filter>
         </activity>
 
         <meta-data
@@ -58,7 +55,7 @@
             android:resource="@color/material_dynamic_primary30" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="124" />
+            android:value="default" />
 
         <service
             android:name=".NanoMessagingService"

@@ -30,9 +30,9 @@ class NanoMessagingService : FirebaseMessagingService() {
         val icon = remoteMessage.notification?.icon
         val clickAction = remoteMessage.notification?.clickAction
 
-        val postSlug = remoteMessage.data["post_slug"]
+        val extras = remoteMessage.data
 
-        sendNotification(this, body.toString(), channelId, title, icon, clickAction, postSlug)
+        sendNotification(this, body.toString(), channelId, title, icon, clickAction, extras)
     }
 
     override fun onNewToken(token: String) {
@@ -52,26 +52,19 @@ class NanoMessagingService : FirebaseMessagingService() {
         pTitle: String? = null,
         pIcon: String? = null,
         pClickAction: String? = null,
-        pPostSlug: String? = null,
+        extras: Map<String, String>? = null,
     ) {
 
-        val channelId = pChannelId ?: "Feeds"
-        val title = pTitle ?: "Feeds"
+        val channelId = pChannelId ?: "Default"
+        val title = pTitle ?: "GEU One"
         val icon = pIcon ?: "ic_feeds"
         val clickAction = pClickAction ?: "android.intent.action.FEED_POST"
-        val postSlug = pPostSlug ?: "adapt"
 
-        var intent: Intent
-        Log.d(TAG, "sendNotification: $postSlug")
-        if(postSlug.isNotEmpty()){
-            intent = Intent(context, FeedViewActivity::class.java)
-            intent.putExtra("feedSlug", postSlug)
-        } else{
-            intent = Intent(context, MainActivity::class.java)
+        val cls = getClickActionCls(extras)
+        val intent = Intent(context, cls)
+        for((k,v) in extras ?: emptyMap()) {
+            intent.putExtra(k, v)
         }
-//        if (intent.resolveActivity(context.packageManager) == null) {
-//            Log.d(TAG, "Activity Does Not Exist")
-//        }
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent = PendingIntent.getActivity(
             context,
@@ -98,4 +91,19 @@ class NanoMessagingService : FirebaseMessagingService() {
         notificationManager.notify(0, notificationBuilder.build())
 
     }
+
+    private fun getClickActionCls(extras: Map<String, String>?): Class<*> {
+        val mainCls = MainActivity::class.java
+        if(extras == null) return mainCls
+        val className = extras["click_action"] ?: return mainCls
+        val cls: Class<*>
+        try {
+            cls = Class.forName(className)
+        } catch (e: ClassNotFoundException) {
+            Log.e("ResolveClickAction", "Failed to resolve")
+            return mainCls
+        }
+        return cls
+    }
+
 }

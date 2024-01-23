@@ -44,8 +44,6 @@ class FeedViewActivity : AppCompatActivity() {
 
         val feedSlug = intent.getStringExtra("feedSlug") ?: ""
 
-        Log.d("FeedViewActivity", "feedSlug: $feedSlug")
-
         addMenu()
 
         binding.webViewPost.webViewClient = object : WebViewClient() {

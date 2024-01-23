@@ -1,12 +1,13 @@
 package com.binbard.geu.one
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
@@ -14,14 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.ActivityMainBinding
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.messaging.FirebaseMessaging
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -29,19 +28,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var erpViewModel: ErpViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        resolveClickAction()
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
         bottomNavView = binding.bottomNavView
-        val bottomNavHost = supportFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
+        val bottomNavHost =
+            supportFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
         val bottomNavController = bottomNavHost.findNavController()
 
         erpViewModel = ViewModelProvider(this)[ErpViewModel::class.java]
-        if(erpViewModel.erpCacheHelper==null){
+        if (erpViewModel.erpCacheHelper == null) {
             erpViewModel.erpCacheHelper = ErpCacheHelper(this)
         }
-        if(erpViewModel.erpRepository==null){
+        if (erpViewModel.erpRepository == null) {
             erpViewModel.erpRepository = ErpRepository(erpViewModel.erpCacheHelper!!)
         }
 
@@ -101,15 +104,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun changeToolbar(toolbar: Toolbar){
+    private fun changeToolbar(toolbar: Toolbar) {
         supportActionBar?.hide()
         setSupportActionBar(toolbar)
         bottomNavView.visibility = View.VISIBLE
         supportActionBar?.show()
     }
 
-    private fun letsDoThis2(){
+    private fun letsDoThis2() {
         val nanoMessagingService = NanoMessagingService()
-        nanoMessagingService.sendNotification(this,"Test Message: Feedback received")
+        nanoMessagingService.sendNotification(this, "Test Message: Feedback received")
     }
+
+    private fun resolveClickAction() {
+        if (intent.extras == null) return
+        val className = intent.extras!!.getString("click_action") ?: return
+        val cls: Class<*>
+        try {
+            cls = Class.forName(className)
+        } catch (e: ClassNotFoundException) {
+            Log.e("ResolveClickAction", "Failed to resolve")
+            return
+        }
+        val i = Intent(this, cls)
+        i.putExtras(intent.extras!!)
+        startActivity(i)
+    }
+
 }

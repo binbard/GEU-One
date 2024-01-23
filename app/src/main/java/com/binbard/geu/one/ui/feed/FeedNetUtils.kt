@@ -63,7 +63,6 @@ object FeedNetUtils {
 
     fun parsePostJson(url: String): FeedPost?{              // Single Posts
         val request = builder.url(url).build()
-        Log.d("FeedNetUtils", "parsePostJson: $url")
 
         try{
             val response = client.newCall(request).execute()
