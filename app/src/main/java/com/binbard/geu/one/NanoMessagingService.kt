@@ -9,6 +9,7 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.binbard.geu.one.helpers.FirebaseUtils
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -16,27 +17,28 @@ class NanoMessagingService : FirebaseMessagingService() {
     private val TAG = "MyFirebaseMsgService"
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d(TAG, "From: ${remoteMessage.from}")
+        Log.d(TAG, "FCM Message payload: ${remoteMessage.data}")
 
-        if (remoteMessage.data.isNotEmpty()) {
-            Log.d(TAG, "Message data payload: ${remoteMessage.data}")
-            sendNotification(this, remoteMessage.data["message"].toString())
-        }
         if (remoteMessage.notification == null) return
 
         val channelId = remoteMessage.notification?.channelId
         val title = remoteMessage.notification?.title
-        val body = remoteMessage.notification?.body
         val icon = remoteMessage.notification?.icon
-        val clickAction = remoteMessage.notification?.clickAction
+        val body = remoteMessage.notification?.body
 
         val extras = remoteMessage.data
 
-        sendNotification(this, body.toString(), channelId, title, icon, clickAction, extras)
+        if (remoteMessage.data.isNotEmpty()) {
+            sendNotification(this, body.toString(), channelId, title, icon, extras)
+        }
     }
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
+        FirebaseUtils.subscribeTo("feed")
+        FirebaseUtils.subscribeTo("resources")
+        FirebaseUtils.subscribeTo("notes")
+        FirebaseUtils.subscribeToAll()
         sendRegistrationToServer(token)
     }
 
@@ -51,26 +53,22 @@ class NanoMessagingService : FirebaseMessagingService() {
         pChannelId: String? = null,
         pTitle: String? = null,
         pIcon: String? = null,
-        pClickAction: String? = null,
         extras: Map<String, String>? = null,
     ) {
-
         val channelId = pChannelId ?: "Default"
         val title = pTitle ?: "GEU One"
         val icon = pIcon ?: "ic_feeds"
-        val clickAction = pClickAction ?: "android.intent.action.FEED_POST"
 
-        val cls = getClickActionCls(extras)
-        val intent = Intent(context, cls)
+        val intent = Intent(context, MainActivity::class.java)
         for((k,v) in extras ?: emptyMap()) {
             intent.putExtra(k, v)
         }
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val pendingIntent = PendingIntent.getActivity(
             context,
-            0,
+            System.nanoTime().toInt(),
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+            PendingIntent.FLAG_IMMUTABLE
         )
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
@@ -88,22 +86,8 @@ class NanoMessagingService : FirebaseMessagingService() {
             NotificationManager.IMPORTANCE_DEFAULT,
         )
         notificationManager.createNotificationChannel(channel)
-        notificationManager.notify(0, notificationBuilder.build())
+        notificationManager.notify(System.nanoTime().toInt(), notificationBuilder.build())
 
-    }
-
-    private fun getClickActionCls(extras: Map<String, String>?): Class<*> {
-        val mainCls = MainActivity::class.java
-        if(extras == null) return mainCls
-        val className = extras["click_action"] ?: return mainCls
-        val cls: Class<*>
-        try {
-            cls = Class.forName(className)
-        } catch (e: ClassNotFoundException) {
-            Log.e("ResolveClickAction", "Failed to resolve")
-            return mainCls
-        }
-        return cls
     }
 
 }

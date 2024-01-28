@@ -3,19 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/bottomNavFeed"
+        android:id="@+id/FeedFragment"
         android:icon="@drawable/ic_feeds"
         android:title="Feed" />
     <item
-        android:id="@+id/bottomNavRes"
+        android:id="@+id/ResourcesFragment"
         android:icon="@drawable/ic_book"
         android:title="Res" />
     <item
-        android:id="@+id/bottomNavNotes"
+        android:id="@+id/NotesFragment"
         android:icon="@drawable/ic_notes"
         android:title="Notes" />
     <item
-        android:id="@+id/bottomNavErp"
+        android:id="@+id/ErpFragment"
         android:icon="@drawable/ic_educap"
         android:title="ERP" />
 </menu>

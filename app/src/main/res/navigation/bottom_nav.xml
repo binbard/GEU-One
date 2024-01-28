@@ -3,36 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_nav"
-    app:startDestination="@id/bottomNavFeed">
+    app:startDestination="@id/FeedFragment">
 
     <fragment
-        android:id="@+id/bottomNavFeed"
+        android:id="@+id/FeedFragment"
         android:name="com.binbard.geu.one.ui.feed.FeedFragment"
         android:label="Feed"
         tools:layout="@layout/fragment_feed"/>
     <fragment
-        android:id="@+id/bottomNavRes"
+        android:id="@+id/ResourcesFragment"
         android:name="com.binbard.geu.one.ui.res.ResFragment"
         android:label="Resources"
         tools:layout="@layout/fragment_res"/>
     <fragment
-        android:id="@+id/bottomNavNotes"
+        android:id="@+id/NotesFragment"
         android:name="com.binbard.geu.one.ui.notes.NotesFragment"
         android:label="Notes"
         tools:layout="@layout/fragment_notes"/>
     <fragment
-        android:id="@+id/bottomNavErp"
+        android:id="@+id/ErpFragment"
         android:name="com.binbard.geu.one.ui.erp.ErpFragment"
         android:label="ERP"
         tools:layout="@layout/fragment_erp">
         <action
             android:id="@+id/action_bottomNavErp_to_erpLoginFragment"
-            app:destination="@id/erpLoginFragment"
-            app:popUpTo="@id/bottomNavErp"
+            app:destination="@id/ErpLoginFragment"
+            app:popUpTo="@id/ErpFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
-        android:id="@+id/erpLoginFragment"
+        android:id="@+id/ErpLoginFragment"
         android:name="com.binbard.geu.one.ui.erp.ErpLoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_erp_login"/>

@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -19,26 +20,24 @@ import com.binbard.geu.one.databinding.ActivityMainBinding
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var bottomNavView: BottomNavigationView
     private lateinit var erpViewModel: ErpViewModel
+    private lateinit var bottomNavController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         resolveClickAction()
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
 
-        bottomNavView = binding.bottomNavView
         val bottomNavHost =
             supportFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
-        val bottomNavController = bottomNavHost.findNavController()
+        bottomNavController = bottomNavHost.findNavController()
+        resolveInitialFragment()
 
         erpViewModel = ViewModelProvider(this)[ErpViewModel::class.java]
         if (erpViewModel.erpCacheHelper == null) {
@@ -50,37 +49,33 @@ class MainActivity : AppCompatActivity() {
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.bottomNavFeed,
-                R.id.bottomNavRes,
-                R.id.bottomNavNotes,
-                R.id.bottomNavErp
+                R.id.ResourcesFragment, R.id.FeedFragment, R.id.NotesFragment, R.id.ErpFragment
             )
         )
-
         bottomNavController.addOnDestinationChangedListener { _, destination, _ ->
             binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             when (destination.id) {
-                R.id.bottomNavFeed -> {
+                R.id.FeedFragment -> {
                     changeToolbar(findViewById(R.id.toolbarFeed))
                 }
-                R.id.bottomNavRes -> {
+                R.id.ResourcesFragment -> {
                     changeToolbar(findViewById(R.id.toolbarRes))
                 }
-                R.id.bottomNavNotes -> {
+                R.id.NotesFragment -> {
                     changeToolbar(findViewById(R.id.toolbarNotes))
                 }
-                R.id.bottomNavErp -> {
+                R.id.ErpFragment -> {
                     changeToolbar(findViewById(R.id.toolbarErp))
                 }
-                R.id.erpLoginFragment -> {
+                R.id.ErpLoginFragment -> {
                     supportActionBar?.hide()
-                    bottomNavView.visibility = View.GONE
+                    binding.bottomNavView.visibility = View.GONE
                 }
             }
         }
 
         setupActionBarWithNavController(bottomNavController, appBarConfiguration)
-        bottomNavView.setupWithNavController(bottomNavController)
+        binding.bottomNavView.setupWithNavController(bottomNavController)
 
     }
 
@@ -107,7 +102,7 @@ class MainActivity : AppCompatActivity() {
     private fun changeToolbar(toolbar: Toolbar) {
         supportActionBar?.hide()
         setSupportActionBar(toolbar)
-        bottomNavView.visibility = View.VISIBLE
+        binding.bottomNavView.visibility = View.VISIBLE
         supportActionBar?.show()
     }
 
@@ -118,17 +113,29 @@ class MainActivity : AppCompatActivity() {
 
     private fun resolveClickAction() {
         if (intent.extras == null) return
-        val className = intent.extras!!.getString("click_action") ?: return
-        val cls: Class<*>
+        val clickAction = intent.extras!!.getString("click_action") ?: ""
+
+        var cls: Class<*>
         try {
-            cls = Class.forName(className)
+            cls = Class.forName(clickAction)
         } catch (e: ClassNotFoundException) {
             Log.e("ResolveClickAction", "Failed to resolve")
+            cls = MainActivity::class.java
             return
         }
+        if (cls == MainActivity::class.java) return
         val i = Intent(this, cls)
         i.putExtras(intent.extras!!)
         startActivity(i)
+    }
+
+    private fun resolveInitialFragment() {
+        if (intent.extras != null){
+            val initialFragment = intent.extras!!.getString("initial_fragment") ?: return
+            bottomNavController.popBackStack()
+            val id = resources.getIdentifier(initialFragment, "id", packageName)
+            if(id!=0) bottomNavController.navigate(id)
+        }
     }
 
 }
