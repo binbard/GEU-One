@@ -24,11 +24,10 @@
         android:visible="false"
         android:title="Syllabus" />
     <item
-        android:id="@+id/item_erp_marks"
+        android:id="@+id/item_erp_midterm_marks"
         android:icon="@drawable/ic_folder_with_files"
         android:checkable="true"
-        android:visible="false"
-        android:title="Marks" />
+        android:title="Midterm Marks" />
     <item
         android:id="@+id/item_erp_exam"
         android:icon="@drawable/ic_folder_with_files"

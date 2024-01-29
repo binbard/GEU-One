@@ -15,6 +15,7 @@ import com.binbard.geu.one.databinding.FragmentErpBinding
 import com.binbard.geu.one.models.LoginStatus
 import com.binbard.geu.one.ui.Snack
 import com.binbard.geu.one.ui.erp.menu.ErpAttendanceFragment
+import com.binbard.geu.one.ui.erp.menu.ErpMidtermMarksFragment
 import com.binbard.geu.one.ui.erp.menu.ErpStudentFragment
 import com.binbard.geu.one.utils.BitmapHelper
 import com.google.android.material.navigation.NavigationView
@@ -23,6 +24,7 @@ import com.google.android.material.navigation.NavigationView
 class ErpFragment : Fragment(){
     private lateinit var binding: FragmentErpBinding
     private lateinit var evm: ErpViewModel
+    private lateinit var tvErpTitle: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -39,6 +41,8 @@ class ErpFragment : Fragment(){
         } else {
             showErpPage(0)
         }
+
+        tvErpTitle = requireActivity().findViewById(R.id.tvErpTitle)
 
         evm.loginStatus.observe(viewLifecycleOwner) {
             if (it == LoginStatus.UNKNOWN) {
@@ -123,9 +127,22 @@ class ErpFragment : Fragment(){
         val transaction = childFragmentManager.beginTransaction()
         when(pageId){
             0 -> transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
-            R.id.item_erp_student -> transaction.replace(R.id.fragmentContainerView2, ErpStudentFragment())
-            R.id.item_erp_attendance -> transaction.replace(R.id.fragmentContainerView2, ErpAttendanceFragment())
-            else -> transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
+            R.id.item_erp_student -> {
+                transaction.replace(R.id.fragmentContainerView2, ErpStudentFragment())
+                tvErpTitle.text = "ERP"
+            }
+            R.id.item_erp_attendance -> {
+                transaction.replace(R.id.fragmentContainerView2, ErpAttendanceFragment())
+                tvErpTitle.text = "ERP - Attendance"
+            }
+            R.id.item_erp_midterm_marks -> {
+                transaction.replace(R.id.fragmentContainerView2, ErpMidtermMarksFragment())
+                tvErpTitle.text = "ERP - Midterm Marks"
+            }
+            else -> {
+                transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
+                tvErpTitle.text = "ERP"
+            }
         }
         transaction.commit()
     }
@@ -167,6 +184,7 @@ class ErpFragment : Fragment(){
             when (menuItem.itemId) {
                 R.id.item_erp_student -> showErpPage(R.id.item_erp_student)
                 R.id.item_erp_attendance -> showErpPage(R.id.item_erp_attendance)
+                R.id.item_erp_midterm_marks -> showErpPage(R.id.item_erp_midterm_marks)
                 else -> showErpPage(R.id.item_erp_student)
             }
             true

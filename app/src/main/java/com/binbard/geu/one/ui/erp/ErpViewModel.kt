@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.binbard.geu.one.models.Attendance
 import com.binbard.geu.one.models.LoginStatus
 import com.binbard.geu.one.models.MidtermMarks
+import com.binbard.geu.one.models.MidtermMarksData
 import com.binbard.geu.one.ui.erp.menu.Student
 
 class ErpViewModel : ViewModel() {
@@ -30,7 +31,7 @@ class ErpViewModel : ViewModel() {
         value = null
     }
 
-    val midtermMarksData:  MutableLiveData<MidtermMarks> = MutableLiveData<MidtermMarks>().apply {
+    val midtermMarksData = MutableLiveData<MidtermMarksData>().apply {
         value = null
     }
 

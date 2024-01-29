@@ -19,7 +19,7 @@ class ErpAttendanceFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentErpAttendanceBinding.inflate(inflater, container, false)
 
         evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]

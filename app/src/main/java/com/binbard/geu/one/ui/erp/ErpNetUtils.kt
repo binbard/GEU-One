@@ -3,8 +3,7 @@ package com.binbard.geu.one.ui.erp
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import com.binbard.geu.one.models.Attendance
-import com.binbard.geu.one.models.AttendanceGson
+import com.binbard.geu.one.models.*
 import com.binbard.geu.one.ui.erp.menu.StudentGson
 import com.binbard.geu.one.ui.erp.menu.Student
 import com.binbard.geu.one.utils.BitmapHelper
@@ -198,6 +197,25 @@ object ErpNetUtils {
             return attendance
         } catch (e: Exception) {
             return null
+        }
+    }
+
+    fun getMidtermMarks(cookies: String, regID: String, sem: Int): MidtermMarksData? {
+        val request = okhttp3.Request.Builder()
+            .url("$erpUrl/Web_StudentAcademic/GetStudentMidMarks")
+            .header("Cookie", cookies)
+            .post(FormBody.Builder().add("YearSem", sem.toString()).add("RegID", regID).build())
+            .build()
+        return try {
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+
+            val json = body?.replace("\\", "")?.replace("\"[", "[")?.replace("]\"", "]")
+            val midtermMarksData = Gson().fromJson(json, MidtermMarksData::class.java)
+            response.body?.close()
+            midtermMarksData
+        } catch (e: Exception) {
+            null
         }
     }
 

@@ -106,4 +106,13 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
+    fun fetchMidtermMarks(erpViewModel: ErpViewModel, sem: Int){
+        GlobalScope.launch(Dispatchers.IO) {
+            Log.d("ErpRepository", "YYY fetchMidtermMarks")
+            val midtermMarksData = erpViewModel.studentData.value?.regID?.let { ErpNetUtils.getMidtermMarks(cookies, it, sem) }
+            erpViewModel.midtermMarksData.postValue(midtermMarksData)
+        }
+    }
+
 }
