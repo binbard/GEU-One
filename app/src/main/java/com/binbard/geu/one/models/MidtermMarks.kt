@@ -7,8 +7,8 @@ data class MidtermMarksData(
 )
 
 data class MidtermMarks(
-    @SerializedName("Marks") val marks: Int,
+    @SerializedName("Marks") val marks: String,
     @SerializedName("Subject") val subject: String,
     @SerializedName("SubjectId") val subjectId: String,
-    @SerializedName("MaxMarks") val maxMarks: Int,
+    @SerializedName("MaxMarks") val maxMarks: String,
 )

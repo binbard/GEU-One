@@ -1,10 +1,13 @@
 package com.binbard.geu.one.ui.erp.menu
 
+import android.R
 import android.content.Context
+import android.text.TextUtils
 import android.view.View
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.core.view.size
+import com.binbard.geu.one.models.MidtermMarks
 import com.binbard.geu.one.models.SubjectAttendance
 import java.text.SimpleDateFormat
 import java.util.*
@@ -96,6 +99,83 @@ object Helper {
         row.addView(present)
         row.addView(getColDivider(context))
         row.addView(employee)
+
+        return row
+    }
+
+    fun createMidtermMarksRow(context: Context, count: Int, midtermMarks: MidtermMarks): TableRow{
+        val row = TableRow(context)
+
+        if(count%2==0) row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+
+        val subject = midtermMarks.subject
+        val subjectSplit = subject.split("/")
+        var (subjectCode, subjectName) = Pair("", "")
+        if(subjectSplit.size!=2) {
+            subjectCode = ""
+            subjectName = subjectSplit[0]
+        } else{
+            subjectCode = subjectSplit[0]
+            subjectName = subjectSplit[1]
+        }
+
+        val marks = midtermMarks.marks
+        val maxMarks = midtermMarks.maxMarks
+
+        val tvSubjectCode = TextView(context)
+        tvSubjectCode.textSize = 18f
+        tvSubjectCode.text = subjectCode
+        tvSubjectCode.setPadding(10, 10, 10, 10)
+        tvSubjectCode.gravity = View.TEXT_ALIGNMENT_CENTER
+
+        val colSeparator0 = View(context)
+        colSeparator0.layoutParams = TableRow.LayoutParams(4, TableRow.LayoutParams.MATCH_PARENT)
+        colSeparator0.setBackgroundResource(R.color.black)
+
+        val tvSubjectName = TextView(context)
+        tvSubjectName.textSize = 18f
+        tvSubjectName.text = subjectName
+        tvSubjectName.tooltipText = subjectName
+        tvSubjectName.setPadding(10, 10, 10, 10)
+        tvSubjectName.gravity = View.TEXT_ALIGNMENT_CENTER
+        tvSubjectName.maxWidth = 420
+        tvSubjectName.maxLines = 1
+        tvSubjectName.ellipsize = TextUtils.TruncateAt.END
+
+        val colSeparator1 = View(context)
+        colSeparator1.layoutParams = TableRow.LayoutParams(4, TableRow.LayoutParams.MATCH_PARENT)
+        colSeparator1.setBackgroundResource(R.color.black)
+
+        val tvMarks = TextView(context)
+        tvMarks.textSize = 18f
+        tvMarks.text = marks
+        tvMarks.setPadding(10, 10, 10, 10)
+        tvMarks.gravity = View.TEXT_ALIGNMENT_CENTER
+
+        val colSeparator2 = View(context)
+        colSeparator2.layoutParams = TableRow.LayoutParams(4, TableRow.LayoutParams.MATCH_PARENT)
+        colSeparator2.setBackgroundResource(R.color.black)
+
+        val tvMaxMarks = TextView(context)
+        tvMaxMarks.textSize = 18f
+        tvMaxMarks.text = maxMarks
+        tvMaxMarks.setPadding(10, 10, 10, 10)
+        tvMaxMarks.gravity = View.TEXT_ALIGNMENT_CENTER
+
+        if(count==0){
+            tvSubjectCode.setTypeface(null, android.graphics.Typeface.BOLD)
+            tvSubjectName.setTypeface(null, android.graphics.Typeface.BOLD)
+            tvMarks.setTypeface(null, android.graphics.Typeface.BOLD)
+            tvMaxMarks.setTypeface(null, android.graphics.Typeface.BOLD)
+        }
+
+        row.addView(tvSubjectCode)
+        row.addView(colSeparator0)
+        row.addView(tvSubjectName)
+        row.addView(colSeparator1)
+        row.addView(tvMarks)
+        row.addView(colSeparator2)
+        row.addView(tvMaxMarks)
 
         return row
     }
