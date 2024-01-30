@@ -12,11 +12,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
+import com.binbard.geu.one.ui.notes.PdfUtils.getFile
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import java.io.File
 
 object PdfUtils {
-    private val downloadingFiles = mutableListOf<Pair<Long,String>>()
+    private val downloadingFiles = mutableListOf<Pair<Long, String>>()
     private val client = OkHttpClient()
     private val builder = okhttp3.Request.Builder()
 
@@ -35,16 +38,19 @@ object PdfUtils {
         return File(getParentDir(context), "$fileName.pdf.jpg")
     }
 
-    fun downloadThumb(context: Context, url: String, saveName: String, thumbDownloaded: MutableLiveData<String>): File? {
+    fun downloadThumb(
+        context: Context, url: String, saveName: String, thumbDownloaded: MutableLiveData<String>
+    ): File? {
         val thumbUrl = url.replace(".pdf", ".pdf.jpg")
         val thumbName = saveName.replace(".pdf", ".pdf.jpg")
         val file = getFileThumb(context, thumbName)
-        if(!file.exists()){
+        if (!file.exists()) {
             val request = builder.url(thumbUrl).build()
             client.newCall(request).enqueue(object : okhttp3.Callback {
                 override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
                     Log.e("PdfUtils", "Failed to download thumb for $file.name")
                 }
+
                 override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
                     val bytes = response.body?.bytes()
                     if (bytes != null && bytes.isNotEmpty()) {
@@ -58,27 +64,32 @@ object PdfUtils {
         return file
     }
 
-    private fun openPdf(context: Context, file: File){
-        val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", file)
+    private fun openPdf(context: Context, file: File) {
+        val uri = FileProvider.getUriForFile(
+            context, context.applicationContext.packageName + ".provider", file
+        )
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, "application/pdf")
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, "No Application available to view pdf", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "No Application available to view pdf", Toast.LENGTH_LONG)
+                .show()
         }
     }
 
     private fun hasPermission(context: Context, permission: String): Boolean {
-        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            context, permission
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermission(activity: Activity, permission: String, requestCode: Int) {
         ActivityCompat.requestPermissions(activity, arrayOf(permission), requestCode)
     }
 
-    private fun downloadPdf(context: Context, url: String, file: File, isExternalSource: Boolean){
+    private fun downloadPdf(context: Context, url: String, file: File, isExternalSource: Boolean) {
         val request = DownloadManager.Request(Uri.parse(url))
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
         request.setTitle(file.name)
@@ -87,23 +98,82 @@ object PdfUtils {
         request.setDestinationUri(file.toUri())
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val id = manager.enqueue(request)
-        if(isExternalSource) Toast.makeText(context, "Downloading ${file.name}", Toast.LENGTH_SHORT).show()
+        if (isExternalSource) Toast.makeText(
+            context, "Downloading ${file.name}", Toast.LENGTH_SHORT
+        ).show()
         else downloadingFiles.add(Pair(id, file.nameWithoutExtension))
     }
 
-    fun openOrDownloadPdf(context: Context, url: String, saveName: String = "", isExternalSource: Boolean = false): Boolean {
+    fun openFollowDownloadPdf(
+        context: Context, url: String, payload: Map<String, String>, cookies: String = ""
+    ) {
+        val baseUrl = url.substringBeforeLast("/")
+
+        val formBody = FormBody.Builder()
+        for ((key, value) in payload) {
+            formBody.add(key, value)
+        }
+        val request0 = builder.url(url).post(formBody.build())
+        request0.addHeader("Cookie", cookies)
+
+        client.newCall(request0.build()).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+                Log.e("PdfUtils", "Failed to follow file")
+            }
+
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                val body = response.body?.string()
+                // {"msg":"OK","data":1,"docNo":"2205048_4"}
+                val docNo = body?.substringAfter("docNo\":\"")?.substringBefore("\"") ?: ""
+                val file = getFile(context, docNo)
+                if (file.exists()) {
+                    openPdf(context, file)
+                    return
+                }
+
+                if (docNo == "") {
+                    Log.e("PdfUtils", "Failed to download ${file.name}")
+                    return
+                }
+
+                val request = builder.url("$baseUrl/DownloadFile?docNo=$docNo").method("GET", null)
+                request.addHeader("Cookie", cookies)
+                Log.d("PdfUtils", "Downloading $baseUrl/DownloadFile?docNo=$docNo")
+
+                client.newCall(request.build()).enqueue(object : okhttp3.Callback {
+                    override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+                        Log.e("PdfUtils", "Failed to download ${file.name}")
+                    }
+
+                    override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                        val bytes = response.body?.bytes()
+                        if (bytes != null && bytes.isNotEmpty()) {
+                            file.writeBytes(bytes)
+                            openPdf(context, file)
+                        }
+                    }
+                })
+            }
+        })
+
+    }
+
+
+    fun openOrDownloadPdf(
+        context: Context, url: String, saveName: String = "", isExternalSource: Boolean = false
+    ): Boolean {
         val fileName = url.substringAfterLast("/").substringBeforeLast(".pdf")
-        val pdfTitle = if(saveName == "") fileName else saveName
+        val pdfTitle = if (saveName == "") fileName else saveName
 
         val file = getFile(context, pdfTitle)
 
         return if (file.exists()) {
             openPdf(context, file)
             true
-        } else{
-            if(!isDownloading(pdfTitle)){
+        } else {
+            if (!isDownloading(pdfTitle)) {
                 downloadPdf(context, url, file, isExternalSource)
-            } else{
+            } else {
                 Toast.makeText(context, "Already downloading...", Toast.LENGTH_SHORT).show()
             }
             false
@@ -116,7 +186,7 @@ object PdfUtils {
 
     fun removeDownloading(id: Long): String? {
         val index = downloadingFiles.indexOfFirst { it.first == id }
-        if (index != -1){
+        if (index != -1) {
             val fileName = downloadingFiles[index].second
             downloadingFiles.removeAt(index)
             return fileName

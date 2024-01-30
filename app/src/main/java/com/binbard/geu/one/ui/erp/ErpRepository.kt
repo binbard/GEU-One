@@ -115,4 +115,13 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
+    fun fetchExamMarks(erpViewModel: ErpViewModel){
+        GlobalScope.launch(Dispatchers.IO) {
+            Log.d("ErpRepository", "CCC fetchExamMarks")
+            val examMarksData = erpViewModel.studentData.value?.regID?.let { ErpNetUtils.getExamMarks(cookies, it) }
+            erpViewModel.examMarksData.postValue(examMarksData)
+        }
+    }
+
 }

@@ -48,38 +48,36 @@ class ErpMidtermMarksFragment: Fragment() {
                 id: Long
             ) {
                 evm.erpRepository?.fetchMidtermMarks(evm, position+1)
+                binding.tblMidtermMarks.visibility = View.GONE
+                binding.tvNoDataMidterm.visibility = View.GONE
+                binding.pbMidtermMarks.visibility = View.VISIBLE
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
 
         evm.midtermMarksData.observe(viewLifecycleOwner) {
+            binding.pbMidtermMarks.visibility = View.GONE
             if(it==null || it.state.isEmpty()){
-                binding.tvNoDataMidterm.visibility = View.VISIBLE
                 binding.tblMidtermMarks.visibility = View.GONE
+                binding.tvNoDataMidterm.visibility = View.VISIBLE
                 return@observe
             }
             binding.tvNoDataMidterm.visibility = View.GONE
             val marksList = it.state
 
             binding.tblMidtermMarks.removeAllViews()
-            val separator = View(context)
-            separator.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 5)
-            separator.setBackgroundResource(R.color.black)
-            binding.tblMidtermMarks.addView(separator)
+            binding.tblMidtermMarks.addView(Helper.getRowDividerBlack(requireContext()))
 
             val header = MidtermMarks("Marks", "#/Subject", "0", "Max Marks")
             val headerRow =  Helper.createMidtermMarksRow(requireContext(), 0, header)
             binding.tblMidtermMarks.addView(headerRow)
+            binding.tblMidtermMarks.addView(Helper.getRowDividerBlack(requireContext()))
 
             for (i in marksList.indices) {
                 val row = Helper.createMidtermMarksRow(requireContext(), i+1, marksList[i])
                 binding.tblMidtermMarks.addView(row)
-
-                val sep = View(context)
-                sep.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 5)
-                sep.setBackgroundResource(R.color.black)
-                binding.tblMidtermMarks.addView(sep)
+                binding.tblMidtermMarks.addView(Helper.getRowDividerBlack(requireContext()))
             }
 
             binding.tblMidtermMarks.visibility = View.VISIBLE

@@ -32,6 +32,5 @@
         android:id="@+id/item_erp_exam"
         android:icon="@drawable/ic_folder_with_files"
         android:checkable="true"
-        android:visible="false"
         android:title="Exam" />
 </menu>

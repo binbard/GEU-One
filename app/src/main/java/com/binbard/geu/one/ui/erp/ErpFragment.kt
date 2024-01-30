@@ -15,6 +15,7 @@ import com.binbard.geu.one.databinding.FragmentErpBinding
 import com.binbard.geu.one.models.LoginStatus
 import com.binbard.geu.one.ui.Snack
 import com.binbard.geu.one.ui.erp.menu.ErpAttendanceFragment
+import com.binbard.geu.one.ui.erp.menu.ErpExamFragment
 import com.binbard.geu.one.ui.erp.menu.ErpMidtermMarksFragment
 import com.binbard.geu.one.ui.erp.menu.ErpStudentFragment
 import com.binbard.geu.one.utils.BitmapHelper
@@ -139,6 +140,10 @@ class ErpFragment : Fragment(){
                 transaction.replace(R.id.fragmentContainerView2, ErpMidtermMarksFragment())
                 tvErpTitle.text = "ERP - Midterm Marks"
             }
+            R.id.item_erp_exam -> {
+                transaction.replace(R.id.fragmentContainerView2, ErpExamFragment())
+                tvErpTitle.text = "ERP - Exam"
+            }
             else -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
                 tvErpTitle.text = "ERP"
@@ -185,6 +190,7 @@ class ErpFragment : Fragment(){
                 R.id.item_erp_student -> showErpPage(R.id.item_erp_student)
                 R.id.item_erp_attendance -> showErpPage(R.id.item_erp_attendance)
                 R.id.item_erp_midterm_marks -> showErpPage(R.id.item_erp_midterm_marks)
+                R.id.item_erp_exam -> showErpPage(R.id.item_erp_exam)
                 else -> showErpPage(R.id.item_erp_student)
             }
             true

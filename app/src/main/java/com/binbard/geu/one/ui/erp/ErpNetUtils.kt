@@ -219,4 +219,23 @@ object ErpNetUtils {
         }
     }
 
+    fun getExamMarks(cookies: String, regID: String): ExamMarksData? {
+        val request = okhttp3.Request.Builder()
+            .url("$erpUrl/Web_StudentAcademic/GetStudentExamSummary")
+            .header("Cookie", cookies)
+            .post(FormBody.Builder().add("RegID", regID).build())
+            .build()
+        return try {
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+
+            val json = body?.replace("\\", "")?.replace("\"[", "[")?.replace("]\"", "]")
+            val examMarksData = Gson().fromJson(json, ExamMarksData::class.java)
+            response.body?.close()
+            examMarksData
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 }
