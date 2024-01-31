@@ -105,8 +105,16 @@ object PdfUtils {
     }
 
     fun openFollowDownloadPdf(
-        context: Context, url: String, payload: Map<String, String>, cookies: String = ""
+        context: Context, url: String, payload: Map<String, String>, cookies: String = "", saveName: String = ""
     ) {
+        var file = File("")
+        if(saveName!=""){
+            file = getFile(context, saveName)
+            if(file.exists()){
+                openPdf(context, file)
+                return
+            }
+        }
         val baseUrl = url.substringBeforeLast("/")
 
         val formBody = FormBody.Builder()
@@ -125,7 +133,7 @@ object PdfUtils {
                 val body = response.body?.string()
                 // {"msg":"OK","data":1,"docNo":"2205048_4"}
                 val docNo = body?.substringAfter("docNo\":\"")?.substringBefore("\"") ?: ""
-                val file = getFile(context, docNo)
+                if(saveName=="") file = getFile(context, docNo)
                 if (file.exists()) {
                     openPdf(context, file)
                     return

@@ -47,15 +47,16 @@ class ErpExamFragment: Fragment() {
 
             val erpHostUrl = getString(R.string.erpHostUrl)
             val regID = evm.studentData.value?.regID ?: ""
+            val pRollNo = evm.studentData.value?.pRollNo ?: ""
             val cookies = evm.erpRepository?.cookies ?: ""
 
             val header = ExamMarks("Sem", "SGPA", "Back", "Result", "Marks", "Subject")
-            val headerRow =  Helper.createExamMarksRow(requireContext(), 0, header, erpHostUrl, regID, cookies)
+            val headerRow =  Helper.createExamMarksRow(requireContext(), 0, header, erpHostUrl, regID, pRollNo, cookies)
             binding.tblExamMarks.addView(headerRow)
             binding.tblExamMarks.addView(Helper.getRowDividerBlack(requireContext()))
 
             for (i in marksList.indices) {
-                val row = Helper.createExamMarksRow(requireContext(), i+1, marksList[i], erpHostUrl, regID, cookies)
+                val row = Helper.createExamMarksRow(requireContext(), i+1, marksList[i], erpHostUrl, regID, pRollNo, cookies)
                 binding.tblExamMarks.addView(row)
                 binding.tblExamMarks.addView(Helper.getRowDividerBlack(requireContext()))
             }

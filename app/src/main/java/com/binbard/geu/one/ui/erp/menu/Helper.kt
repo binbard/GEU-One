@@ -210,6 +210,7 @@ object Helper {
         examMarks: ExamMarks,
         erpHostUrl: String,
         regID: String,
+        pRollNo: String,
         cookies: String
     ): TableRow {
         val row = TableRow(context)
@@ -254,11 +255,11 @@ object Helper {
         tvTotalSubject.gravity = View.TEXT_ALIGNMENT_CENTER
 
         val urlMarksheet = "${erpHostUrl}Web_StudentAcademic/FillMarksheet"
-        val tvMarksheetView = getMarkSheetLinkSpan(context, count, urlMarksheet, yearSem, regID, cookies, "View Detail")
+        val tvMarksheetView = getMarkSheetLinkSpan(context, count, urlMarksheet, yearSem, regID, cookies, "View Detail", "$pRollNo-$yearSem-MS")
         if (count == 0) tvMarksheetView.text = "Marksheet View"
 
         val urlGrade = "${erpHostUrl}Web_StudentAcademic/FillMarksheet_ChoiceBase"
-        val tvGradeView = getMarkSheetLinkSpan(context, count, urlGrade, yearSem, regID, cookies, "View ($yearSem)")
+        val tvGradeView = getMarkSheetLinkSpan(context, count, urlGrade, yearSem, regID, cookies, "View ($yearSem)", "$pRollNo-$yearSem")
         if (count == 0) tvGradeView.text = "Grade View"
 
         val tvMarks = TextView(context)
@@ -307,6 +308,7 @@ object Helper {
         regID: String,
         cookies: String,
         linkTxt: String,
+        saveName: String,
     ): TextView {
         val tvMarksheetView = TextView(context)
         tvMarksheetView.textSize = 18f
@@ -321,7 +323,7 @@ object Helper {
             spannableString.setSpan(clickSpan, 0, linkTxt.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             tvMarksheetView.text = spannableString
             tvMarksheetView.setOnClickListener {
-                PdfUtils.openFollowDownloadPdf(context, link, payload, cookies)
+                PdfUtils.openFollowDownloadPdf(context, link, payload, cookies, saveName)
             }
         }
         return tvMarksheetView
