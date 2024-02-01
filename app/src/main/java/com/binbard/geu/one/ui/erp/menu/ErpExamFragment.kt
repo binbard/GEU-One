@@ -24,6 +24,7 @@ class ErpExamFragment: Fragment() {
         val evm: ErpViewModel = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
         if(evm.examMarksData.value==null) {
+            binding.tvNoDataExam.visibility = View.INVISIBLE
             evm.erpRepository?.fetchExamMarks(evm)
         }
 

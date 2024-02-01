@@ -10,6 +10,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.one.R
+import com.binbard.geu.one.helpers.PdfUtils
 
 class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesViewModel) :
     RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder>() {

@@ -1,4 +1,4 @@
-package com.binbard.geu.one.ui.notes
+package com.binbard.geu.one.helpers
 
 import android.app.Activity
 import android.app.DownloadManager
@@ -12,10 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
-import com.binbard.geu.one.ui.notes.PdfUtils.getFile
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import java.io.File
 
 object PdfUtils {
@@ -98,19 +96,21 @@ object PdfUtils {
         request.setDestinationUri(file.toUri())
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val id = manager.enqueue(request)
-        if (isExternalSource) Toast.makeText(
-            context, "Downloading ${file.name}", Toast.LENGTH_SHORT
-        ).show()
-        else downloadingFiles.add(Pair(id, file.nameWithoutExtension))
+//        if (isExternalSource) Toast.makeText(context, "Downloading ${file.name}", Toast.LENGTH_SHORT).show() else
+        downloadingFiles.add(Pair(id, file.nameWithoutExtension))
     }
 
     fun openFollowDownloadPdf(
-        context: Context, url: String, payload: Map<String, String>, cookies: String = "", saveName: String = ""
+        context: Context,
+        url: String,
+        payload: Map<String, String>,
+        cookies: String = "",
+        saveName: String = ""
     ) {
         var file = File("")
-        if(saveName!=""){
+        if (saveName != "") {
             file = getFile(context, saveName)
-            if(file.exists()){
+            if (file.exists()) {
                 openPdf(context, file)
                 return
             }
@@ -133,7 +133,7 @@ object PdfUtils {
                 val body = response.body?.string()
                 // {"msg":"OK","data":1,"docNo":"2205048_4"}
                 val docNo = body?.substringAfter("docNo\":\"")?.substringBefore("\"") ?: ""
-                if(saveName=="") file = getFile(context, docNo)
+                if (saveName == "") file = getFile(context, docNo)
                 if (file.exists()) {
                     openPdf(context, file)
                     return
@@ -170,7 +170,7 @@ object PdfUtils {
     fun openOrDownloadPdf(
         context: Context, url: String, saveName: String = "", isExternalSource: Boolean = false
     ): Boolean {
-        val fileName = url.substringAfterLast("/").substringBeforeLast(".pdf")
+        val fileName = url.substringAfterLast("/").substringBeforeLast(".pdf").replace("%20", " ")
         val pdfTitle = if (saveName == "") fileName else saveName
 
         val file = getFile(context, pdfTitle)

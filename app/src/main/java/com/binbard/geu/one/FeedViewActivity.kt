@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
-import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuInflater
@@ -20,7 +19,7 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import com.binbard.geu.one.databinding.ActivityFeedViewBinding
 import com.binbard.geu.one.ui.feed.FeedHelper
-import com.binbard.geu.one.ui.notes.PdfUtils
+import com.binbard.geu.one.helpers.PdfUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

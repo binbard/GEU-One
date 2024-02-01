@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentNotesBinding
+import com.binbard.geu.one.helpers.PdfUtils
 
 class NotesFragment : Fragment() {
     private lateinit var binding: FragmentNotesBinding

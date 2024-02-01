@@ -1,4 +1,4 @@
-package com.binbard.geu.one.ui
+package com.binbard.geu.one.helpers
 
 import android.view.ViewGroup
 import com.google.android.material.snackbar.Snackbar

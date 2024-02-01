@@ -6,17 +6,14 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ClickableSpan
-import android.text.style.URLSpan
-import android.util.Log
 import android.view.View
 import android.widget.TableRow
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.view.size
 import com.binbard.geu.one.models.ExamMarks
 import com.binbard.geu.one.models.MidtermMarks
 import com.binbard.geu.one.models.SubjectAttendance
-import com.binbard.geu.one.ui.notes.PdfUtils
+import com.binbard.geu.one.helpers.PdfUtils
 import java.text.SimpleDateFormat
 import java.util.*
 

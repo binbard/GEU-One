@@ -2,7 +2,7 @@ package com.binbard.geu.one.ui.res
 
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageView
+import com.google.android.material.button.MaterialButton
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
@@ -11,9 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentResBinding
-import com.binbard.geu.one.ui.notes.PdfUtils
+import com.binbard.geu.one.databinding.ItemResCardBinding
+import com.binbard.geu.one.helpers.PdfUtils
 
-class ResFragment: Fragment() {
+class ResFragment : Fragment() {
     private lateinit var binding: FragmentResBinding
     private lateinit var rvm: ResViewModel
     override fun onCreateView(
@@ -28,24 +29,50 @@ class ResFragment: Fragment() {
         setHasOptionsMenu(true)
 
         val intent = CustomTabsIntent.Builder().build()
-        binding.btAcmClub.setOnClickListener {
-            intent.launchUrl(it.context, "https://geu-acm.surge.sh/".toUri())
-        }
-        binding.btIeeeClub.setOnClickListener {
-            intent.launchUrl(it.context, "https://geu-ieee.github.io/".toUri())
-        }
-        binding.btFacultyList.setOnClickListener {
-            intent.launchUrl(it.context, "https://geu.ac.in/computer-science-and-engineering/faculty/".toUri())
-        }
-        binding.btSyllabus.setOnClickListener {
-            intent.launchUrl(it.context, "https://csitgeu.in/wp/2017/08/16/all-semester-syllabus/".toUri())
-        }
-        binding.btMiniproject.setOnClickListener {
-//            PdfUtils.openPdfWithName(it.context, "MiniProject")
-            PdfUtils.openOrDownloadPdf(requireContext(), "https://github.com/geu-one-static/files/blob/main/Mini%20Project%205th%20sem%20all.pdf?raw=true", "MiniProject5thSem")
-        }
 
-        requireActivity().findViewById<ImageView>(R.id.imgErpMenu).setOnClickListener(null)
+        rvm.resRepository = rvm.resRepository ?: ResRepository(requireContext())
+
+        rvm.resList.observe(viewLifecycleOwner) {
+            if (it == null) {
+                rvm.resRepository?.fetchResources(rvm)
+                return@observe
+            }
+
+            binding.root.removeAllViews()
+            for (resSection in it) {
+                val resTitle = resSection.title
+                val resObjList = resSection.content
+
+                val resCardBinding = ItemResCardBinding.inflate(inflater, container, false)
+                resCardBinding.tvResCardTitle.text = resTitle
+
+                resCardBinding.flResCardBody.removeAllViews()
+
+                for (resObj in resObjList) {
+                    val button = MaterialButton(requireContext())
+                    button.text = resObj.name
+                    val params = ViewGroup.MarginLayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    params.setMargins(10, 10, 10, 10)
+                    button.layoutParams = params
+
+                    if (resObj.type == "pdf") {
+                        button.setOnClickListener {
+                            PdfUtils.openOrDownloadPdf(requireContext(), resObj.url, isExternalSource =  true)
+                        }
+                    } else if (resObj.type == "link") {
+                        button.setOnClickListener {
+                            intent.launchUrl(it.context, resObj.url.toUri())
+                        }
+                    }
+
+                    resCardBinding.flResCardBody.addView(button)
+                }
+                binding.root.addView(resCardBinding.root)
+            }
+        }
 
         return binding.root
     }
@@ -55,6 +82,7 @@ class ResFragment: Fragment() {
         inflater.inflate(R.menu.menu_res_top, menu)
         MenuCompat.setGroupDividerEnabled(menu, true)
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_res_clearfiles -> {

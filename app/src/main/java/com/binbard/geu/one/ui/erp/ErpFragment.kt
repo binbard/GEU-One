@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpBinding
 import com.binbard.geu.one.models.LoginStatus
-import com.binbard.geu.one.ui.Snack
+import com.binbard.geu.one.helpers.Snack
 import com.binbard.geu.one.ui.erp.menu.ErpAttendanceFragment
 import com.binbard.geu.one.ui.erp.menu.ErpExamFragment
 import com.binbard.geu.one.ui.erp.menu.ErpMidtermMarksFragment
@@ -36,14 +36,14 @@ class ErpFragment : Fragment(){
 
         setHasOptionsMenu(true)
 
+        tvErpTitle = requireActivity().findViewById(R.id.tvErpTitle)
+
         if(evm.loginStatus.value==LoginStatus.LOGGED_IN){
             setupErpFeatures()
             if(childFragmentManager.fragments.size==0) showErpPage(R.id.item_erp_student)
         } else {
             showErpPage(0)
         }
-
-        tvErpTitle = requireActivity().findViewById(R.id.tvErpTitle)
 
         evm.loginStatus.observe(viewLifecycleOwner) {
             if (it == LoginStatus.UNKNOWN) {
