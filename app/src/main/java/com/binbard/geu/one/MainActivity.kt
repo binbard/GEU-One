@@ -20,6 +20,7 @@ import com.binbard.geu.one.databinding.ActivityMainBinding
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class MainActivity : AppCompatActivity() {
@@ -92,7 +93,20 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.item_gen_feedback -> {
 //                Toast.makeText(this, "Feedback", Toast.LENGTH_SHORT).show()
-                letsDoThis2()
+//                letsDoThis2()
+
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Feedback")
+                    .setMessage("Info: This is always shared anonymously.")
+                    .setView(R.layout.dialog_feedback)
+                    .setNegativeButton("Cancel") { dialog, which ->
+                        // Negative btn pressed
+                    }
+                    .setPositiveButton("SEND") { dialog, which ->
+                        letsDoThis2()
+                    }
+                    .show()
+
                 true
             }
             else -> false
@@ -108,7 +122,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun letsDoThis2() {
         val nanoMessagingService = NanoMessagingService()
-        nanoMessagingService.sendNotification(this, "Test Message: Feedback received")
+        nanoMessagingService.sendNotification(this, "Feedback received. Thankyou for your valuable time.")
     }
 
     private fun resolveClickAction() {

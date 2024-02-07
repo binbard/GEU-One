@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.databinding.FragmentErpExamBinding
 import com.binbard.geu.one.models.ExamMarks
 import com.binbard.geu.one.ui.erp.ErpViewModel
+import kotlin.math.roundToInt
 
 class ErpExamFragment: Fragment() {
     private lateinit var binding: FragmentErpExamBinding
@@ -25,22 +26,26 @@ class ErpExamFragment: Fragment() {
 
         if(evm.examMarksData.value==null) {
             binding.tvNoDataExam.visibility = View.INVISIBLE
+            binding.tvExamCgpa.visibility = View.INVISIBLE
             evm.erpRepository?.fetchExamMarks(evm)
         }
 
-        binding.srlExamMarks.setProgressViewOffset(true, 50, 200)
+        binding.srlExamMarks.setProgressViewOffset(false,50,200)
         binding.srlExamMarks.setOnRefreshListener {
             evm.erpRepository?.fetchExamMarks(evm)
+            binding.tvExamCgpa.visibility = View.INVISIBLE
             binding.tblExamMarks.removeAllViews()
         }
 
         evm.examMarksData.observe(viewLifecycleOwner) {
             binding.srlExamMarks.isRefreshing = false
+            binding.pbErpExam.visibility = View.GONE
             if(it==null || it.ExamSummary.isEmpty()){
                 binding.tvNoDataExam.visibility = View.VISIBLE
                 return@observe
             }
             binding.tvNoDataExam.visibility = View.GONE
+            binding.tvExamCgpa.visibility = View.VISIBLE
             val marksList = it.ExamSummary
 
             binding.tblExamMarks.removeAllViews()
@@ -56,11 +61,18 @@ class ErpExamFragment: Fragment() {
             binding.tblExamMarks.addView(headerRow)
             binding.tblExamMarks.addView(Helper.getRowDividerBlack(requireContext()))
 
+            var cgpa = 0.0
+
             for (i in marksList.indices) {
                 val row = Helper.createExamMarksRow(requireContext(), i+1, marksList[i], erpHostUrl, regID, pRollNo, cookies)
                 binding.tblExamMarks.addView(row)
                 binding.tblExamMarks.addView(Helper.getRowDividerBlack(requireContext()))
+                cgpa += marksList[i].sgpa.toDouble()
             }
+
+            cgpa /= marksList.size
+            cgpa = (cgpa / 0.05).roundToInt() * 0.05
+            binding.tvExamCgpa.text = "CGPA (Agg.): ${cgpa}"
 
             binding.tblExamMarks.visibility = View.VISIBLE
         }

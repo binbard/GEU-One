@@ -32,9 +32,7 @@ class ErpViewModel : ViewModel() {
         value = null
     }
 
-    val examMarksData = MutableLiveData<ExamMarksData>().apply {
-        value = null
-    }
+    val examMarksData = MutableLiveData<ExamMarksData>()
 
     val currentErpPage = MutableLiveData<Int>().apply {
         value = 0
