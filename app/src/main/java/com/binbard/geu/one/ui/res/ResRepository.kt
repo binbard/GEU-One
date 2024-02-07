@@ -23,9 +23,9 @@ class ResRepository(context: Context) {
 
     fun fetchResources(rvm: ResViewModel){
         GlobalScope.launch {
-            val jsonDataLocal = getResourcesJson() ?: return@launch
-            val resListLocal = ResNetUtils.jsonToResList(jsonDataLocal) ?: return@launch
-            withContext(rvm.viewModelScope.coroutineContext) {
+            val jsonDataLocal = getResourcesJson()
+            val resListLocal = jsonDataLocal?.let { ResNetUtils.jsonToResList(it) }
+            if(resListLocal!=null) withContext(rvm.viewModelScope.coroutineContext) {
                 rvm.resList.value = resListLocal
             }
 

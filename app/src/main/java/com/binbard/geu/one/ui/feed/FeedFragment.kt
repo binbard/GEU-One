@@ -47,7 +47,6 @@ class FeedFragment : Fragment() {
         )
         fvm.feedHelper = fvm.feedHelper ?: FeedHelper(requireContext())
 
-        binding.srlFeed.setProgressViewOffset(true, 50, 200)
         binding.srlFeed.setOnRefreshListener {
             fvm.feedHelper!!.fetchData(fvm)
         }

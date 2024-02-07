@@ -4,6 +4,8 @@ data class ResObj(
     val name: String,
     val url: String,
     val type: String,
+    val imgUrl: String? = null,
+    val onlyFor: String? = null
 )
 
 data class ResSection(
