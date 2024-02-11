@@ -1,14 +1,24 @@
 package com.binbard.geu.one.ui.erp
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.TextUtils.replace
+import android.text.style.URLSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpLoginBinding
 import com.binbard.geu.one.models.LoginStatus
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ErpLoginFragment : Fragment() {
     private lateinit var binding: FragmentErpLoginBinding
@@ -18,11 +28,26 @@ class ErpLoginFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentErpLoginBinding.inflate(inflater, container, false)
 
         evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
+        requireActivity().findViewById<TextView>(R.id.tvErpTitle).text = "ERP - Login"
+
+        if(evm.loginStatus.value == LoginStatus.RESET_MATCH || evm.loginStatus.value == LoginStatus.RESET_NOTMATCH){
+            evm.loginStatus.value = LoginStatus.UNKNOWN
+        }
+
+        val spannable = SpannableString("Forgot Password?")
+        spannable.setSpan(URLSpan(null), 0, spannable.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        binding.tvForgotPass.text = spannable
+        binding.tvForgotPass.setOnClickListener {
+            parentFragmentManager.beginTransaction().replace(
+                R.id.fragmentContainerView2,
+                ErpLoginRequestChangeFragment()
+            ).addToBackStack(null).commit()
+        }
 
         binding.etId.doOnTextChanged { text, start, before, count ->
             evm.loginId.value = text.toString()
@@ -33,7 +58,8 @@ class ErpLoginFragment : Fragment() {
 
         binding.btLogin.setOnClickListener {
 
-            val imm = requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            val imm =
+                requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
             imm.hideSoftInputFromWindow(view?.windowToken, 0)
 
             val id = binding.etId.text.toString()

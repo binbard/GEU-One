@@ -124,4 +124,17 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
+    fun resetErpPassword(erpViewModel: ErpViewModel, id: String, email: String, dob: String){
+        GlobalScope.launch(Dispatchers.IO) {
+            val params = "ID=$id&Mob=$email&db=${dob.replace("/","%2F")}"
+            val code = ErpNetUtils.resetErpPassword(cookies, params)
+            withContext(Dispatchers.Main){
+                Log.d("ErpRepository", "DDD resetErpPassword $code")
+                if(code=="NotMatch") erpViewModel.loginStatus.value = LoginStatus.RESET_NOTMATCH
+                else erpViewModel.loginStatus.value = LoginStatus.RESET_MATCH
+            }
+        }
+    }
+
 }

@@ -238,4 +238,19 @@ object ErpNetUtils {
         }
     }
 
+    fun resetErpPassword(cookies: String, params: String): String{
+        val request = okhttp3.Request.Builder()
+            .url("$erpUrl/Account/ResetPassword?$params")
+            .header("Cookie", cookies)
+            .build()
+        return try{
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+            response.body?.close()
+            body ?: ""
+        } catch (e: Exception){
+            return ""
+        }
+    }
+
 }

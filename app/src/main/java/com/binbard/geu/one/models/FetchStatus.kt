@@ -24,5 +24,7 @@ enum class LoginStatus {
     PREV_LOGGED_OUT,
     LOGGED_IN,
     NOT_LOGGED_IN,
+    RESET_MATCH,
+    RESET_NOTMATCH,
     UNKNOWN,
 }

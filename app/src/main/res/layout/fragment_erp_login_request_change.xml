@@ -7,15 +7,16 @@
     android:paddingBottom="100dp">
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/pbErpLogin"
+        android:id="@+id/pbErpPassReset"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="?attr/actionBarSize"
+        android:layout_marginTop="?attr/actionBarSize"
         android:indeterminate="true"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -35,11 +36,11 @@
             android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etId"
+                android:id="@+id/etUid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="username"
-                android:hint="Student ID"
+                android:hint="STUDENT ID"
                 android:inputType="number|text"
                 android:minHeight="54dp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -47,46 +48,61 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            app:passwordToggleEnabled="true">
+            android:layout_marginTop="10dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPass"
+                android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autofillHints="password"
-                android:hint="Password"
-                android:inputType="textPassword"
+                android:autofillHints="email"
+                android:hint="Email-ID"
+                android:inputType="textEmailAddress"
                 android:minHeight="54dp" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="date"
+                android:hint="Date Of Birth (DD/MM/YYYY)"
+                android:inputType="datetime"
+                android:maxLength="10"
+                android:minHeight="54dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
 
     </LinearLayout>
 
     <Button
-        android:id="@+id/btLogin"
+        android:id="@+id/btReset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="Done"
+        android:layout_marginTop="15dp"
+        android:text="Reset"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_reset_available" />
 
     <TextView
-        android:id="@+id/tv_forgot_pass"
+        android:id="@+id/tv_reset_available"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="1dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:linksClickable="true"
+        android:layout_marginTop="15dp"
+        android:gravity="center_horizontal"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:paddingBottom="2dp"
-        android:text="Forgot Password?"
-        android:textStyle="italic"
-        app:layout_constraintEnd_toEndOf="@+id/linearLayout"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        android:text="Reset Available in: "
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        tools:visibility="gone" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
