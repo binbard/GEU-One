@@ -129,10 +129,35 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         GlobalScope.launch(Dispatchers.IO) {
             val params = "ID=$id&Mob=$email&db=${dob.replace("/","%2F")}"
             val code = ErpNetUtils.resetErpPassword(cookies, params)
+            Log.d("ErpRepository", "DDD resetErpPassword $code")
             withContext(Dispatchers.Main){
-                Log.d("ErpRepository", "DDD resetErpPassword $code")
                 if(code=="NotMatch") erpViewModel.loginStatus.value = LoginStatus.RESET_NOTMATCH
                 else erpViewModel.loginStatus.value = LoginStatus.RESET_MATCH
+            }
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun changeErpPassword(erpViewModel: ErpViewModel, password: String, url: String){
+        GlobalScope.launch(Dispatchers.IO) {
+            if(url=="") return@launch
+            val newCookies = ErpNetUtils.preChangeErpPassword(cookies, url)
+            if(newCookies=="x"){
+                withContext(Dispatchers.Main){
+                    erpViewModel.loginStatus.value = LoginStatus.CHANGE_PASSWORD_EXPIRED
+                }
+                return@launch
+            }
+            erpCacheHelper.saveCookies(newCookies)
+            cookies = newCookies
+            Log.d("ErpRepository", "EEE preChangeErpPassword $newCookies")
+            val result = ErpNetUtils.changeErpPassword(cookies, password)
+            // result: "{"data":1}"
+            val code = result.substringAfter(":").substringBefore("}")
+            Log.d("ErpRepository", "EEE resetErpPassword $result  |  $code")
+            withContext(Dispatchers.Main){
+                if(code=="1") erpViewModel.loginStatus.value = LoginStatus.CHANGE_PASSWORD_SUCCESS
+                else erpViewModel.loginStatus.value = LoginStatus.CHANGE_PASSWORD_FAILED
             }
         }
     }

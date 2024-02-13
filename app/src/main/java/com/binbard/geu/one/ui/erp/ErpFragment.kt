@@ -20,6 +20,7 @@ import com.binbard.geu.one.ui.erp.menu.ErpMidtermMarksFragment
 import com.binbard.geu.one.ui.erp.menu.ErpStudentFragment
 import com.binbard.geu.one.utils.BitmapHelper
 import com.google.android.material.navigation.NavigationView
+import java.net.URL
 
 
 class ErpFragment : Fragment(){
@@ -47,7 +48,7 @@ class ErpFragment : Fragment(){
 
         evm.loginStatus.observe(viewLifecycleOwner) {
             if (it == LoginStatus.UNKNOWN) {
-                evm.loginStatus.value = evm.erpCacheHelper?.getLoginStatus()
+                if(!handleInitPage()) evm.loginStatus.value = evm.erpCacheHelper?.getLoginStatus()
             } else if (it == LoginStatus.PREV_LOGGED_IN) {
                 showErpPage(R.id.item_erp_student)
                 evm.erpCacheHelper?.loadLocalStudentData(evm)
@@ -122,12 +123,29 @@ class ErpFragment : Fragment(){
         }
     }
 
+    private fun handleInitPage(): Boolean{
+        if(!evm.shouldHandleInitPage) return false
+        val uri = requireActivity().intent.data ?: return false
+        val url = URL(uri.scheme, uri.host, uri.path)
+        val erpExtHost = resources.getString(R.string.erpExtHost)
+        if(uri.host==erpExtHost && uri.path=="/Account/ChangePassword"){
+            evm.shouldHandleInitPage = false
+            showErpPage(R.id.ErpLoginChangeFragment)
+            return true
+        }
+        return false
+    }
+
     private fun showErpPage(pageId: Int) {
         evm.currentErpPage.value = pageId
         childFragmentManager.clearBackStack("xyz")
         val transaction = childFragmentManager.beginTransaction()
         when(pageId){
             0 -> transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
+            R.id.ErpLoginChangeFragment -> {
+                transaction.replace(R.id.fragmentContainerView2, ErpLoginChangeFragment())
+                transaction.addToBackStack("xyz")
+            }
             R.id.item_erp_student -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpStudentFragment())
                 tvErpTitle.text = "ERP"

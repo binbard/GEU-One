@@ -35,5 +35,21 @@
         android:id="@+id/ErpLoginFragment"
         android:name="com.binbard.geu.one.ui.erp.ErpLoginFragment"
         android:label="Login"
-        tools:layout="@layout/fragment_erp_login"/>
+        tools:layout="@layout/fragment_erp_login">
+        <action
+            android:id="@+id/action_ErpLoginFragment_to_erpLoginResetFragment"
+            app:destination="@id/ErpLoginResetFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ErpLoginResetFragment"
+        android:name="com.binbard.geu.one.ui.erp.ErpLoginResetFragment"
+        android:label="ErpLoginResetFragment" >
+        <action
+            android:id="@+id/action_erpLoginResetFragment_to_erpLoginChangeFragment"
+            app:destination="@id/ErpLoginChangeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ErpLoginChangeFragment"
+        android:name="com.binbard.geu.one.ui.erp.ErpLoginChangeFragment"
+        android:label="ErpLoginChangeFragment" />
 </navigation>

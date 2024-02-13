@@ -1,24 +1,19 @@
 package com.binbard.geu.one.ui.erp
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.TextUtils.replace
 import android.text.style.URLSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpLoginBinding
 import com.binbard.geu.one.models.LoginStatus
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ErpLoginFragment : Fragment() {
     private lateinit var binding: FragmentErpLoginBinding
@@ -45,7 +40,7 @@ class ErpLoginFragment : Fragment() {
         binding.tvForgotPass.setOnClickListener {
             parentFragmentManager.beginTransaction().replace(
                 R.id.fragmentContainerView2,
-                ErpLoginRequestChangeFragment()
+                ErpLoginResetFragment()
             ).addToBackStack(null).commit()
         }
 

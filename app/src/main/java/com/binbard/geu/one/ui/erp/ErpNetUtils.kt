@@ -4,22 +4,26 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import com.binbard.geu.one.models.*
-import com.binbard.geu.one.ui.erp.menu.StudentGson
 import com.binbard.geu.one.ui.erp.menu.Student
+import com.binbard.geu.one.ui.erp.menu.StudentGson
 import com.binbard.geu.one.utils.BitmapHelper
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.jsoup.Jsoup
 import java.util.*
+
 
 object ErpNetUtils {
     val client = OkHttpClient()
 
-    private const val erpUrl = "https://erp.geu.ac.in"
+    private const val erpUrl = "https://student.geu.ac.in"
 
     suspend fun getCookies(): String = withContext(Dispatchers.IO) {
         val request = okhttp3.Request.Builder()
@@ -32,7 +36,7 @@ object ErpNetUtils {
             var cookies = ""
             for(cookie in cookieSet){
                 val mainCookie = cookie.split(";")[0]
-                cookies += mainCookie + ";"
+                cookies += "$mainCookie;"
             }
             response.body?.close()
             cookies
@@ -40,6 +44,28 @@ object ErpNetUtils {
             Log.d("ErpNetUtils", "Error: ${e.message}")
             ""
         }
+    }
+
+    fun mergeCookies(xcookies: String, cookiesList: List<String> ): String{
+        val cookiesMap = HashMap<String, String>()
+        val xcookiesList = xcookies.split(";")
+        for(cookie in xcookiesList){
+            if(cookie == "") continue
+            val key = cookie.split("=")[0]
+            val value = cookie.split("=")[1]
+            cookiesMap[key] = value
+        }
+        for(cookie in cookiesList){
+            val key = cookie.split("=")[0]
+            val value = cookie.split("=")[1]
+            cookiesMap[key] = value
+        }
+        var cookies = ""
+        for((key, value) in cookiesMap){
+            cookies += "$key=$value;"
+        }
+        Log.d("ErpNetUtils", "AAA: $cookies")
+        return cookies
     }
 
     suspend fun getToken(cookies: String): String = withContext(Dispatchers.IO) {
@@ -242,6 +268,44 @@ object ErpNetUtils {
         val request = okhttp3.Request.Builder()
             .url("$erpUrl/Account/ResetPassword?$params")
             .header("Cookie", cookies)
+            .build()
+        return try{
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+            response.body?.close()
+            body ?: ""
+        } catch (e: Exception){
+            return ""
+        }
+    }
+
+    fun preChangeErpPassword(cookies: String, link: String): String{
+        val request = okhttp3.Request.Builder()
+            .method("GET", null)
+            .url(link)
+            .header("Cookie", cookies)
+            .build()
+        return try{
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+//            Log.d("ErpNetUtils", "preChangeErpPassword: $body")
+            val cookiesList = response.headers("Set-Cookie")
+            val newCookies = mergeCookies(cookies, cookiesList)
+            response.body?.close()
+            if (body != null && body.contains("This Reset Password Link is expired")) return "x"
+            newCookies
+        } catch (e: Exception){
+            return ""
+        }
+    }
+
+    fun changeErpPassword(cookies: String, password: String): String{
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val json = "{Password: '$password'}".toRequestBody(mediaType)
+        val request = okhttp3.Request.Builder()
+            .url("$erpUrl/Account/ChangeUserPassword")
+            .header("Cookie", cookies)
+            .post(json)
             .build()
         return try{
             val response = client.newCall(request).execute()

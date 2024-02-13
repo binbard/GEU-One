@@ -1,6 +1,7 @@
 package com.binbard.geu.one
 
 import android.content.Intent
+import android.os.Build.VERSION_CODES.P
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -9,6 +10,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -21,15 +23,20 @@ import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.net.URL
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var erpViewModel: ErpViewModel
     private lateinit var bottomNavController: NavController
+    private var shouldGotoChangePassword = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        resolveClickAction()
+        if (intent.extras != null) {
+            resolveClickAction()
+            resolveHostIntent()
+        }
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -38,7 +45,8 @@ class MainActivity : AppCompatActivity() {
         val bottomNavHost =
             supportFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
         bottomNavController = bottomNavHost.findNavController()
-        resolveInitialFragment()
+        if(shouldGotoChangePassword) gotoChangePassword()
+        else resolveInitialFragment()
 
         erpViewModel = ViewModelProvider(this)[ErpViewModel::class.java]
         if (erpViewModel.erpCacheHelper == null) {
@@ -92,9 +100,6 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.item_gen_feedback -> {
-//                Toast.makeText(this, "Feedback", Toast.LENGTH_SHORT).show()
-//                letsDoThis2()
-
                 MaterialAlertDialogBuilder(this)
                     .setTitle("Feedback")
                     .setMessage("Info: This is always shared anonymously.")
@@ -122,12 +127,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun letsDoThis2() {
         val nanoMessagingService = NanoMessagingService()
-        nanoMessagingService.sendNotification(this, "Feedback received. Thankyou for your valuable time.")
+        nanoMessagingService.sendNotification(
+            this,
+            "Feedback received. Thankyou for your valuable time."
+        )
     }
 
     private fun resolveClickAction() {
-        if (intent.extras == null) return
-        val clickAction = intent.extras!!.getString("click_action") ?: ""
+        val clickAction = intent.extras?.getString("click_action") ?: return
 
         var cls: Class<*>
         try {
@@ -144,12 +151,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun resolveInitialFragment() {
-        if (intent.extras != null){
+        if (intent.extras != null) {
             val initialFragment = intent.extras!!.getString("initial_fragment") ?: return
             bottomNavController.popBackStack()
             val id = resources.getIdentifier(initialFragment, "id", packageName)
-            if(id!=0) bottomNavController.navigate(id)
+            if (id != 0) bottomNavController.navigate(id)
         }
+    }
+
+    private fun resolveHostIntent() {
+        val uri = intent.data ?: return
+        val url = URL(uri.scheme, uri.host, uri.path)
+        val erpExtHost = resources.getString(R.string.erpExtHost)
+
+        // Handle Change Password
+        if(uri.host==erpExtHost && uri.path=="/Account/ChangePassword"){
+            shouldGotoChangePassword = true
+        } else{
+            val intent = CustomTabsIntent.Builder().build()
+            intent.launchUrl(this, uri)
+        }
+    }
+
+    private fun gotoChangePassword(){
+        bottomNavController.navigate(R.id.ErpFragment)
     }
 
 }

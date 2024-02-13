@@ -37,6 +37,7 @@ class ErpViewModel : ViewModel() {
     val currentErpPage = MutableLiveData<Int>().apply {
         value = 0
     }
+    var shouldHandleInitPage = true
     var isCacheEnabled = true
 
     var erpCacheHelper: ErpCacheHelper? = null

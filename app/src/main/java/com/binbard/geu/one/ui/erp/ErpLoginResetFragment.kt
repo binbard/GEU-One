@@ -1,7 +1,5 @@
 package com.binbard.geu.one.ui.erp
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,27 +9,28 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
-import com.binbard.geu.one.databinding.FragmentErpLoginRequestChangeBinding
+import com.binbard.geu.one.databinding.FragmentErpLoginResetBinding
 import com.binbard.geu.one.helpers.Snack
 import com.binbard.geu.one.models.LoginStatus
-import com.google.android.material.snackbar.Snackbar
 
-class ErpLoginRequestChangeFragment : Fragment() {
-    private lateinit var binding: FragmentErpLoginRequestChangeBinding
+class ErpLoginResetFragment : Fragment() {
+    private lateinit var binding: FragmentErpLoginResetBinding
     private lateinit var evm: ErpViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentErpLoginRequestChangeBinding.inflate(inflater, container, false)
+    ): View {
+        binding = FragmentErpLoginResetBinding.inflate(inflater, container, false)
 
         evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
         requireActivity().findViewById<TextView>(R.id.tvErpTitle).text = "ERP - Reset Password"
 
         binding.etUid.setText(evm.loginId.value)
+
+        binding.tvResetAvailable.setTextColor(requireContext().resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text))
 
         evm.loginStatus.observe(viewLifecycleOwner) {
             if (it != LoginStatus.RESET_MATCH && it != LoginStatus.RESET_NOTMATCH) return@observe

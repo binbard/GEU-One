@@ -7,7 +7,7 @@
     android:paddingBottom="100dp">
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/pbErpPassReset"
+        android:id="@+id/pbErpPassChange"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="?attr/actionBarSize"
@@ -36,12 +36,12 @@
             android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etUid"
+                android:id="@+id/etPass1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autofillHints="username"
-                android:hint="STUDENT ID"
-                android:inputType="number|text"
+                android:autofillHints="password"
+                android:hint="New Password"
+                android:inputType="text"
                 android:minHeight="54dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -51,28 +51,12 @@
             android:layout_marginTop="10dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEmail"
+                android:id="@+id/etPass2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autofillHints="email"
-                android:hint="Email-ID"
-                android:inputType="textEmailAddress"
-                android:minHeight="54dp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDob"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints="date"
-                android:hint="Date Of Birth (DD/MM/YYYY)"
-                android:inputType="datetime"
-                android:maxLength="10"
+                android:autofillHints="password"
+                android:hint="Confirm Password"
+                android:inputType="text"
                 android:minHeight="54dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -80,25 +64,26 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/btReset"
+        android:id="@+id/btChange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Reset"
+        android:layout_marginTop="20dp"
+        android:text="Change Password"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_reset_available" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_change_pass_success" />
 
     <TextView
-        android:id="@+id/tv_reset_available"
+        android:id="@+id/tv_change_pass_success"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
+        android:defaultFocusHighlightEnabled="true"
         android:gravity="center_horizontal"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:paddingBottom="2dp"
-        android:text="Reset Available in: "
+        android:text="Your password has been changed successfully."
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

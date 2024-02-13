@@ -7,6 +7,7 @@
     <string name="action_settings">Settings</string>
     <string name="feedsHostUrl">https://csitgeu.in/wp/</string>
     <string name="erpHostUrl">https://erp.geu.ac.in/</string>
+    <string name="erpExtHost">student.geu.ac.in</string>
     <string name="resHostUrl">https://api.npoint.io/0640fc3b63efe7955f6f</string>
     <string name="notesUrl">https://raw.githubusercontent.com/geu-one-static/notes/master/notes.txt</string>
 </resources>
