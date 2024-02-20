@@ -1,13 +1,18 @@
 package com.binbard.geu.one.ui.res
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.core.view.MenuCompat
+import androidx.core.view.marginStart
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentResBinding
@@ -16,6 +21,8 @@ import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpViewModel
 import com.binbard.geu.one.ui.erp.menu.Student
+import com.binbard.geu.one.ui.notes.NotesFragment
+import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.*
 
@@ -79,40 +86,15 @@ class ResFragment : Fragment() {
                     continue
                 }
 
+                val filteredList = resObjList.filter { shouldShowResObj(evm.studentData.value, it.onlyFor) }
+
                 val resCardBinding = ItemResCardBinding.inflate(inflater, container, false)
                 resCardBinding.tvResCardTitle.text = resTitle
+                resCardBinding.rvResCardBody.layoutManager = GridLayoutManager(context, 3)
+                resCardBinding.rvResCardBody.adapter = GridAdapter(filteredList)
 
-                resCardBinding.flResCardBody.removeAllViews()
+                binding.llResBox.addView(resCardBinding.root)
 
-                for (resObj in resObjList) {
-                    if (!shouldShowResObj(evm.studentData.value, resObj.onlyFor)) continue
-
-                    val button = MaterialButton(requireContext())
-                    button.text = resObj.name
-                    val params = ViewGroup.MarginLayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                    params.setMargins(10, 10, 10, 10)
-                    button.layoutParams = params
-
-                    if (resObj.type == "pdf") {
-                        button.setOnClickListener {
-                            PdfUtils.openOrDownloadPdf(
-                                requireContext(),
-                                resObj.url,
-                                isExternalSource = true
-                            )
-                        }
-                    } else if (resObj.type == "link") {
-                        button.setOnClickListener {
-                            intent.launchUrl(it.context, resObj.url.toUri())
-                        }
-                    }
-                    resCardBinding.flResCardBody.addView(button)
-                }
-
-                if(resCardBinding.flResCardBody.childCount>0) binding.llResBox.addView(resCardBinding.root)
             }
         }
 

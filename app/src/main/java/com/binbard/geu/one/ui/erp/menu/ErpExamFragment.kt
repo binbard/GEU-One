@@ -1,15 +1,16 @@
 package com.binbard.geu.one.ui.erp.menu
 
-import com.binbard.geu.one.R
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpExamBinding
 import com.binbard.geu.one.models.ExamMarks
 import com.binbard.geu.one.ui.erp.ErpViewModel
+import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 class ErpExamFragment: Fragment() {
@@ -71,8 +72,10 @@ class ErpExamFragment: Fragment() {
             }
 
             cgpa /= marksList.size
-            cgpa = (cgpa / 0.05).roundToInt() * 0.05
-            binding.tvExamCgpa.text = "CGPA (Agg.): ${cgpa}"
+            val df = DecimalFormat("#.00")
+            val mCgpa = df.format((cgpa * 20).roundToInt() / 20.0)
+
+            binding.tvExamCgpa.text = "CGPA (Agg.): $mCgpa"
 
             binding.tblExamMarks.visibility = View.VISIBLE
         }

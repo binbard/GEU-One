@@ -312,7 +312,7 @@ object Helper {
         tvMarksheetView.setPadding(10, 10, 10, 10)
         tvMarksheetView.gravity = View.TEXT_ALIGNMENT_CENTER
         if (count != 0) {
-            val payload = mapOf("YearSem" to yearSem, "Regid" to regID)
+            val payload = mapOf("yearSem" to yearSem, "Regid" to regID)
             val spannableString = SpannableString(linkTxt)
             val clickSpan: ClickableSpan = object : ClickableSpan() {
                 override fun onClick(widget: View) {}
