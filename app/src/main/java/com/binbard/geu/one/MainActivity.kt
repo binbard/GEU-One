@@ -1,7 +1,6 @@
 package com.binbard.geu.one
 
 import android.content.Intent
-import android.os.Build.VERSION_CODES.P
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -19,15 +18,18 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.binbard.geu.one.databinding.ActivityMainBinding
+import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
+import com.binbard.geu.one.ui.initial.InitialActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.net.URL
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
     private lateinit var erpViewModel: ErpViewModel
     private lateinit var bottomNavController: NavController
     private var shouldGotoChangePassword = false
@@ -37,6 +39,8 @@ class MainActivity : AppCompatActivity() {
             resolveClickAction()
             resolveHostIntent()
         }
+        sharedPreferencesHelper = SharedPreferencesHelper(this)
+        handleFirstTimeLaunch()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
 
@@ -131,6 +135,13 @@ class MainActivity : AppCompatActivity() {
             this,
             "Feedback received. Thankyou for your valuable time."
         )
+    }
+
+    private fun handleFirstTimeLaunch() {
+        if(sharedPreferencesHelper.getInitDone()) return
+        val intent = Intent(this, InitialActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun resolveClickAction() {
