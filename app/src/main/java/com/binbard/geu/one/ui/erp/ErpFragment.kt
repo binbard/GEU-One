@@ -1,6 +1,7 @@
 package com.binbard.geu.one.ui.erp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.browser.customtabs.CustomTabsIntent

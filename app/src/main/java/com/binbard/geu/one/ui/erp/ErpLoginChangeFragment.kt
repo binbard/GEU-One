@@ -51,6 +51,7 @@ class ErpLoginChangeFragment : Fragment() {
                 binding.tvChangePassSuccess.visibility = View.VISIBLE
                 binding.btChange.text = "Go to Login"
                 binding.btChange.setOnClickListener {
+                    evm.loginStatus.value = LoginStatus.UNKNOWN
                     parentFragmentManager.popBackStack()
                 }
                 if(it == LoginStatus.CHANGE_PASSWORD_EXPIRED){

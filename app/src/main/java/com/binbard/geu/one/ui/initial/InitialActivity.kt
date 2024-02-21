@@ -14,10 +14,6 @@ import com.binbard.geu.one.helpers.Snack
 
 class InitialActivity: AppCompatActivity() {
     private lateinit var binding: ActivityInitialBinding
-//    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
-//    private var selectedCampus = ""
-//    private lateinit var campusMap: Map<LinearLayout,String>
-
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,44 +21,5 @@ class InitialActivity: AppCompatActivity() {
         binding = ActivityInitialBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        val selectableItemBackground = ContextCompat.getDrawable(this, android.R.attr.selectableItemBackground)
-//        binding.llHill.background = selectableItemBackground
-//        binding.llDeemed.background = selectableItemBackground
-//
-//        sharedPreferencesHelper = SharedPreferencesHelper(this)
-//
-//        campusMap = mapOf(
-//            binding.llDeemed to "deemed",
-//            binding.llHill to "hill"
-//        )
-//
-//        binding.llDeemed.setOnClickListener() {
-//            changeCampus(binding.llDeemed)
-//        }
-//        binding.llHill.setOnClickListener() {
-//            changeCampus(binding.llHill)
-//        }
-//
-//        binding.btnNext.setOnClickListener() {
-//            if(selectedCampus == "") {
-//                Snack.showMsg(binding.root, "Please select campus")
-//                return@setOnClickListener
-//            }
-//            sharedPreferencesHelper.setCampus(selectedCampus)
-//            sharedPreferencesHelper.setInitDone(true)
-//            startActivity(Intent(this, MainActivity::class.java))
-//            finish()
-//        }
-
     }
-
-//    @SuppressLint("ResourceType")
-//    private fun changeCampus(llCampus: LinearLayout){
-//        binding.llDeemed.background = null
-//        binding.llHill.background = null
-//
-//        llCampus.setBackgroundResource(R.drawable.rounded_corner)
-//
-//        selectedCampus = campusMap[llCampus].toString()
-//    }
 }

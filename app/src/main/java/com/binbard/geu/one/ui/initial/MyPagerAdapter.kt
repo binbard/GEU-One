@@ -26,7 +26,7 @@ class MyPagerAdapter(val fm: FragmentManager) : PagerAdapter() {
         }
         view.findViewById<Button>(R.id.btnOnboard)?.setOnClickListener {
             if(it == null) return@setOnClickListener
-            fm.beginTransaction().replace(
+            fm.beginTransaction().addToBackStack("xyz").replace(
                 R.id.fragmentContainerView3, SelectCampusFragment()
             ).commit()
         }
