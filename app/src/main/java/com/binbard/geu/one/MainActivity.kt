@@ -2,10 +2,12 @@ package com.binbard.geu.one
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -18,6 +20,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.binbard.geu.one.databinding.ActivityMainBinding
+import com.binbard.geu.one.databinding.DialogFeedbackBinding
+import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
@@ -49,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         val bottomNavHost =
             supportFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
         bottomNavController = bottomNavHost.findNavController()
-        if(shouldGotoChangePassword) gotoChangePassword()
+        if (shouldGotoChangePassword) gotoChangePassword()
         else resolveInitialFragment()
 
         erpViewModel = ViewModelProvider(this)[ErpViewModel::class.java]
@@ -104,15 +108,33 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.item_gen_feedback -> {
+                val dialogFeedbackBinding = DialogFeedbackBinding.inflate(layoutInflater, null, false)
+                dialogFeedbackBinding.chipBugReport.setOnClickListener {
+                    dialogFeedbackBinding.etFeedback.hint = "I encountered a bug while navigating from.."
+                }
+                dialogFeedbackBinding.chipReview.setOnClickListener {
+                    dialogFeedbackBinding.etFeedback.hint = "My experience with this app has been.."
+                }
+                dialogFeedbackBinding.chipFeatureRequest.setOnClickListener {
+                    dialogFeedbackBinding.etFeedback.hint = "I want a new feature in this app.."
+                }
+
+                var feedbackType = "review"
+                val selectedChip = dialogFeedbackBinding.chipGroup.checkedChipId
+                if(selectedChip == dialogFeedbackBinding.chipBugReport.id) feedbackType = "bug"
+                else if(selectedChip == dialogFeedbackBinding.chipFeatureRequest.id) feedbackType = "feature"
+                else if(selectedChip == dialogFeedbackBinding.chipReview.id) feedbackType = "review"
+
                 MaterialAlertDialogBuilder(this)
                     .setTitle("Feedback")
                     .setMessage("Info: This is always shared anonymously.")
-                    .setView(R.layout.dialog_feedback)
+                    .setView(dialogFeedbackBinding.root)
                     .setNegativeButton("Cancel") { dialog, which ->
                         // Negative btn pressed
                     }
                     .setPositiveButton("SEND") { dialog, which ->
-                        letsDoThis2()
+                        val feedbackUrl = resources.getString(R.string.feedbackUrl)
+                        NetUtils.sendFeedback(this, feedbackUrl, feedbackType, dialogFeedbackBinding.etFeedback.text.toString())
                     }
                     .show()
 
@@ -129,16 +151,8 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.show()
     }
 
-    private fun letsDoThis2() {
-        val nanoMessagingService = NanoMessagingService()
-        nanoMessagingService.sendNotification(
-            this,
-            "Feedback received. Thankyou for your valuable time."
-        )
-    }
-
     private fun handleFirstTimeLaunch() {
-        if(sharedPreferencesHelper.getInitDone()) return
+        if (sharedPreferencesHelper.getInitDone()) return
         val intent = Intent(this, InitialActivity::class.java)
         startActivity(intent)
         finish()
@@ -176,15 +190,15 @@ class MainActivity : AppCompatActivity() {
         val erpExtHost = resources.getString(R.string.erpExtHost)
 
         // Handle Change Password
-        if(uri.host==erpExtHost && uri.path=="/Account/ChangePassword"){
+        if (uri.host == erpExtHost && uri.path == "/Account/ChangePassword") {
             shouldGotoChangePassword = true
-        } else{
+        } else {
             val intent = CustomTabsIntent.Builder().build()
             intent.launchUrl(this, uri)
         }
     }
 
-    private fun gotoChangePassword(){
+    private fun gotoChangePassword() {
         bottomNavController.navigate(R.id.ErpFragment)
     }
 

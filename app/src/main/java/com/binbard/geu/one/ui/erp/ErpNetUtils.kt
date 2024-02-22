@@ -21,7 +21,7 @@ import java.util.*
 
 
 object ErpNetUtils {
-    val client = OkHttpClient()
+    private val client = OkHttpClient()
 
     private const val erpUrl = "https://student.geu.ac.in"
 

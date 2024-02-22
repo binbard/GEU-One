@@ -45,8 +45,6 @@ class ResFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        val intent = CustomTabsIntent.Builder().build()
-
         rvm.resRepository = rvm.resRepository ?: ResRepository(requireContext())
 
         rvm.resList.observe(viewLifecycleOwner) {

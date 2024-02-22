@@ -9,5 +9,6 @@
     <string name="erpHostUrl">https://student.geu.ac.in/</string>
     <string name="erpExtHost">student.geu.ac.in</string>
     <string name="resHostUrl">https://api.npoint.io/0640fc3b63efe7955f6f</string>
+    <string name="feedbackUrl">https://script.google.com/macros/s/AKfycbwV5Vw-5jf-H5_rekeW85Wd-Gdym6f_UIUOkFjPzEU4IOmm04q71S9-4MFsfpFW17Pj/exec</string>
     <string name="notesUrl">https://raw.githubusercontent.com/geu-one-static/notes/master/notes.txt</string>
 </resources>
