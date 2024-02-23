@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
+import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuInflater
@@ -20,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import com.binbard.geu.one.databinding.ActivityFeedViewBinding
 import com.binbard.geu.one.ui.feed.FeedHelper
 import com.binbard.geu.one.helpers.PdfUtils
+import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,7 +31,8 @@ import java.util.*
 class FeedViewActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFeedViewBinding
-    private lateinit var hostUrl: String
+    private lateinit var feedUrl: String
+    private lateinit var feedUrlView: String
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +52,7 @@ class FeedViewActivity : AppCompatActivity() {
             @Deprecated("Deprecated in Java")
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 if (url != null && url.endsWith(".pdf")) {
-                    PdfUtils.openOrDownloadPdf(this@FeedViewActivity, url,"",true)
+                    PdfUtils.openOrDownloadPdf(this@FeedViewActivity, url, "", true)
                     return true
                 }
                 val intent = CustomTabsIntent.Builder().build()
@@ -61,17 +64,28 @@ class FeedViewActivity : AppCompatActivity() {
         binding.webViewPost.setBackgroundColor(Color.TRANSPARENT)
         binding.webViewPost.settings.defaultFontSize = 18
 
-        hostUrl = resources.getString(R.string.feedsHostUrl)
+        val sharedPreferencesHelper = SharedPreferencesHelper(this)
+        val campus = sharedPreferencesHelper.getCampus()
+
+        if (campus == "deemed") {
+            feedUrl = "${resources.getString(R.string.feedsHostDeemed)}$feedSlug?json=post"
+            feedUrlView = "${resources.getString(R.string.feedsHostDeemed)}$feedSlug"
+        } else {
+            feedUrl =
+                "${resources.getString(R.string.feedsHostHill)}wp-json/wp/v2/posts/?slug=$feedSlug"
+            feedUrlView = "${resources.getString(R.string.feedsHostHill)}$feedSlug"
+        }
+
         binding.fabOpenInBrowser.setOnClickListener {
             val intent = CustomTabsIntent.Builder().build()
-            intent.launchUrl(this@FeedViewActivity, android.net.Uri.parse("$hostUrl$feedSlug"))
+            intent.launchUrl(this@FeedViewActivity, android.net.Uri.parse(feedUrlView))
         }
 
         val feedHelper = FeedHelper(this)
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val feedPost = feedHelper.fetchFeed(feedSlug)
+                val feedPost = feedHelper.fetchFeed(feedUrl, campus)
                 if (feedPost == null) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
@@ -95,7 +109,7 @@ class FeedViewActivity : AppCompatActivity() {
                     binding.tvPostTitle.text = getSpannedPostTitle(feedPost.title)
                     binding.fabOpenInBrowser.visibility = View.VISIBLE
                     val sdf = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
-                    val postTime = sdf.format(feedPost.date)
+                    val postTime = sdf.format(feedPost.modified)
                     binding.tvPostModified.text = "Last Modified: $postTime"
                 }
             }
@@ -131,7 +145,8 @@ class FeedViewActivity : AppCompatActivity() {
         theme.resolveAttribute(com.google.android.material.R.attr.colorAccent, typedValue1, true)
         val colorAccentHex = String.format("%06X", 0xFFFFFF and typedValue1.data)
 
-        val rootStyle = ".wrapper{overflow-x:scroll;} a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;max-width:100%;}"
+        val rootStyle =
+            ".wrapper{overflow-x:scroll;} a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;max-width:100%;}"
         val bodyStyle =
             "body{color:$colorAccentHex; font-family: font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 18px; line-height: 1.5;} a{color:0077cc;}"
 
@@ -145,7 +160,8 @@ class FeedViewActivity : AppCompatActivity() {
               }
         """.trimIndent()
 
-        val html = "<html><style>$rootStyle$bodyStyle</style><body>$content<script >$js</script></body></html>";
+        val html =
+            "<html><style>$rootStyle$bodyStyle</style><body>$content<script >$js</script></body></html>";
         return html
     }
 

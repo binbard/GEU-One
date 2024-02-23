@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentFeedBinding
+import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.models.FetchStatus
 import com.binbard.geu.one.ui.notes.NotesFragment
 import kotlinx.coroutines.launch
@@ -25,6 +26,9 @@ class FeedFragment : Fragment() {
     private lateinit var adapter: FeedRecyclerAdapter
     private lateinit var toolbarFeed: Toolbar
     private lateinit var layoutManager: LinearLayoutManager
+    private val sharedPreferencesHelper: SharedPreferencesHelper by lazy {
+        SharedPreferencesHelper(requireContext())
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,8 +51,11 @@ class FeedFragment : Fragment() {
         )
         fvm.feedHelper = fvm.feedHelper ?: FeedHelper(requireContext())
 
+        val sharedPreferencesHelper = SharedPreferencesHelper(requireContext())
+        val campus = sharedPreferencesHelper.getCampus()
+
         binding.srlFeed.setOnRefreshListener {
-            fvm.feedHelper!!.fetchData(fvm)
+            fvm.feedHelper!!.fetchData(fvm,campus)
         }
 
         if(fvm.fetchStatus.value == FetchStatus.DONE) {
@@ -58,7 +65,7 @@ class FeedFragment : Fragment() {
 
         fvm.fetchStatus.observe(viewLifecycleOwner) {
             if (fvm.fetchStatus.value == FetchStatus.NA){
-                fvm.feedHelper!!.fetchData(fvm)
+                fvm.feedHelper!!.fetchData(fvm,campus)
             } else if (it == FetchStatus.FAILED) {
                 Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
             } else if (it == FetchStatus.NO_NEW_DATA_FOUND) {
@@ -91,7 +98,10 @@ class FeedFragment : Fragment() {
         return when (item.itemId) {
             R.id.item_feed_top_site -> {
                 val intent = CustomTabsIntent.Builder().build()
-                intent.launchUrl(requireContext(), getString(R.string.feedsHostUrl).toUri())
+                val campus = sharedPreferencesHelper.getCampus()
+                val url = if(campus=="deemed") getString(R.string.feedsHostDeemed)
+                else getString(R.string.feedsHostHill)
+                intent.launchUrl(requireContext(), url.toUri())
                 true
             }
             R.id.item_feed_show_only -> {

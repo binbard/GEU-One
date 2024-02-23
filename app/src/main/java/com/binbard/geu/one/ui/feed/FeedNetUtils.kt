@@ -1,9 +1,9 @@
 package com.binbard.geu.one.ui.feed
 
 import android.util.Log
-import com.binbard.geu.one.models.FeedPost
-import com.binbard.geu.one.models.FeedPostWrapper
-import com.binbard.geu.one.models.FetchStatus
+import com.binbard.geu.one.models.*
+import com.binbard.geu.one.ui.feed.FeedNetUtils.builder
+import com.binbard.geu.one.ui.feed.FeedNetUtils.parseDecode
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -40,28 +40,28 @@ object FeedNetUtils {
         return text
     }
 
-    fun parseFeedListJson(jsonData: String): List<Feed> {
+    fun parseFeedListJson(jsonData: String, campus: String): List<Feed> {
         val dataList = mutableListOf<Feed>()
-        // jsonData: {"status":"ok","count":2,"count_total":773,"pages":387,"posts":[{"id":4257,"slug":"notice-5th-semester-mini-project-external-evaluation-schedule-2","date":"2024-01-10 15:31:25"},{"id":4249,"slug":"debarred-students-time-table-of-b-tech-cse-iiird-vth-semester-2023-24","date":"2024-01-04 20:19:20"}]}
-        val posts = jsonData.substringAfter("posts\":[{").substringBefore("}]").split("},{")
-        for (post in posts) {
-            val id = post.substringAfter("id\":").substringBefore(",").toInt()
-            val slug = post.substringAfter("slug\":\"").substringBefore("\"")
-            val title = post.substringAfter("title\":\"").substringBefore("\"")
-            val date = post.substringAfter("date\":\"").substringBefore("\"")
 
-            val feedTitle = parseDecode(title)
+        val gson: Gson = GsonBuilder().create()
+        val posts: List<FeedPost>
+        if(campus=="deemed"){
+            val feedPostMultiWrapper = gson.fromJson(jsonData, FeedPostMultiWrapperDeemed::class.java)
+            posts = feedPostMultiWrapper.posts
+        } else{
+            val feedPostMultiWrapperHill = gson.fromJson(jsonData, Array<FeedPostHill>::class.java)
+            val feedPostMulti = feedPostMultiWrapperHill.map { it.toFeedPost() }
+            posts = feedPostMulti.toList()
+        }
 
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT)
-            val feedDate = sdf.parse(date) ?: continue
-
-            dataList.add(Feed(id, slug, feedTitle, feedDate))
+        for (post in posts){
+            dataList.add(Feed(post.id, post.slug, parseDecode(post.title), post.modified))
         }
 
         return dataList
     }
 
-    fun parsePostJson(url: String): FeedPost?{              // Single Posts
+    fun parsePostJson(url: String, campus: String): FeedPost?{              // Single Posts
         val request = builder.url(url).build()
 
         try{
@@ -70,10 +70,18 @@ object FeedNetUtils {
 
             val jsonData = response.body?.string() ?: ""
 
-            val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create()
-            val feedPostWrapper = gson.fromJson(jsonData, FeedPostWrapper::class.java)
-            feedPostWrapper.post.title = parseDecode(feedPostWrapper.post.title)
-            return feedPostWrapper.post
+            val gson: Gson = GsonBuilder().create()
+
+            if(campus=="deemed"){
+                val feedPostWrapper = gson.fromJson(jsonData, FeedPostWrapperDeemed::class.java)
+                feedPostWrapper.post.title = parseDecode(feedPostWrapper.post.title)
+                return feedPostWrapper.post
+            } else{
+                val feedPostWrapper = gson.fromJson(jsonData, Array<FeedPostHill>::class.java)
+                return feedPostWrapper[0].toFeedPost()
+            }
+
+
         } catch (e: Exception) {
             Log.e("FeedNetUtils", "parsePostJson: ${e.message}")
             return null

@@ -5,7 +5,8 @@
     <string name="navigation_drawer_close">Close</string>
     <string name="title_activity_feed_view">FeedView</string>
     <string name="action_settings">Settings</string>
-    <string name="feedsHostUrl">https://csitgeu.in/wp/</string>
+    <string name="feedsHostDeemed">https://csitgeu.in/wp/</string>
+    <string name="feedsHostHill">http://btechcsegehu.in/</string>
     <string name="erpHostUrl">https://student.geu.ac.in/</string>
     <string name="erpExtHost">student.geu.ac.in</string>
     <string name="resHostUrl">https://api.npoint.io/0640fc3b63efe7955f6f</string>
