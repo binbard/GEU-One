@@ -43,19 +43,20 @@ object FeedNetUtils {
     fun parseFeedListJson(jsonData: String, campus: String): List<Feed> {
         val dataList = mutableListOf<Feed>()
 
-        val gson: Gson = GsonBuilder().create()
         val posts: List<FeedPost>
         if(campus=="deemed"){
+            val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create()
             val feedPostMultiWrapper = gson.fromJson(jsonData, FeedPostMultiWrapperDeemed::class.java)
             posts = feedPostMultiWrapper.posts
         } else{
+            val gson: Gson = GsonBuilder().create()
             val feedPostMultiWrapperHill = gson.fromJson(jsonData, Array<FeedPostHill>::class.java)
             val feedPostMulti = feedPostMultiWrapperHill.map { it.toFeedPost() }
             posts = feedPostMulti.toList()
         }
 
         for (post in posts){
-            dataList.add(Feed(post.id, post.slug, parseDecode(post.title), post.modified))
+            dataList.add(Feed(post.id, post.slug, parseDecode(post.title), post.date))
         }
 
         return dataList

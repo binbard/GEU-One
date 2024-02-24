@@ -80,7 +80,6 @@ class FeedFragment : Fragment() {
                 fvm.fetchStatus.value = FetchStatus.DONE
             }
         }
-
         adapter = FeedRecyclerAdapter()
         binding.rvFeed.adapter = adapter
         binding.rvFeed.layoutManager = LinearLayoutManager(context)
