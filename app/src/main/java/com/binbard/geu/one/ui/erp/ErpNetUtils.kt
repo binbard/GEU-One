@@ -17,6 +17,7 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.jsoup.Jsoup
+import java.time.Duration
 import java.util.*
 
 
@@ -259,6 +260,27 @@ object ErpNetUtils {
             val examMarksData = Gson().fromJson(json, ExamMarksData::class.java)
             response.body?.close()
             examMarksData
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun fetchFeeDetails(cookies: String, feeType: Int, duration: Int = 0): FeeDetails? {
+        val request = okhttp3.Request.Builder()
+            .url("$erpUrl/Web_StudentFinance/FillHead")
+            .header("Cookie", cookies)
+            .post(FormBody.Builder().add("FeeType", feeType.toString()).add("duration", duration.toString()).build())
+            .build()
+
+        return try {
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+
+            Log.d("ErpNetUtils", body ?: "")
+            val json = body?.replace("\\", "")?.replace("\"[", "[")?.replace("]\"", "]")
+            val feeDetails = Gson().fromJson(json, FeeDetails::class.java)
+            response.body?.close()
+            feeDetails
         } catch (e: Exception) {
             null
         }

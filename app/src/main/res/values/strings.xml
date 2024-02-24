@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">GEU One</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
     <string name="title_activity_feed_view">FeedView</string>
@@ -8,6 +7,7 @@
     <string name="feedsHostDeemed">https://csitgeu.in/wp/</string>
     <string name="feedsHostHill">http://btechcsegehu.in/</string>
     <string name="erpHostUrl">https://student.geu.ac.in/</string>
+    <string name="erpHostUrlHill">https://student.gehu.ac.in/</string>
     <string name="erpExtHost">student.geu.ac.in</string>
     <string name="resHostUrl">https://api.npoint.io/0640fc3b63efe7955f6f</string>
     <string name="feedbackUrl">https://script.google.com/macros/s/AKfycbwV5Vw-5jf-H5_rekeW85Wd-Gdym6f_UIUOkFjPzEU4IOmm04q71S9-4MFsfpFW17Pj/exec</string>

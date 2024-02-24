@@ -10,10 +10,8 @@ import android.view.View
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.core.view.size
-import com.binbard.geu.one.models.ExamMarks
-import com.binbard.geu.one.models.MidtermMarks
-import com.binbard.geu.one.models.SubjectAttendance
 import com.binbard.geu.one.helpers.PdfUtils
+import com.binbard.geu.one.models.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -293,6 +291,92 @@ object Helper {
         row.addView(getColDivider(context))
         row.addView(tvGradeView)
         row.addView(getColDivider(context))
+
+        return row
+    }
+
+    fun createFeeInfoRow(context: Context, key: String, value: String, count: Int=0): TableRow {
+        val row = TableRow(context)
+        val rowKey = TextView(context)
+        rowKey.text = key
+        rowKey.textSize = 18f
+        rowKey.minWidth = 400
+        val rowValue = TextView(context)
+        rowValue.text = value
+        rowValue.textSize = 18f
+        row.addView(rowKey)
+        row.addView(rowValue)
+        return row
+    }
+
+    fun createFeeDetailsRow(context: Context, count: Int, headData: FeeHead): TableRow {
+        val row = TableRow(context)
+
+        if (count % 2 == 0) row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+
+        val ysCol = TextView(context)
+        ysCol.textSize = 18f
+        ysCol.text = headData.YS
+        ysCol.setPadding(10, 10, 10, 10)
+        ysCol.gravity = View.TEXT_ALIGNMENT_CENTER
+
+        val feeHeadCol = TextView(context)
+        feeHeadCol.textSize = 18f
+        feeHeadCol.text = headData.FeeHead
+        feeHeadCol.tooltipText = headData.FeeHead
+        feeHeadCol.setPadding(10, 10, 10, 10)
+        feeHeadCol.gravity = View.TEXT_ALIGNMENT_CENTER
+        feeHeadCol.maxWidth = 420
+        feeHeadCol.maxLines = 1
+        feeHeadCol.ellipsize = TextUtils.TruncateAt.END
+
+        val dueAmountCol = TextView(context)
+        dueAmountCol.textSize = 18f
+        dueAmountCol.text = headData.DueAmount
+        dueAmountCol.setPadding(10, 10, 10, 10)
+        dueAmountCol.gravity = View.TEXT_ALIGNMENT_CENTER
+
+        val refundAmountCol = TextView(context)
+        refundAmountCol.textSize = 18f
+        refundAmountCol.text = headData.RefundAmount
+        refundAmountCol.setPadding(10, 10, 10, 10)
+        refundAmountCol.gravity = View.TEXT_ALIGNMENT_CENTER
+
+        val receivedAmountCol = TextView(context)
+        receivedAmountCol.textSize = 18f
+        receivedAmountCol.text = headData.ReceivedAmount
+        receivedAmountCol.setPadding(10, 10, 10, 10)
+        receivedAmountCol.gravity = View.TEXT_ALIGNMENT_CENTER
+
+        val balanceAmountCol = TextView(context)
+        balanceAmountCol.textSize = 18f
+        balanceAmountCol.text = headData.BalanceAmount
+        balanceAmountCol.setPadding(10, 10, 10, 10)
+        balanceAmountCol.gravity = View.TEXT_ALIGNMENT_CENTER
+
+        if (count == 0) {
+            ysCol.setTypeface(null, android.graphics.Typeface.BOLD)
+            feeHeadCol.setTypeface(null, android.graphics.Typeface.BOLD)
+            dueAmountCol.setTypeface(null, android.graphics.Typeface.BOLD)
+            refundAmountCol.setTypeface(null, android.graphics.Typeface.BOLD)
+            receivedAmountCol.setTypeface(null, android.graphics.Typeface.BOLD)
+            balanceAmountCol.setTypeface(null, android.graphics.Typeface.BOLD)
+        }
+
+        row.addView(ysCol)
+        row.addView(getColDividerBlack(context))
+        row.addView(feeHeadCol)
+        row.addView(getColDividerBlack(context))
+        row.addView(dueAmountCol)
+        row.addView(getColDividerBlack(context))
+        row.addView(refundAmountCol)
+        row.addView(getColDividerBlack(context))
+        row.addView(receivedAmountCol)
+        row.addView(getColDividerBlack(context))
+        row.addView(balanceAmountCol)
+
+        row.isFocusable = true
+        row.isClickable = true
 
         return row
     }

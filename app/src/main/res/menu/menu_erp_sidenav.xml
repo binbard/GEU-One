@@ -33,4 +33,9 @@
         android:icon="@drawable/ic_folder_with_files"
         android:checkable="true"
         android:title="Exam" />
+    <item
+        android:id="@+id/item_erp_fees"
+        android:icon="@drawable/ic_folder_with_files"
+        android:checkable="true"
+        android:title="Fees" />
 </menu>

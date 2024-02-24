@@ -125,6 +125,19 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     }
 
     @OptIn(DelicateCoroutinesApi::class)
+    fun fetchFeeDetails(erpViewModel: ErpViewModel, feeType: Int){
+        GlobalScope.launch(Dispatchers.IO) {
+            Log.d("ErpRepository", "MMM fetchFeeDetails")
+            val feeDetails = ErpNetUtils.fetchFeeDetails(cookies, feeType)
+            if(feeDetails!=null && feeType==2 && feeDetails.headdatahostel.isEmpty()){
+                erpViewModel.feeDetails.postValue(null)
+                return@launch
+            }
+            erpViewModel.feeDetails.postValue(feeDetails)
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
     fun resetErpPassword(erpViewModel: ErpViewModel, id: String, email: String, dob: String){
         GlobalScope.launch(Dispatchers.IO) {
             val params = "ID=$id&Mob=$email&db=${dob.replace("/","%2F")}"

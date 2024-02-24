@@ -13,12 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpBinding
+import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.models.LoginStatus
 import com.binbard.geu.one.helpers.Snack
-import com.binbard.geu.one.ui.erp.menu.ErpAttendanceFragment
-import com.binbard.geu.one.ui.erp.menu.ErpExamFragment
-import com.binbard.geu.one.ui.erp.menu.ErpMidtermMarksFragment
-import com.binbard.geu.one.ui.erp.menu.ErpStudentFragment
+import com.binbard.geu.one.ui.erp.menu.*
 import com.binbard.geu.one.utils.BitmapHelper
 import com.google.android.material.navigation.NavigationView
 import java.net.URL
@@ -28,6 +26,7 @@ class ErpFragment : Fragment(){
     private lateinit var binding: FragmentErpBinding
     private lateinit var evm: ErpViewModel
     private lateinit var tvErpTitle: TextView
+    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -39,6 +38,8 @@ class ErpFragment : Fragment(){
         setHasOptionsMenu(true)
 
         tvErpTitle = requireActivity().findViewById(R.id.tvErpTitle)
+
+        sharedPreferencesHelper = SharedPreferencesHelper(requireContext())
 
         if(evm.loginStatus.value==LoginStatus.LOGGED_IN){
             setupErpFeatures()
@@ -108,7 +109,9 @@ class ErpFragment : Fragment(){
         return when (item.itemId) {
             R.id.item_erp_top_visit_site -> {
                 val intent = CustomTabsIntent.Builder().build()
-                intent.launchUrl(requireContext(), getString(R.string.erpHostUrl).toUri())
+                val campus = sharedPreferencesHelper.getCampus()
+                val url = if(campus=="deemed") getString(R.string.erpHostUrl) else getString(R.string.erpHostUrlHill)
+                intent.launchUrl(requireContext(), url.toUri())
                 true
             }
             R.id.item_erp_top_cache_data -> {
@@ -163,6 +166,10 @@ class ErpFragment : Fragment(){
                 transaction.replace(R.id.fragmentContainerView2, ErpExamFragment())
                 tvErpTitle.text = "ERP - Exam"
             }
+            R.id.item_erp_fees -> {
+                transaction.replace(R.id.fragmentContainerView2, ErpFeesFragment())
+                tvErpTitle.text = "ERP - Fees"
+            }
             else -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
                 tvErpTitle.text = "ERP"
@@ -210,6 +217,7 @@ class ErpFragment : Fragment(){
                 R.id.item_erp_attendance -> showErpPage(R.id.item_erp_attendance)
                 R.id.item_erp_midterm_marks -> showErpPage(R.id.item_erp_midterm_marks)
                 R.id.item_erp_exam -> showErpPage(R.id.item_erp_exam)
+                R.id.item_erp_fees -> showErpPage(R.id.item_erp_fees)
                 else -> showErpPage(R.id.item_erp_student)
             }
             true
