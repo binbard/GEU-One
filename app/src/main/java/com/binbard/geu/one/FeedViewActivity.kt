@@ -101,9 +101,9 @@ class FeedViewActivity : AppCompatActivity() {
                     binding.appBar.visibility = View.VISIBLE
                     binding.webViewPost.settings.javaScriptEnabled = true
                     binding.webViewPost.loadData(
-                        getPostContent(feedPost.content),
+                        getPostContent(parseDecode(feedPost.content)),
                         "text/html",
-                        "UTF-8"
+                        "UTF-16"
                     )
                     binding.postToolbarLayout.title = getSpannedToolbarTitle(feedPost.title)
                     binding.tvPostTitle.text = getSpannedPostTitle(feedPost.title)
@@ -116,6 +116,18 @@ class FeedViewActivity : AppCompatActivity() {
         }
 
     }
+
+
+    fun parseDecode(txt: String): String{
+        var text = txt.replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {     // Decode unicode
+            String(Character.toChars(it.groupValues[1].toInt(radix = 16)))
+        }
+        text = text.replace("&#[0-9]+;".toRegex()) {                  // Decode html entities
+            String(Character.toChars(it.value.substringAfter("&#").substringBefore(";").toInt()))
+        }
+        return text
+    }
+
 
     private fun getSpannedToolbarTitle(title: String): SpannableString {
         val spannable = SpannableString(title)

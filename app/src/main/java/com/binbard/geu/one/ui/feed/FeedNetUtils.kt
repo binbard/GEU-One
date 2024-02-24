@@ -3,7 +3,6 @@ package com.binbard.geu.one.ui.feed
 import android.util.Log
 import com.binbard.geu.one.models.*
 import com.binbard.geu.one.ui.feed.FeedNetUtils.builder
-import com.binbard.geu.one.ui.feed.FeedNetUtils.parseDecode
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -30,16 +29,6 @@ object FeedNetUtils {
 
     }
 
-    fun parseDecode(txt: String): String{
-        var text = txt.replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {     // Decode unicode
-            String(Character.toChars(it.groupValues[1].toInt(radix = 16)))
-        }
-        text = text.replace("&#[0-9]+;".toRegex()) {                  // Decode html entities
-            String(Character.toChars(it.value.substringAfter("&#").substringBefore(";").toInt()))
-        }
-        return text
-    }
-
     fun parseFeedListJson(jsonData: String, campus: String): List<Feed> {
         val dataList = mutableListOf<Feed>()
 
@@ -56,7 +45,7 @@ object FeedNetUtils {
         }
 
         for (post in posts){
-            dataList.add(Feed(post.id, post.slug, parseDecode(post.title), post.date))
+            dataList.add(Feed(post.id, post.slug, post.title, post.date))
         }
 
         return dataList
@@ -71,13 +60,12 @@ object FeedNetUtils {
 
             val jsonData = response.body?.string() ?: ""
 
-            val gson: Gson = GsonBuilder().create()
-
             if(campus=="deemed"){
+                val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create()
                 val feedPostWrapper = gson.fromJson(jsonData, FeedPostWrapperDeemed::class.java)
-                feedPostWrapper.post.title = parseDecode(feedPostWrapper.post.title)
                 return feedPostWrapper.post
             } else{
+                val gson: Gson = GsonBuilder().create()
                 val feedPostWrapper = gson.fromJson(jsonData, Array<FeedPostHill>::class.java)
                 return feedPostWrapper[0].toFeedPost()
             }
