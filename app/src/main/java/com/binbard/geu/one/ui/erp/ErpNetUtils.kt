@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -283,6 +284,21 @@ object ErpNetUtils {
             feeDetails
         } catch (e: Exception) {
             null
+        }
+    }
+
+    fun updateChannel(url: String, json: String): String{
+        val request = okhttp3.Request.Builder()
+            .url(url)
+            .post(json.toRequestBody("application/json".toMediaTypeOrNull()))
+            .build()
+        return try{
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+            response.body?.close()
+            body ?: ""
+        } catch (e: Exception){
+            return "x"
         }
     }
 

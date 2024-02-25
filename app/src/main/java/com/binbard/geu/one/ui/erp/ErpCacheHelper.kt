@@ -9,10 +9,9 @@ import com.google.gson.Gson
 import java.util.*
 
 class ErpCacheHelper(context: Context) {
-    private val spErp = context.getSharedPreferences("erp", Context.MODE_PRIVATE)
+    private val spErp = context.getSharedPreferences("erp_session", Context.MODE_PRIVATE)
     private val spStudentData = context.getSharedPreferences("student_data", Context.MODE_PRIVATE)
     private val spStudentImg = context.getSharedPreferences("student_image", Context.MODE_PRIVATE)
-    private val spAttendance = context.getSharedPreferences("attendance", Context.MODE_PRIVATE)
     private val spLog = context.getSharedPreferences("log", Context.MODE_PRIVATE)
 
     fun getCookies(): String {
@@ -66,9 +65,11 @@ class ErpCacheHelper(context: Context) {
         }
     }
 
-    fun saveLocalAttendanceData(attendance: Attendance) {
-        val attendanceJson = Gson().toJson(attendance)
-        spStudentData.edit().putString("attendanceData", attendanceJson).apply()
+    fun getSemester(): String {
+        return spErp.getString("sem", "") ?: ""
+    }
+    fun saveSemester(value: String) {
+        spErp.edit().putString("sem", value).apply()
     }
 
     fun saveLog(log: String){

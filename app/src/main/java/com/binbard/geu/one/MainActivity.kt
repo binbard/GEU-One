@@ -63,6 +63,16 @@ class MainActivity : AppCompatActivity() {
         if (erpViewModel.erpRepository == null) {
             erpViewModel.erpRepository = ErpRepository(erpViewModel.erpCacheHelper!!)
         }
+        if (erpViewModel.studentData.value == null) erpViewModel.erpCacheHelper?.loadLocalStudentData(
+            erpViewModel
+        )
+
+        erpViewModel.studentData.observe(this) {
+            if (it == null) return@observe
+            val channel = resources.getString(R.string.channelUrl)
+            val fbToken = sharedPreferencesHelper.getFbToken()
+            erpViewModel.erpRepository?.updateChannel(erpViewModel, channel, fbToken)
+        }
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
@@ -108,9 +118,11 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.item_gen_feedback -> {
-                val dialogFeedbackBinding = DialogFeedbackBinding.inflate(layoutInflater, null, false)
+                val dialogFeedbackBinding =
+                    DialogFeedbackBinding.inflate(layoutInflater, null, false)
                 dialogFeedbackBinding.chipBugReport.setOnClickListener {
-                    dialogFeedbackBinding.etFeedback.hint = "I encountered a bug while navigating from.."
+                    dialogFeedbackBinding.etFeedback.hint =
+                        "I encountered a bug while navigating from.."
                 }
                 dialogFeedbackBinding.chipReview.setOnClickListener {
                     dialogFeedbackBinding.etFeedback.hint = "My experience with this app has been.."
@@ -121,9 +133,11 @@ class MainActivity : AppCompatActivity() {
 
                 var feedbackType = "review"
                 val selectedChip = dialogFeedbackBinding.chipGroup.checkedChipId
-                if(selectedChip == dialogFeedbackBinding.chipBugReport.id) feedbackType = "bug"
-                else if(selectedChip == dialogFeedbackBinding.chipFeatureRequest.id) feedbackType = "feature"
-                else if(selectedChip == dialogFeedbackBinding.chipReview.id) feedbackType = "review"
+                if (selectedChip == dialogFeedbackBinding.chipBugReport.id) feedbackType = "bug"
+                else if (selectedChip == dialogFeedbackBinding.chipFeatureRequest.id) feedbackType =
+                    "feature"
+                else if (selectedChip == dialogFeedbackBinding.chipReview.id) feedbackType =
+                    "review"
 
                 MaterialAlertDialogBuilder(this)
                     .setTitle("Feedback")
@@ -134,7 +148,12 @@ class MainActivity : AppCompatActivity() {
                     }
                     .setPositiveButton("SEND") { dialog, which ->
                         val feedbackUrl = resources.getString(R.string.feedbackUrl)
-                        NetUtils.sendFeedback(this, feedbackUrl, feedbackType, dialogFeedbackBinding.etFeedback.text.toString())
+                        NetUtils.sendFeedback(
+                            this,
+                            feedbackUrl,
+                            feedbackType,
+                            dialogFeedbackBinding.etFeedback.text.toString()
+                        )
                     }
                     .show()
 

@@ -24,7 +24,4 @@ object FirebaseUtils {
                 Log.d("FirebaseUtils", msg)
             }
     }
-    fun subscribeToAll() {
-        subscribeTo("all")
-    }
 }

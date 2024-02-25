@@ -1,6 +1,8 @@
 package com.binbard.geu.one.ui.erp.menu
 
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import kotlin.text.Typography.section
 
 data class Student(
     @SerializedName("RegID") var regID: String,
@@ -35,6 +37,7 @@ data class Student(
     @SerializedName("ClassRollNo") var classRollNo: String,
     @SerializedName("Batch") var batch: String,
     @SerializedName("ABCAccountNo") var abcAccountNo: String,
+    @SerializedName("token") var token: String? = null,
 ){
     val properties: List<Pair<String,String>> get() = listOf(
         "Father Name" to fatherHusName,
@@ -52,6 +55,7 @@ data class Student(
         "HighSchool %" to marks10,
         "Intermediate %" to marks12,
     )
+    fun toGson() = Gson().toJson(this)
 }
 
 data class StudentGson(@SerializedName("state") val state: List<Student>)

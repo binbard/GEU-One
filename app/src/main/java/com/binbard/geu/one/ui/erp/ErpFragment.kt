@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpBinding
+import com.binbard.geu.one.helpers.FirebaseUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.models.LoginStatus
 import com.binbard.geu.one.helpers.Snack
@@ -22,11 +23,13 @@ import com.google.android.material.navigation.NavigationView
 import java.net.URL
 
 
-class ErpFragment : Fragment(){
+class ErpFragment : Fragment() {
     private lateinit var binding: FragmentErpBinding
     private lateinit var evm: ErpViewModel
     private lateinit var tvErpTitle: TextView
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
+    private var firstTimeLogin = false
+    private var campus = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -41,16 +44,18 @@ class ErpFragment : Fragment(){
 
         sharedPreferencesHelper = SharedPreferencesHelper(requireContext())
 
-        if(evm.loginStatus.value==LoginStatus.LOGGED_IN){
+        campus = sharedPreferencesHelper.getCampus()
+
+        if (evm.loginStatus.value == LoginStatus.LOGGED_IN) {
             setupErpFeatures()
-            if(childFragmentManager.fragments.size==0) showErpPage(R.id.item_erp_student)
+            if (childFragmentManager.fragments.size == 0) showErpPage(R.id.item_erp_student)
         } else {
             showErpPage(0)
         }
 
         evm.loginStatus.observe(viewLifecycleOwner) {
             if (it == LoginStatus.UNKNOWN) {
-                if(!handleInitPage()) evm.loginStatus.value = evm.erpCacheHelper?.getLoginStatus()
+                if (!handleInitPage()) evm.loginStatus.value = evm.erpCacheHelper?.getLoginStatus()
             } else if (it == LoginStatus.PREV_LOGGED_IN) {
                 showErpPage(R.id.item_erp_student)
                 evm.erpCacheHelper?.loadLocalStudentData(evm)
@@ -58,11 +63,12 @@ class ErpFragment : Fragment(){
                 setupErpFeatures()
             } else if (it == LoginStatus.PREV_LOGGED_OUT) {
                 evm.loginStatus.value = LoginStatus.NOT_LOGGED_IN
+                firstTimeLogin = true
                 showErpPage(0)
             } else if (it == LoginStatus.LOGIN_SUCCESS) {
                 evm.loginStatus.value = LoginStatus.LOGGED_IN
                 setupErpFeatures()
-                if(evm.currentErpPage.value==0) showErpPage(R.id.item_erp_student)      // Redirect to student page
+                if (evm.currentErpPage.value == 0) showErpPage(R.id.item_erp_student)      // Redirect to student page
                 evm.erpCacheHelper!!.saveLoginStatus(LoginStatus.PREV_LOGGED_IN)
                 evm.erpRepository?.syncStudentData(evm)
             } else if (it == LoginStatus.LOGIN_FAILED) {
@@ -91,7 +97,7 @@ class ErpFragment : Fragment(){
         }
 
         evm.comments.observe(viewLifecycleOwner) {
-            if (it != ""){
+            if (it != "") {
                 Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
                 evm.comments.value = ""
             }
@@ -105,12 +111,13 @@ class ErpFragment : Fragment(){
         inflater.inflate(R.menu.menu_erp_top, menu)
         MenuCompat.setGroupDividerEnabled(menu, true)
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_erp_top_visit_site -> {
                 val intent = CustomTabsIntent.Builder().build()
-                val campus = sharedPreferencesHelper.getCampus()
-                val url = if(campus=="deemed") getString(R.string.erpHostUrl) else getString(R.string.erpHostUrlHill)
+                val url =
+                    if (campus == "deemed") getString(R.string.erpHostUrl) else getString(R.string.erpHostUrlHill)
                 intent.launchUrl(requireContext(), url.toUri())
                 true
             }
@@ -127,12 +134,12 @@ class ErpFragment : Fragment(){
         }
     }
 
-    private fun handleInitPage(): Boolean{
-        if(!evm.shouldHandleInitPage) return false
+    private fun handleInitPage(): Boolean {
+        if (!evm.shouldHandleInitPage) return false
         val uri = requireActivity().intent.data ?: return false
         val url = URL(uri.scheme, uri.host, uri.path)
         val erpExtHost = resources.getString(R.string.erpExtHost)
-        if(uri.host==erpExtHost && uri.path=="/Account/ChangePassword"){
+        if (uri.host == erpExtHost && uri.path == "/Account/ChangePassword") {
             evm.shouldHandleInitPage = false
             showErpPage(R.id.ErpLoginChangeFragment)
             return true
@@ -144,7 +151,7 @@ class ErpFragment : Fragment(){
         evm.currentErpPage.value = pageId
         childFragmentManager.clearBackStack("xyz")
         val transaction = childFragmentManager.beginTransaction()
-        when(pageId){
+        when (pageId) {
             0 -> transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
             R.id.ErpLoginChangeFragment -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpLoginChangeFragment())
@@ -187,22 +194,42 @@ class ErpFragment : Fragment(){
             val bitmap = BitmapHelper.stringToBitmap(it)
             drawerLayout.findViewById<ImageView>(R.id.tvStuImg)?.setImageBitmap(bitmap)
         }
-        evm.studentData.observe(viewLifecycleOwner) {
-            drawerLayout.findViewById<TextView>(R.id.tvStuId)?.text = it?.studentID
-            drawerLayout.findViewById<TextView>(R.id.tvStuName)?.text = it?.studentName
-        }
 
         if (unset) {
             btnErpMenu.setOnClickListener(null)
             requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout).setDrawerLockMode(
-                DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+            )
             return
         }
 
-        requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout).setDrawerLockMode(
-            DrawerLayout.LOCK_MODE_UNLOCKED)
+        evm.studentData.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+            if (firstTimeLogin) {
+                evm.erpCacheHelper?.saveSemester(it.yearSem)
+                val mCourse = it.course.replace(" ", "_")
+                FirebaseUtils.subscribeTo(mCourse)
+                FirebaseUtils.subscribeTo("$campus.$mCourse")
+                FirebaseUtils.subscribeTo("$campus.$mCourse.${it.yearSem}")
+                firstTimeLogin = false
+            } else {
+                val savedSem = evm.erpCacheHelper?.getSemester()
+                if (savedSem != it.yearSem) {
+                    evm.erpCacheHelper?.saveSemester(it.yearSem)
+                    val mCourse = it.course.replace(" ", "_")
+                    FirebaseUtils.unsubscribeFrom("$campus.$mCourse.$savedSem")
+                    FirebaseUtils.subscribeTo("$campus.$mCourse.${it.yearSem}")
+                }
+            }
+            drawerLayout.findViewById<TextView>(R.id.tvStuId)?.text = it.studentID
+            drawerLayout.findViewById<TextView>(R.id.tvStuName)?.text = it.studentName
+        }
 
-        btnErpMenu.setOnClickListener{
+        requireActivity().findViewById<DrawerLayout>(R.id.drawer_layout).setDrawerLockMode(
+            DrawerLayout.LOCK_MODE_UNLOCKED
+        )
+
+        btnErpMenu.setOnClickListener {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.closeDrawer(GravityCompat.START)
             } else {
@@ -210,18 +237,19 @@ class ErpFragment : Fragment(){
             }
         }
 
-        drawerLayout.findViewById<NavigationView>(R.id.nav_view).setNavigationItemSelectedListener { menuItem ->
-            drawerLayout.closeDrawers()
-            when (menuItem.itemId) {
-                R.id.item_erp_student -> showErpPage(R.id.item_erp_student)
-                R.id.item_erp_attendance -> showErpPage(R.id.item_erp_attendance)
-                R.id.item_erp_midterm_marks -> showErpPage(R.id.item_erp_midterm_marks)
-                R.id.item_erp_exam -> showErpPage(R.id.item_erp_exam)
-                R.id.item_erp_fees -> showErpPage(R.id.item_erp_fees)
-                else -> showErpPage(R.id.item_erp_student)
+        drawerLayout.findViewById<NavigationView>(R.id.nav_view)
+            .setNavigationItemSelectedListener { menuItem ->
+                drawerLayout.closeDrawers()
+                when (menuItem.itemId) {
+                    R.id.item_erp_student -> showErpPage(R.id.item_erp_student)
+                    R.id.item_erp_attendance -> showErpPage(R.id.item_erp_attendance)
+                    R.id.item_erp_midterm_marks -> showErpPage(R.id.item_erp_midterm_marks)
+                    R.id.item_erp_exam -> showErpPage(R.id.item_erp_exam)
+                    R.id.item_erp_fees -> showErpPage(R.id.item_erp_fees)
+                    else -> showErpPage(R.id.item_erp_student)
+                }
+                true
             }
-            true
-        }
     }
 
 }

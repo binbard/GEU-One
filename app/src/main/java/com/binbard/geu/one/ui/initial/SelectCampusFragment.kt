@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.binbard.geu.one.MainActivity
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentSelectCampusBinding
+import com.binbard.geu.one.helpers.FirebaseUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.helpers.Snack
 
@@ -48,6 +49,9 @@ class SelectCampusFragment: Fragment() {
             }
             sharedPreferencesHelper.setCampus(selectedCampus)
             sharedPreferencesHelper.setInitDone(true)
+            FirebaseUtils.subscribeTo(selectedCampus)
+            FirebaseUtils.subscribeTo("$selectedCampus-feed")
+            FirebaseUtils.subscribeTo("$selectedCampus-resources")
             startActivity(Intent(requireContext(), MainActivity::class.java))
             requireActivity().finish()
         }

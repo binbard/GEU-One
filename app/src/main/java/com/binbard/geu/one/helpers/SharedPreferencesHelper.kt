@@ -12,6 +12,13 @@ class SharedPreferencesHelper(context: Context) {
         sharedPreferences.edit().putBoolean("initDone", value).apply()
     }
 
+    fun getFbToken(): String {
+        return sharedPreferences.getString("fbToken", "") ?: ""
+    }
+    fun setFbToken(value: String) {
+        sharedPreferences.edit().putString("fbToken", value).apply()
+    }
+
     fun getCampus(): String {
         return sharedPreferences.getString("campus", "") ?: ""
     }
