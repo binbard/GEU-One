@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <queries>
+        <provider android:authorities="com.google.android.gm" />
+    </queries>
+
     <application
         android:name=".MyApplication"
         android:allowBackup="false"
@@ -17,6 +21,10 @@
         android:theme="@style/Theme.GEUOne"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_settings" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -33,21 +41,26 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="student.geu.ac.in" />
-                <data android:scheme="https" android:host="student.gehu.ac.in" />
+
+                <data
+                    android:host="student.geu.ac.in"
+                    android:scheme="https" />
+                <data
+                    android:host="student.gehu.ac.in"
+                    android:scheme="https" />
             </intent-filter>
-
         </activity>
-
-        <activity android:name=".ui.initial.InitialActivity"
+        <activity
+            android:name=".ui.initial.InitialActivity"
             android:exported="false" />
-
         <activity
             android:name=".FeedViewActivity"
             android:exported="false"
@@ -55,6 +68,7 @@
             android:theme="@style/Theme.GEUOne.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.POST" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -80,10 +94,5 @@
             </intent-filter>
         </service>
     </application>
-
-    <queries>
-        <provider android:authorities="com.google.android.gm" />
-    </queries>
-
 
 </manifest>

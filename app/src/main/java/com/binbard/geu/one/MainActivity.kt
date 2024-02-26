@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat.startActivity
@@ -42,11 +43,12 @@ class MainActivity : AppCompatActivity() {
     private var shouldGotoChangePassword = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        sharedPreferencesHelper = SharedPreferencesHelper(this)
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         if (intent.extras != null) {
             resolveClickAction()
             resolveHostIntent()
         }
-        sharedPreferencesHelper = SharedPreferencesHelper(this)
         handleFirstTimeLaunch()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -126,7 +128,9 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_gen_settings -> {
-                Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
                 true
             }
             R.id.item_gen_feedback -> {
@@ -159,6 +163,7 @@ class MainActivity : AppCompatActivity() {
                         // Negative btn pressed
                     }
                     .setPositiveButton("SEND") { dialog, which ->
+                        if(dialogFeedbackBinding.etFeedback.text.isEmpty()) return@setPositiveButton
                         val feedbackUrl = resources.getString(R.string.feedbackUrl)
                         NetUtils.sendFeedback(
                             this,

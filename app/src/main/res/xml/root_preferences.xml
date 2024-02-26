@@ -1,0 +1,51 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Personal">
+
+        <EditTextPreference
+            app:key="signature"
+            app:title="Your Signature"
+            app:defaultValue="Anonymous"
+            app:dialogTitle="Signature"
+            app:summary="Used as your identity"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key=""
+            app:defaultValue="deemed"
+            app:entries="@array/campus_entries"
+            app:entryValues="@array/campus_values"
+            app:title="Your Campus"
+            app:selectable="false"
+            app:enabled="false"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Sync">
+
+        <SwitchPreferenceCompat
+            app:key="sync"
+            app:title="Receive Push Notifications" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="About">
+
+        <Preference
+            app:enabled="false"
+            app:title="@string/app_name"
+            app:summary="Version 1.1" />
+
+        <Preference
+            app:title="Privacy Policy" />
+
+        <Preference
+            app:title="Terms &amp; Conditions" />
+
+        <Preference
+            app:title="Contributors" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
