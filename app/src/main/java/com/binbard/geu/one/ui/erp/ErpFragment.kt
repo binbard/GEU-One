@@ -28,7 +28,6 @@ class ErpFragment : Fragment() {
     private lateinit var evm: ErpViewModel
     private lateinit var tvErpTitle: TextView
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
-    private var firstTimeLogin = false
     private var campus = ""
 
     override fun onCreateView(
@@ -63,7 +62,7 @@ class ErpFragment : Fragment() {
                 setupErpFeatures()
             } else if (it == LoginStatus.PREV_LOGGED_OUT) {
                 evm.loginStatus.value = LoginStatus.NOT_LOGGED_IN
-                firstTimeLogin = true
+                evm.firstTimeLogin = true
                 showErpPage(0)
             } else if (it == LoginStatus.LOGIN_SUCCESS) {
                 evm.loginStatus.value = LoginStatus.LOGGED_IN
@@ -205,13 +204,16 @@ class ErpFragment : Fragment() {
 
         evm.studentData.observe(viewLifecycleOwner) {
             if (it == null) return@observe
-            if (firstTimeLogin) {
+            if (evm.firstTimeLogin) {
                 evm.erpCacheHelper?.saveSemester(it.yearSem)
                 val mCourse = it.course.replace(" ", "_")
                 FirebaseUtils.subscribeTo(mCourse)
                 FirebaseUtils.subscribeTo("$campus.$mCourse")
                 FirebaseUtils.subscribeTo("$campus.$mCourse.${it.yearSem}")
-                firstTimeLogin = false
+                evm.firstTimeLogin = false
+                val channel = resources.getString(R.string.channelUrl)
+                val fbToken = sharedPreferencesHelper.getFbToken()
+                evm.erpRepository?.updateChannel(evm, channel, fbToken)
             } else {
                 val savedSem = evm.erpCacheHelper?.getSemester()
                 if (savedSem != it.yearSem) {

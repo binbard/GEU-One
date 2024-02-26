@@ -43,7 +43,7 @@ class FeedPostHill(
 class FeedPost(
     val id: Int,
     val slug: String,
-    var title: String,
+    val title: String,
     val date: Date,
     val modified: Date,
     val content: String

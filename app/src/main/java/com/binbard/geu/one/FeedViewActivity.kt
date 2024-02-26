@@ -100,13 +100,15 @@ class FeedViewActivity : AppCompatActivity() {
                     binding.pbPost.visibility = View.GONE
                     binding.appBar.visibility = View.VISIBLE
                     binding.webViewPost.settings.javaScriptEnabled = true
+                    val mTitle = parseDecode(feedPost.title)
+                    val mContent = parseDecode(feedPost.content)
                     binding.webViewPost.loadData(
-                        getPostContent(parseDecode(feedPost.content)),
+                        getPostContent(mContent),
                         "text/html",
                         "UTF-16"
                     )
-                    binding.postToolbarLayout.title = getSpannedToolbarTitle(feedPost.title)
-                    binding.tvPostTitle.text = getSpannedPostTitle(feedPost.title)
+                    binding.postToolbarLayout.title = getSpannedToolbarTitle(mTitle)
+                    binding.tvPostTitle.text = getSpannedPostTitle(mTitle)
                     binding.fabOpenInBrowser.visibility = View.VISIBLE
                     val sdf = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
                     val postTime = sdf.format(feedPost.modified)

@@ -56,6 +56,7 @@ data class Student(
         "Intermediate %" to marks12,
     )
     fun toGson() = Gson().toJson(this)
+    fun toIdGson() = Gson().toJson(mapOf("StudentID" to studentID))
 }
 
 data class StudentGson(@SerializedName("state") val state: List<Student>)

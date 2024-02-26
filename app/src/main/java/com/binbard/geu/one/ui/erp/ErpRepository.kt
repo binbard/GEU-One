@@ -5,6 +5,7 @@ import com.binbard.geu.one.helpers.FirebaseUtils
 import com.binbard.geu.one.models.LoginStatus
 import com.binbard.geu.one.utils.BitmapHelper
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import java.util.*
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -22,7 +23,6 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun preLogin(erpViewModel: ErpViewModel) {
         val id = erpCacheHelper.getStudentId()
         val password = erpCacheHelper.getPassword()
@@ -63,7 +63,6 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun fetchAttendance(erpViewModel: ErpViewModel) {
         GlobalScope.launch(Dispatchers.IO) {
             val attendance = erpViewModel.studentData.value?.regID?.let {
@@ -80,7 +79,6 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun fetchImage(erpViewModel: ErpViewModel) {
         GlobalScope.launch(Dispatchers.IO) {
             val image = ErpNetUtils.getStudentImage(cookies)
@@ -91,7 +89,6 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun syncStudentData(erpViewModel: ErpViewModel) {
         Log.d("ErpRepository", "ZZZ syncStudentData")
         fetchImage(erpViewModel)
@@ -108,7 +105,6 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun fetchMidtermMarks(erpViewModel: ErpViewModel, sem: Int) {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("ErpRepository", "YYY fetchMidtermMarks")
@@ -123,7 +119,6 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun fetchExamMarks(erpViewModel: ErpViewModel) {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("ErpRepository", "CCC fetchExamMarks")
@@ -133,7 +128,6 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun fetchFeeDetails(erpViewModel: ErpViewModel, feeType: Int) {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("ErpRepository", "MMM fetchFeeDetails")
@@ -146,18 +140,18 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun updateChannel(erpViewModel: ErpViewModel, url: String, fbToken: String) {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("ErpRepository", "GGG updateChannel")
+            var gson = ""
             erpViewModel.studentData.value?.token = fbToken
-            val gson = erpViewModel.studentData.value?.toGson() ?: return@launch
+            if(fbToken == "") gson = erpViewModel.studentData.value?.toIdGson() ?: return@launch
+            else gson = erpViewModel.studentData.value?.toGson() ?: return@launch
             val res = ErpNetUtils.updateChannel(url, gson)
             Log.d("ErpRepository", "GGG updateChannel $res")
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun resetErpPassword(erpViewModel: ErpViewModel, id: String, email: String, dob: String) {
         GlobalScope.launch(Dispatchers.IO) {
             val params = "ID=$id&Mob=$email&db=${dob.replace("/", "%2F")}"
@@ -170,7 +164,6 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun changeErpPassword(erpViewModel: ErpViewModel, password: String, url: String) {
         GlobalScope.launch(Dispatchers.IO) {
             if (url == "") return@launch

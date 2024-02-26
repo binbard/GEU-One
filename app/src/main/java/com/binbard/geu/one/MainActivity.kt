@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -29,6 +30,8 @@ import com.binbard.geu.one.ui.erp.ErpViewModel
 import com.binbard.geu.one.ui.initial.InitialActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.net.URL
+import java.time.ZoneId
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -68,10 +71,19 @@ class MainActivity : AppCompatActivity() {
         )
 
         erpViewModel.studentData.observe(this) {
-            if (it == null) return@observe
-            val channel = resources.getString(R.string.channelUrl)
-            val fbToken = sharedPreferencesHelper.getFbToken()
-            erpViewModel.erpRepository?.updateChannel(erpViewModel, channel, fbToken)
+            if(it == null || erpViewModel.firstTimeLogin) return@observe
+            val lastSyncTime = sharedPreferencesHelper.getLastSyncTime()
+            val lastTime = Date(lastSyncTime)
+            val currentTime = Date()
+            val lastLocalDate = lastTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+            val currentLocalDate = currentTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+            if(lastLocalDate != currentLocalDate) {
+                val channel = resources.getString(R.string.channelUrl)
+                erpViewModel.erpRepository?.updateChannel(erpViewModel, channel, "")
+                sharedPreferencesHelper.setLastSyncTime(currentTime.time)
+            } else{
+                Log.d("Sync", "Already synced")
+            }
         }
 
         val appBarConfiguration = AppBarConfiguration(

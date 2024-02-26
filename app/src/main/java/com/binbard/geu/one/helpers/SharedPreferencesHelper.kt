@@ -19,6 +19,13 @@ class SharedPreferencesHelper(context: Context) {
         sharedPreferences.edit().putString("fbToken", value).apply()
     }
 
+    fun getLastSyncTime(): Long {
+        return sharedPreferences.getLong("lastSyncTime", 0)
+    }
+    fun setLastSyncTime(value: Long) {
+        sharedPreferences.edit().putLong("lastSyncTime", value).apply()
+    }
+
     fun getCampus(): String {
         return sharedPreferences.getString("campus", "") ?: ""
     }

@@ -277,7 +277,6 @@ object ErpNetUtils {
             val response = client.newCall(request).execute()
             val body = response.body?.string()
 
-            Log.d("ErpNetUtils", body ?: "")
             val json = body?.replace("\\", "")?.replace("\"[", "[")?.replace("]\"", "]")
             val feeDetails = Gson().fromJson(json, FeeDetails::class.java)
             response.body?.close()

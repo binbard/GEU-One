@@ -41,6 +41,7 @@ class ErpViewModel : ViewModel() {
     val currentErpPage = MutableLiveData<Int>().apply {
         value = 0
     }
+    var firstTimeLogin = false
     var shouldHandleInitPage = true
     var isCacheEnabled = true
 

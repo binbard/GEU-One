@@ -78,6 +78,8 @@ class ErpCacheHelper(context: Context) {
 
     fun clearLocalData(){
         spErp.edit().clear().apply()
+        spStudentData.edit().clear().apply()
+        spStudentImg.edit().clear().apply()
     }
 
 }

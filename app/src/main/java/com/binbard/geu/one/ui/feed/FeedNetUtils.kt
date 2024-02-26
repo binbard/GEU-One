@@ -45,7 +45,7 @@ object FeedNetUtils {
         }
 
         for (post in posts){
-            dataList.add(Feed(post.id, post.slug, post.title, post.date))
+            dataList.add(Feed(post.id, post.slug, parseDecode(post.title), post.date))
         }
 
         return dataList
@@ -59,22 +59,34 @@ object FeedNetUtils {
             if (!response.isSuccessful) return null
 
             val jsonData = response.body?.string() ?: ""
+            val mPost: FeedPost?
 
             if(campus=="deemed"){
                 val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create()
                 val feedPostWrapper = gson.fromJson(jsonData, FeedPostWrapperDeemed::class.java)
-                return feedPostWrapper.post
+                mPost = feedPostWrapper.post
             } else{
                 val gson: Gson = GsonBuilder().create()
                 val feedPostWrapper = gson.fromJson(jsonData, Array<FeedPostHill>::class.java)
-                return feedPostWrapper[0].toFeedPost()
+                mPost = feedPostWrapper[0].toFeedPost()
             }
-
-
+            val post = FeedPost(mPost.id, mPost.slug, parseDecode(mPost.title), mPost.date, mPost.modified, parseDecode(mPost.content))
+            return post
         } catch (e: Exception) {
             Log.e("FeedNetUtils", "parsePostJson: ${e.message}")
             return null
         }
+    }
+
+    fun parseDecode(txt: String?): String{
+        if(txt==null) return ""
+        var text = txt.replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {     // Decode unicode
+            String(Character.toChars(it.groupValues[1].toInt(radix = 16)))
+        }
+        text = text.replace("&#[0-9]+;".toRegex()) {                  // Decode html entities
+            String(Character.toChars(it.value.substringAfter("&#").substringBefore(";").toInt()))
+        }
+        return text
     }
 
 }
