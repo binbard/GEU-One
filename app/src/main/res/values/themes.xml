@@ -34,9 +34,6 @@
     </style>
 
     <style name="Theme.GEUOne.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:tint">@color/material_dynamic_primary20</item>
-        <item name="colorPrimary">@color/material_dynamic_primary70</item>
-        <item name="contentScrim">@color/material_dynamic_primary60</item>
     </style>
 
     <style name="Theme.GEUOne.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"></style>

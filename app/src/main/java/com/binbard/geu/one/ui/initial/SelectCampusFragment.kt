@@ -2,7 +2,9 @@ package com.binbard.geu.one.ui.initial
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,7 +66,11 @@ class SelectCampusFragment: Fragment() {
         binding.llDeemed.background = null
         binding.llHill.background = null
 
-        llCampus.setBackgroundResource(R.drawable.rounded_corner)
+        try{
+            llCampus.setBackgroundResource(R.drawable.rounded_corner)
+        } catch(e: Exception){
+            llCampus.setBackgroundColor(Color.LTGRAY)
+        }
 
         selectedCampus = campusMap[llCampus].toString()
     }

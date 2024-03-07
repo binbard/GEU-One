@@ -60,7 +60,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/erp_sidenav_header"
-        app:menu="@menu/menu_erp_sidenav"
-        tools:ignore="MissingConstraints" />
+        app:menu="@menu/menu_erp_sidenav" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

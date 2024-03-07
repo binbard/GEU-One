@@ -1,5 +1,6 @@
 package com.binbard.geu.one.ui.erp
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -13,7 +14,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpLoginBinding
+import com.binbard.geu.one.helpers.DeviceUtils
+import com.binbard.geu.one.helpers.Snack
 import com.binbard.geu.one.models.LoginStatus
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 
 class ErpLoginFragment : Fragment() {
     private lateinit var binding: FragmentErpLoginBinding
@@ -52,10 +57,14 @@ class ErpLoginFragment : Fragment() {
         }
 
         binding.btLogin.setOnClickListener {
-
             val imm =
                 requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
             imm.hideSoftInputFromWindow(view?.windowToken, 0)
+
+            if(!DeviceUtils.isGooglePlayServicesAvailable(requireContext())){
+                Snack.showMsg(binding.root, "Please update Google Play Services")
+                return@setOnClickListener
+            }
 
             val id = binding.etId.text.toString()
             val pass = binding.etPass.text.toString()

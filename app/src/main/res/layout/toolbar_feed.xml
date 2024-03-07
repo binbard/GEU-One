@@ -18,10 +18,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:iconifiedByDefault="false"
-            app:queryHint="Search Feeds"
+            android:inputType="text"
             app:iconifiedByDefault="false"
-            app:searchHintIcon="@drawable/ic_search"
-            app:queryBackground="@android:color/transparent"/>
+            app:queryBackground="@android:color/transparent"
+            app:queryHint="Search Feeds"
+            app:searchHintIcon="@drawable/ic_search" />
 
     </LinearLayout>
 </androidx.appcompat.widget.Toolbar>

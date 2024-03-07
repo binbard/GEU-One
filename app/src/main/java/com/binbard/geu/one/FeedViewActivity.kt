@@ -146,7 +146,7 @@ class FeedViewActivity : AppCompatActivity() {
             0
         )
         spannable.setSpan(
-            android.text.style.ForegroundColorSpan(resources.getColor(com.google.android.material.R.color.material_dynamic_primary50)),
+            android.text.style.ForegroundColorSpan(Color.RED),
             0,
             title.length,
             0
