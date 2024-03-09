@@ -6,11 +6,12 @@
         <item name="colorPrimary">#AD5E74</item>
         <item name="colorPrimaryVariant">#742E46</item>
         <item name="colorOnPrimary">@color/white</item>
+        <item name="android:textColor">#F6E2E9</item>
 
         <!-- Secondary brand color. -->
         <item name="colorSecondary">#AD5E74</item>
         <item name="colorSecondaryVariant">#742E46</item>
-        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorOnSecondary">@color/black</item>
 
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@android:color/transparent</item>
@@ -18,7 +19,7 @@
 
         <!-- Customize your theme here. -->
         <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+        <itemc name="windowNoTitle">true</itemc>
     </style>
 
     <style name="MyLinearTheme">
