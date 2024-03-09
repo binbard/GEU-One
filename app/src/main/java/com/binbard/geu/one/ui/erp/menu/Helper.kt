@@ -1,15 +1,17 @@
 package com.binbard.geu.one.ui.erp.menu
 
-import android.R
 import android.content.Context
+import android.graphics.Color
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ClickableSpan
+import android.util.TypedValue
 import android.view.View
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.core.view.size
+import com.binbard.geu.one.R
 import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.models.*
 import java.text.SimpleDateFormat
@@ -110,10 +112,14 @@ object Helper {
             subjectCode.text = attendance.subjectCode
             employee.text = attendance.employee
 
-            counter.setTextColor(context.resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text))
-            if (subject.text.endsWith("(L)")) subject.setTextColor(context.resources.getColor(com.google.android.material.R.color.m3_ref_palette_dynamic_neutral50))
-            else subject.setTextColor(context.resources.getColor(com.google.android.material.R.color.m3_ref_palette_dynamic_neutral60))
-            percentage.setTextColor(context.resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text))
+            val typedValue1 = TypedValue()
+            context.theme.resolveAttribute(android.R.attr.colorPrimary, typedValue1, true)
+
+            counter.setTextColor(typedValue1.data)
+            if (subject.text.endsWith("(L)")) subject.setTextColor(Color.GRAY)
+            if(percentage.text.toString().toFloat() < 75) percentage.setTextColor(Color.RED)
+            else percentage.setTextColor(Color.GREEN)
+            percentage.alpha = 0.6f
         }
 
         row.addView(counter)

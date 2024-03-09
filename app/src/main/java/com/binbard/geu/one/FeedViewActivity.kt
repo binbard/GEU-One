@@ -103,7 +103,7 @@ class FeedViewActivity : AppCompatActivity() {
                     val mTitle = parseDecode(feedPost.title)
                     val mContent = parseDecode(feedPost.content)
                     binding.webViewPost.loadData(
-                        getPostContent(mContent),
+                        getPostContent(mContent, binding.tvPostModified.currentTextColor),
                         "text/html",
                         "UTF-16"
                     )
@@ -120,7 +120,7 @@ class FeedViewActivity : AppCompatActivity() {
     }
 
 
-    fun parseDecode(txt: String): String{
+    private fun parseDecode(txt: String): String{
         var text = txt.replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {     // Decode unicode
             String(Character.toChars(it.groupValues[1].toInt(radix = 16)))
         }
@@ -139,6 +139,9 @@ class FeedViewActivity : AppCompatActivity() {
 
     private fun getSpannedPostTitle(title: String): SpannableString {
         val spannable = SpannableString(title)
+        val typedValue1 = TypedValue()
+        theme.resolveAttribute(android.R.attr.colorPrimary, typedValue1, true)
+        val colorAccentHex = String.format("%06X", 0xFFFFFF and typedValue1.data)
         spannable.setSpan(
             android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
             0,
@@ -146,7 +149,7 @@ class FeedViewActivity : AppCompatActivity() {
             0
         )
         spannable.setSpan(
-            android.text.style.ForegroundColorSpan(Color.RED),
+            android.text.style.ForegroundColorSpan(Color.parseColor("#$colorAccentHex")),
             0,
             title.length,
             0
@@ -154,10 +157,12 @@ class FeedViewActivity : AppCompatActivity() {
         return spannable
     }
 
-    private fun getPostContent(content: String): String {
+    private fun getPostContent(content: String, colorInt: Int): String {
         val typedValue1 = TypedValue()
-        theme.resolveAttribute(com.google.android.material.R.attr.colorAccent, typedValue1, true)
-        val colorAccentHex = String.format("%06X", 0xFFFFFF and typedValue1.data)
+//        theme.resolveAttribute(android.R.attr.colorAccent, typedValue1, true)
+//        val colorAccentHex = String.format("%06X", 0xFFFFFF and typedValue1.data)
+
+        val colorAccentHex = String.format("%06X", 0xFFFFFF and colorInt)
 
         val rootStyle =
             ".wrapper{overflow-x:scroll;} a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;max-width:100%;}"

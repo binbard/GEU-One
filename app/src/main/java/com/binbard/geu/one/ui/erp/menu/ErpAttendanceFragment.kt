@@ -2,6 +2,7 @@ package com.binbard.geu.one.ui.erp.menu
 
 import android.os.Bundle
 import android.text.SpannableString
+import android.util.TypedValue
 import android.view.*
 import android.widget.TableRow
 import androidx.fragment.app.Fragment
@@ -88,14 +89,16 @@ class ErpAttendanceFragment : Fragment() {
             txt.indexOf("\n") - 1,
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
         )
+        val typedValue1 = TypedValue()
+        context?.theme?.resolveAttribute(android.R.attr.colorPrimary, typedValue1, true)
         spannableString.setSpan(
-            android.text.style.ForegroundColorSpan(resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text)),
+            android.text.style.ForegroundColorSpan(typedValue1.data),
             txt.indexOf("\n"),
             txt.length,
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         spannableString.setSpan(
-            android.text.style.ForegroundColorSpan(resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text)),
+            android.text.style.ForegroundColorSpan(typedValue1.data),
             0,
             txt.indexOf("\n"),
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -107,7 +110,7 @@ class ErpAttendanceFragment : Fragment() {
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         spannableString.setSpan(
-            android.text.style.ForegroundColorSpan(resources.getColor(com.google.android.material.R.color.m3_ref_palette_dynamic_neutral70)),
+            android.text.style.ForegroundColorSpan(typedValue1.data),
             txt.indexOf("\n"),
             txt.length,
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE

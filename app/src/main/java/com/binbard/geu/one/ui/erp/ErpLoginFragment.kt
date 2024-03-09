@@ -1,10 +1,12 @@
 package com.binbard.geu.one.ui.erp
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.URLSpan
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

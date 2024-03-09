@@ -3,13 +3,15 @@
 
     <style name="Theme.GEUOne" parent="Theme.Material3.DayNight">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">#AD5E74</item>
+        <item name="colorPrimaryVariant">#742E46</item>
         <item name="colorOnPrimary">@color/white</item>
+
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorSecondary">#AD5E74</item>
+        <item name="colorSecondaryVariant">#742E46</item>
         <item name="colorOnSecondary">@color/black</item>
+
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
@@ -21,6 +23,7 @@
 
     <style name="MyLinearTheme">
         <item name="android:textColor">@color/black</item>
+        <item name="android:background">#91475d</item>
     </style>
 
     <style name="roundedImageViewRounded">
@@ -34,6 +37,9 @@
     </style>
 
     <style name="Theme.GEUOne.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:tint">#4E1D2E</item>
+        <item name="colorPrimary">#eb91a9</item>
+        <item name="contentScrim">#cc768f</item>
     </style>
 
     <style name="Theme.GEUOne.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"></style>
