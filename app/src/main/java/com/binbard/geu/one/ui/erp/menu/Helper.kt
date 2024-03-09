@@ -117,9 +117,9 @@ object Helper {
 
             counter.setTextColor(typedValue1.data)
             if (subject.text.endsWith("(L)")) subject.setTextColor(Color.GRAY)
-            if(percentage.text.toString().toFloat() < 75) percentage.setTextColor(Color.RED)
-            else percentage.setTextColor(Color.GREEN)
-            percentage.alpha = 0.6f
+            if(percentage.text.toString().toFloat() < 75) percentage.setTextColor(context.resources.getColor(R.color.red_400))
+            else percentage.setTextColor(context.resources.getColor(R.color.green_200))
+            percentage.alpha = 0.8f
         }
 
         row.addView(counter)

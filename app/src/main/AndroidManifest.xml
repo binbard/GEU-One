@@ -50,12 +50,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="student.geu.ac.in"
-                    android:scheme="https" />
-                <data
-                    android:host="student.gehu.ac.in"
-                    android:scheme="https" />
+                <data android:scheme="https"/>
+                <data android:host="student.geu.ac.in"/>
+                <data android:host="student.gehu.ac.in"/>
             </intent-filter>
         </activity>
         <activity

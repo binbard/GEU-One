@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpExamBinding
+import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.models.ExamMarks
 import com.binbard.geu.one.ui.erp.ErpViewModel
 import java.text.DecimalFormat
@@ -15,6 +16,9 @@ import kotlin.math.roundToInt
 
 class ErpExamFragment: Fragment() {
     private lateinit var binding: FragmentErpExamBinding
+    private val sharedPreferencesHelper: SharedPreferencesHelper by lazy {
+        SharedPreferencesHelper(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,7 +56,8 @@ class ErpExamFragment: Fragment() {
             binding.tblExamMarks.removeAllViews()
             binding.tblExamMarks.addView(Helper.getRowDividerBlack(requireContext()))
 
-            val erpHostUrl = getString(R.string.erpHostUrl)
+            val campus = sharedPreferencesHelper.getCampus()
+            val erpHostUrl = if(campus == "deemed") getString(R.string.erpHostUrlDeemed) else getString(R.string.erpHostUrlHill)
             val regID = evm.studentData.value?.regID ?: ""
             val pRollNo = evm.studentData.value?.pRollNo ?: ""
             val cookies = evm.erpRepository?.cookies ?: ""

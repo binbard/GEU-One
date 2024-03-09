@@ -80,7 +80,7 @@ class NotesFragment : Fragment() {
 
         requireActivity()
             .onBackPressedDispatcher
-            .addCallback(this, object : OnBackPressedCallback(true) {
+            .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     nvm.gotoPrevDir()
                 }
@@ -96,10 +96,8 @@ class NotesFragment : Fragment() {
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.item_notes_clearfiles -> {
-                PdfUtils.clearAllFiles(requireContext())
-                nvm.rvAdapter?.notifyDataSetChanged()
-                Toast.makeText(requireActivity(), "Cleared Files", Toast.LENGTH_SHORT).show()
+            R.id.item_notes_upload -> {
+                Toast.makeText(requireActivity(), "Coming soon", Toast.LENGTH_SHORT).show()
                 true
             }
             else -> false

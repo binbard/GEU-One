@@ -116,7 +116,7 @@ class ErpFragment : Fragment() {
             R.id.item_erp_top_visit_site -> {
                 val intent = CustomTabsIntent.Builder().build()
                 val url =
-                    if (campus == "deemed") getString(R.string.erpHostUrl) else getString(R.string.erpHostUrlHill)
+                    if (campus == "deemed") getString(R.string.erpHostUrlDeemed) else getString(R.string.erpHostUrlHill)
                 intent.launchUrl(requireContext(), url.toUri())
                 true
             }

@@ -6,6 +6,7 @@
     <item
         android:id="@+id/item_erp_top_cache_data"
         android:checkable="true"
+        android:checked="true"
         android:title="Cache Data" />
     <item
         android:id="@+id/item_erp_top_logout"

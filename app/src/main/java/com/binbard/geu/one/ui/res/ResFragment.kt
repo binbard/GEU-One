@@ -125,9 +125,8 @@ class ResFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.item_res_clearfiles -> {
-                PdfUtils.clearAllFiles(requireContext())
-                Toast.makeText(requireActivity(), "Cleared Files", Toast.LENGTH_SHORT).show()
+            R.id.item_res_add -> {
+                Toast.makeText(requireActivity(), "Coming soon", Toast.LENGTH_SHORT).show()
                 true
             }
             else -> false

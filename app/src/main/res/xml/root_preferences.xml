@@ -10,32 +10,35 @@
             app:summary="Used as your identity"
             app:useSimpleSummaryProvider="true" />
 
-        <ListPreference
-            app:key=""
-            app:defaultValue="deemed"
-            app:entries="@array/campus_entries"
-            app:entryValues="@array/campus_values"
-            app:title="Your Campus"
-            app:selectable="false"
+        <Preference
+            app:key="campus"
             app:enabled="false"
-            app:useSimpleSummaryProvider="true" />
+            app:title="Your Campus"
+            app:summary="N/A" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Sync">
+    <PreferenceCategory app:title="App">
 
         <SwitchPreferenceCompat
             app:key="sync"
+            app:defaultValue="true"
             app:title="Receive Push Notifications" />
+
+        <Preference
+            app:key="clear_files"
+            app:title="Clear Files"
+            app:summary="Delete all downloaded files" />
 
     </PreferenceCategory>
 
     <PreferenceCategory app:title="About">
 
         <Preference
+            app:key="version"
             app:enabled="false"
             app:title="@string/app_name"
-            app:summary="Version 1.1" />
+            app:summary="N/A" />
 
         <Preference
             app:title="Privacy Policy" />

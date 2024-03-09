@@ -3,14 +3,14 @@
 
     <style name="Theme.GEUOne" parent="Theme.Material3.DayNight">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#AD5E74</item>
-        <item name="colorPrimaryVariant">#742E46</item>
+        <item name="colorPrimary">@color/red_400</item>
+        <item name="colorPrimaryVariant">@color/red_200</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="android:textColor">#F6E2E9</item>
+        <item name="android:textColor">@color/white_200</item>
 
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">#AD5E74</item>
-        <item name="colorSecondaryVariant">#742E46</item>
+        <item name="colorSecondary">@color/red_400</item>
+        <item name="colorSecondaryVariant">@color/red_200</item>
         <item name="colorOnSecondary">@color/black</item>
 
         <!-- Status bar color. -->
@@ -19,18 +19,18 @@
 
         <!-- Customize your theme here. -->
         <item name="windowActionBar">false</item>
-        <itemc name="windowNoTitle">true</itemc>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="MyLinearTheme">
         <item name="android:textColor">@color/black</item>
-        <item name="android:background">#91475d</item>
+        <item name="android:background">@color/red_400</item>
     </style>
 
     <style name="Theme.GEUOne.AppBarOverlay">
-        <item name="android:tint">#FAD4E1</item>
-        <item name="colorPrimary">#ad5e74</item>
-        <item name="contentScrim">#742e46</item>
+        <item name="android:tint">@color/white_200</item>
+        <item name="colorPrimary">@color/red_400</item>
+        <item name="contentScrim">@color/red_200</item>
     </style>
 
     <style name="MyCard" parent="CardView">

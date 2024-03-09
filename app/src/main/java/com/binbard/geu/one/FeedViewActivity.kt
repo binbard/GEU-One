@@ -61,6 +61,22 @@ class FeedViewActivity : AppCompatActivity() {
             }
         }
 
+        // <item name="android:tint">@color/material_dynamic_primary20</item>
+        //        <item name="colorPrimary">@color/material_dynamic_primary70</item>
+        //        <item name="contentScrim">@color/material_dynamic_primary60</item>
+
+        try{
+            if (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+                binding.postToolbarLayout.setBackgroundColor(resources.getColor(com.google.android.material.R.color.material_dynamic_primary50))
+                binding.postToolbarLayout.setContentScrimColor(resources.getColor(com.google.android.material.R.color.material_dynamic_primary30))
+            } else{
+                binding.postToolbarLayout.setBackgroundColor(resources.getColor(com.google.android.material.R.color.material_dynamic_primary70))
+                binding.postToolbarLayout.setContentScrimColor(resources.getColor(com.google.android.material.R.color.material_dynamic_primary60))
+            }
+        } catch (e: Exception){
+            Log.e("FeedViewActivity", "Error in setting toolbar color", e)
+        }
+
         binding.webViewPost.setBackgroundColor(Color.TRANSPARENT)
         binding.webViewPost.settings.defaultFontSize = 18
 

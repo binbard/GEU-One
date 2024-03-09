@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/item_res_check"
-        android:title="Check" />
-    <item
-        android:id="@+id/item_res_clearfiles"
-        android:title="Clear Files" />
+        android:id="@+id/item_res_add"
+        android:title="Add Resource" />
 </menu>
