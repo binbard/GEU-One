@@ -77,9 +77,9 @@ class MainActivity : AppCompatActivity() {
             val lastSyncTime = sharedPreferencesHelper.getLastSyncTime()
             val lastTime = Date(lastSyncTime)
             val currentTime = Date()
-            val lastLocalDate = lastTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-            val currentLocalDate = currentTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-            if(lastLocalDate != currentLocalDate) {
+            val lastLocalTime = lastTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
+            val currentLocalTime = currentTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
+            if(lastLocalTime.dayOfYear != currentLocalTime.dayOfYear) {
                 val channel = resources.getString(R.string.channelUrl)
                 erpViewModel.erpRepository?.updateChannel(erpViewModel, channel, "")
                 sharedPreferencesHelper.setLastSyncTime(currentTime.time)
@@ -128,7 +128,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_gen_settings -> {
-//                Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
                 true
@@ -173,7 +172,6 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
                     .show()
-
                 true
             }
             else -> false

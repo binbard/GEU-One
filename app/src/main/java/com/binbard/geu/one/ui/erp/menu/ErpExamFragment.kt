@@ -57,7 +57,7 @@ class ErpExamFragment: Fragment() {
             binding.tblExamMarks.addView(Helper.getRowDividerBlack(requireContext()))
 
             val campus = sharedPreferencesHelper.getCampus()
-            val erpHostUrl = if(campus == "deemed") getString(R.string.erpHostUrlDeemed) else getString(R.string.erpHostUrlHill)
+            val erpHostUrl = if(campus == "deemed") getString(R.string.erpHostUrlDeemed) else getString(R.string.erpHostUrlDeemed)
             val regID = evm.studentData.value?.regID ?: ""
             val pRollNo = evm.studentData.value?.pRollNo ?: ""
             val cookies = evm.erpRepository?.cookies ?: ""

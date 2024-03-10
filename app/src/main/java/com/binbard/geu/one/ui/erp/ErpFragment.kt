@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
@@ -120,15 +121,25 @@ class ErpFragment : Fragment() {
                 intent.launchUrl(requireContext(), url.toUri())
                 true
             }
+
             R.id.item_erp_top_cache_data -> {
                 item.isChecked = !item.isChecked
                 evm.isCacheEnabled = !evm.isCacheEnabled
                 true
             }
+
             R.id.item_erp_top_logout -> {
-                evm.loginStatus.value = LoginStatus.LOGOUT
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Logout")
+                    .setMessage("Are you sure you want to logout?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        evm.loginStatus.value = LoginStatus.LOGOUT
+                    }
+                    .setNegativeButton("No") { _, _ -> }
+                    .show()
                 true
             }
+
             else -> false
         }
     }
@@ -156,26 +167,32 @@ class ErpFragment : Fragment() {
                 transaction.replace(R.id.fragmentContainerView2, ErpLoginChangeFragment())
                 transaction.addToBackStack("xyz")
             }
+
             R.id.item_erp_student -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpStudentFragment())
                 tvErpTitle.text = "ERP"
             }
+
             R.id.item_erp_attendance -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpAttendanceFragment())
                 tvErpTitle.text = "ERP - Attendance"
             }
+
             R.id.item_erp_midterm_marks -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpMidtermMarksFragment())
                 tvErpTitle.text = "ERP - Midterm Marks"
             }
+
             R.id.item_erp_exam -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpExamFragment())
                 tvErpTitle.text = "ERP - Exam"
             }
+
             R.id.item_erp_fees -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpFeesFragment())
                 tvErpTitle.text = "ERP - Fees"
             }
+
             else -> {
                 transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
                 tvErpTitle.text = "ERP"

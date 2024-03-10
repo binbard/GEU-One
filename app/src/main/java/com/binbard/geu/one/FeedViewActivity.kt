@@ -1,6 +1,7 @@
 package com.binbard.geu.one
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
@@ -19,9 +20,12 @@ import androidx.core.view.MenuCompat
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import com.binbard.geu.one.databinding.ActivityFeedViewBinding
+import com.binbard.geu.one.databinding.DialogFeedbackBinding
+import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.ui.feed.FeedHelper
 import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -208,15 +212,58 @@ class FeedViewActivity : AppCompatActivity() {
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                when (menuItem.itemId) {
+                return when (menuItem.itemId) {
                     R.id.item_gen_settings -> {
-                        Toast.makeText(this@FeedViewActivity, "Settings", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@FeedViewActivity, SettingsActivity::class.java)
+                        startActivity(intent)
+                        true
                     }
                     R.id.item_gen_feedback -> {
-                        Toast.makeText(this@FeedViewActivity, "Feedback", Toast.LENGTH_SHORT).show()
+                        val dialogFeedbackBinding =
+                            DialogFeedbackBinding.inflate(layoutInflater, null, false)
+                        dialogFeedbackBinding.chipBugReport.setOnClickListener {
+                            dialogFeedbackBinding.etFeedback.hint =
+                                "I encountered a bug while navigating from.."
+                        }
+                        dialogFeedbackBinding.chipReview.setOnClickListener {
+                            dialogFeedbackBinding.etFeedback.hint = "My experience with this app has been.."
+                        }
+                        dialogFeedbackBinding.chipFeatureRequest.setOnClickListener {
+                            dialogFeedbackBinding.etFeedback.hint = "I want a new feature in this app.."
+                        }
+
+                        var feedbackType = "review"
+                        val selectedChip = dialogFeedbackBinding.chipGroup.checkedChipId
+                        if (selectedChip == dialogFeedbackBinding.chipBugReport.id) feedbackType = "bug"
+                        else if (selectedChip == dialogFeedbackBinding.chipFeatureRequest.id) feedbackType =
+                            "feature"
+                        else if (selectedChip == dialogFeedbackBinding.chipReview.id) feedbackType =
+                            "review"
+
+                        MaterialAlertDialogBuilder(this@FeedViewActivity)
+                            .setTitle("Feedback")
+                            .setMessage("Info: This is always shared anonymously.")
+                            .setView(dialogFeedbackBinding.root)
+                            .setNegativeButton("Cancel") { dialog, which ->
+                                // Negative btn pressed
+                            }
+                            .setPositiveButton("SEND") { dialog, which ->
+                                if(dialogFeedbackBinding.etFeedback.text.isEmpty()) return@setPositiveButton
+                                val feedbackUrl = resources.getString(R.string.feedbackUrl)
+                                NetUtils.sendFeedback(
+                                    this@FeedViewActivity,
+                                    feedbackUrl,
+                                    feedbackType,
+                                    dialogFeedbackBinding.etFeedback.text.toString()
+                                )
+                            }
+                            .show()
+                        true
+                    }
+                    else -> {
+                        false
                     }
                 }
-                return true
             }
         })
     }

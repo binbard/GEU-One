@@ -1,6 +1,7 @@
 package com.binbard.geu.one.ui.erp.menu
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +29,17 @@ class ErpStudentFragment: Fragment() {
         sideSheetDialog = SideSheetDialog(requireContext())
         val tvStuName: TextView? = sideSheetDialog.findViewById(R.id.tvStuName)
         val tvStuId: TextView? = sideSheetDialog.findViewById(R.id.tvStuId)
+
+        try{
+            binding.llvCardId.setBackgroundColor(resources.getColor(com.google.android.material.R.color.material_dynamic_primary40))
+            binding.icCamera.setColorFilter(resources.getColor(com.google.android.material.R.color.material_dynamic_primary90))
+            binding.icCall.setColorFilter(resources.getColor(com.google.android.material.R.color.material_dynamic_primary90))
+            binding.icEmail.setColorFilter(resources.getColor(com.google.android.material.R.color.material_dynamic_primary90))
+            binding.tvErpStuName.setTextColor(resources.getColor(com.google.android.material.R.color.material_dynamic_neutral90))
+            binding.tvErpStuId.setTextColor(resources.getColor(com.google.android.material.R.color.material_dynamic_neutral90))
+        } catch (e: Exception){
+            Log.e("ErpStudentFragment", "Error: ${e.message}")
+        }
 
         erpViewModel.erpStudentImg.observe(viewLifecycleOwner) {
             if(it!="") {

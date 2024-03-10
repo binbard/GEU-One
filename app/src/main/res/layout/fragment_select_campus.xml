@@ -34,7 +34,8 @@
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:elevation="20dp"
-            app:srcCompat="@mipmap/ic_deemed" />
+            app:srcCompat="@mipmap/ic_deemed"
+            android:contentDescription="@string/app_name" />
 
         <TextView
             android:id="@+id/textView5"
