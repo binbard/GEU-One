@@ -213,7 +213,7 @@ object ErpNetUtils {
             .header("Cookie", cookies)
             .post(FormBody.Builder().add("RegID", regID).build())
             .build()
-        try {
+        return try {
             val response = client.newCall(request).execute()
             val body = response.body?.string()
 
@@ -222,9 +222,9 @@ object ErpNetUtils {
             val attendanceGson = gson.fromJson(json, AttendanceGson::class.java)
             val attendance = Attendance(attendanceGson.subjectAttendance, attendanceGson.totalAttendance[0])
             response.body?.close()
-            return attendance
+            attendance
         } catch (e: Exception) {
-            return null
+            null
         }
     }
 

@@ -5,8 +5,12 @@ import java.util.*
 
 
 data class SubjectAttendance(
+    @SerializedName("SubjectID") var subjectId: String,
     @SerializedName("Subject") var subject: String,
     @SerializedName("SubjectCode") var subjectCode: String,
+    @SerializedName("PeriodAssignID") var periodAssignId: String,
+    @SerializedName("TTID") var ttid: String,
+    @SerializedName("LectureTypeID") var lectureTypeId: String,
     @SerializedName("Employee") var employee: String,
     @SerializedName("TotalLecture") var totalLecture: String,
     @SerializedName("TotalPresent") var totalPresent: String,

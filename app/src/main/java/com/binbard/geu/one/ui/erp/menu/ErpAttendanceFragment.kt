@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.util.TypedValue
 import android.view.*
+import android.widget.Toast
 import android.widget.TableRow
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpAttendanceBinding
 import com.binbard.geu.one.ui.erp.ErpViewModel
 import java.util.*
@@ -15,6 +17,7 @@ import java.util.*
 class ErpAttendanceFragment : Fragment() {
     private lateinit var binding: FragmentErpAttendanceBinding
     private lateinit var evm: ErpViewModel
+    private var selectedRow = -1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,97 +28,18 @@ class ErpAttendanceFragment : Fragment() {
 
         evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
-        if(!evm.isCacheEnabled){
+        if (!evm.isCacheEnabled) {
 //            Toast.makeText(requireContext(), "Cache Disabled", Toast.LENGTH_SHORT).show()
             evm.attendanceData.value = null
         }
 
-        if (evm.attendanceData.value == null) {
-            binding.tvAttendance.visibility = View.GONE
-            binding.progressBar.visibility = View.VISIBLE
-        }
+        childFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainerView4, ErpAttendanceListFragment())
+            .addToBackStack(null)
+            .commit()
 
-        evm.attendanceData.observe(viewLifecycleOwner) {
-            if (it == null) {
-                evm.erpRepository?.fetchAttendance(evm)
-                return@observe
-            }
-
-            binding.progressBar.visibility = View.GONE
-            binding.tvAttendance.visibility = View.VISIBLE
-
-            val dateFrom = Helper.convertToHumanDate(it.totalAttendance.dateFrom)
-            val dateTo = Helper.convertToHumanDate(it.totalAttendance.dateTo)
-            val totalPercentage = it.totalAttendance.totalPercentage
-
-            val txt = "Total Attendance: $totalPercentage%\nFrom $dateFrom to $dateTo"
-
-            binding.tvAttendance.text = getSpannableAttendanceTitle(txt)
-
-            binding.tblAttendance.removeAllViews()
-
-            var count = 0
-            val separator = View(context)
-            separator.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1)
-            separator.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
-            binding.tblAttendance.addView(separator)
-
-            val header = Helper.createAttendanceRow(requireContext(), count, null)
-            header.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
-            binding.tblAttendance.addView(header)
-
-            for (attendance in it.subjectAttendance) {
-                val row = Helper.createAttendanceRow(requireContext(), ++count, attendance)
-                binding.tblAttendance.addView(row)
-            }
-
-        }
 
         return binding.root
-    }
-
-    private fun getSpannableAttendanceTitle(txt: String): SpannableString {
-        val spannableString = SpannableString(txt)
-
-        spannableString.setSpan(
-            android.text.style.RelativeSizeSpan(1.4f),
-            0,
-            txt.indexOf("\n"),
-            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        spannableString.setSpan(
-            android.text.style.UnderlineSpan(),
-            txt.indexOf(":") + 2,
-            txt.indexOf("\n") - 1,
-            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        val typedValue1 = TypedValue()
-        context?.theme?.resolveAttribute(android.R.attr.colorPrimary, typedValue1, true)
-        spannableString.setSpan(
-            android.text.style.ForegroundColorSpan(typedValue1.data),
-            txt.indexOf("\n"),
-            txt.length,
-            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        spannableString.setSpan(
-            android.text.style.ForegroundColorSpan(typedValue1.data),
-            0,
-            txt.indexOf("\n"),
-            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        spannableString.setSpan(
-            android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
-            0,
-            txt.indexOf("\n"),
-            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        spannableString.setSpan(
-            android.text.style.ForegroundColorSpan(typedValue1.data),
-            txt.indexOf("\n"),
-            txt.length,
-            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        return spannableString
     }
 
 }

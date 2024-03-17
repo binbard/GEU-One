@@ -69,7 +69,8 @@ class SelectCampusFragment: Fragment() {
         try{
             llCampus.setBackgroundResource(R.drawable.rounded_corner)
         } catch(e: Exception){
-            llCampus.setBackgroundColor(Color.LTGRAY)
+            llCampus.setBackgroundResource(R.drawable.rounded_corner_fallback)
+//            llCampus.setBackgroundColor(Color.LTGRAY)
         }
 
         selectedCampus = campusMap[llCampus].toString()

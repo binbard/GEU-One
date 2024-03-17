@@ -116,10 +116,10 @@ object Helper {
             context.theme.resolveAttribute(android.R.attr.colorPrimary, typedValue1, true)
 
             counter.setTextColor(typedValue1.data)
-            if (subject.text.endsWith("(L)")) subject.setTextColor(Color.GRAY)
+            if (subject.text.endsWith("(L)")) subject.alpha = 0.7f
             if(percentage.text.toString().toFloat() < 75) percentage.setTextColor(context.resources.getColor(R.color.red_400))
             else percentage.setTextColor(context.resources.getColor(R.color.green_200))
-            percentage.alpha = 0.8f
+            percentage.alpha = 0.9f
         }
 
         row.addView(counter)
