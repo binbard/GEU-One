@@ -36,7 +36,7 @@ object ErpNetUtils {
             val cookiesList = response.headers("Set-Cookie")
             val cookieSet = HashSet(cookiesList)
             var cookies = ""
-            for(cookie in cookieSet){
+            for (cookie in cookieSet) {
                 val mainCookie = cookie.split(";")[0]
                 cookies += "$mainCookie;"
             }
@@ -48,22 +48,22 @@ object ErpNetUtils {
         }
     }
 
-    fun mergeCookies(xcookies: String, cookiesList: List<String> ): String{
+    fun mergeCookies(xcookies: String, cookiesList: List<String>): String {
         val cookiesMap = HashMap<String, String>()
         val xcookiesList = xcookies.split(";")
-        for(cookie in xcookiesList){
-            if(cookie == "") continue
+        for (cookie in xcookiesList) {
+            if (cookie == "") continue
             val key = cookie.split("=")[0]
             val value = cookie.split("=")[1]
             cookiesMap[key] = value
         }
-        for(cookie in cookiesList){
+        for (cookie in cookiesList) {
             val key = cookie.split("=")[0]
             val value = cookie.split("=")[1]
             cookiesMap[key] = value
         }
         var cookies = ""
-        for((key, value) in cookiesMap){
+        for ((key, value) in cookiesMap) {
             cookies += "$key=$value;"
         }
         Log.d("ErpNetUtils", "AAA: $cookies")
@@ -109,49 +109,54 @@ object ErpNetUtils {
         }
     }
 
-    suspend fun login(id: String, password: String, token: String, captchaText: String, cookies: String): String =
+    suspend fun login(
+        id: String,
+        password: String,
+        token: String,
+        captchaText: String,
+        cookies: String
+    ): String =
         withContext(Dispatchers.IO) {
 
-        val fill = FormBody.Builder()
-            .add("hdnMsg","GEU")
-            .add("checkOnline", "0")
-            .add("__RequestVerificationToken", token)
-            .add("UserName", id)
-            .add("Password", password)
-            .add("clientIP", "")
-            .add("captcha", captchaText)
-            .build()
+            val fill = FormBody.Builder()
+                .add("hdnMsg", "GEU")
+                .add("checkOnline", "0")
+                .add("__RequestVerificationToken", token)
+                .add("UserName", id)
+                .add("Password", password)
+                .add("clientIP", "")
+                .add("captcha", captchaText)
+                .build()
 
-        val client1 = client.newBuilder().followRedirects(false).build()
+            val client1 = client.newBuilder().followRedirects(false).build()
 
-        val request = okhttp3.Request.Builder()
-            .url(erpUrl)
-            .header("Cookie", cookies)
-            .post(fill)
-            .build()
+            val request = okhttp3.Request.Builder()
+                .url(erpUrl)
+                .header("Cookie", cookies)
+                .post(fill)
+                .build()
 
-        val response = client1.newCall(request).execute()
+            val response = client1.newCall(request).execute()
 
-        if(response.code == 302){
-            val cookiesList = response.headers("Set-Cookie")
-            val uid = cookiesList[0].split("=")[2].split("&")[0]
-            response.body?.close()
-            return@withContext "SUCCESS"
-        } else{
-            val body = response.body?.string() ?: ""
-            if(body.contains("Captcha does not match")){
+            if (response.code == 302) {
+                val cookiesList = response.headers("Set-Cookie")
+                val uid = cookiesList[0].split("=")[2].split("&")[0]
                 response.body?.close()
-                return@withContext "INVALID_CAPTCHA"
-            } else if(body.contains("The user name or password provided is incorrect.")){
-                response.body?.close()
-                return@withContext "INVALID_CREDENTIALS"
+                return@withContext "SUCCESS"
+            } else {
+                val body = response.body?.string() ?: ""
+                if (body.contains("Captcha does not match")) {
+                    response.body?.close()
+                    return@withContext "INVALID_CAPTCHA"
+                } else if (body.contains("The user name or password provided is incorrect.")) {
+                    response.body?.close()
+                    return@withContext "INVALID_CREDENTIALS"
+                }
             }
+            response.body?.close()
+            return@withContext "xAB"
+
         }
-        response.body?.close()
-        return@withContext "xAB"
-
-    }
-
 
 
     fun getStudentDetails(cookies: String): Student? {
@@ -170,7 +175,7 @@ object ErpNetUtils {
             val studentGson: StudentGson = Gson().fromJson(json, StudentGson::class.java)
             val details = studentGson.state
 
-            if(details.isEmpty()){
+            if (details.isEmpty()) {
                 response.body?.close()
                 return null
             }
@@ -179,7 +184,7 @@ object ErpNetUtils {
 
             val studentData = details[0]
 
-            for(data in studentData.properties){
+            for (data in studentData.properties) {
                 result += "${data.first}: ${data.second}\n"
             }
 
@@ -191,7 +196,7 @@ object ErpNetUtils {
         }
     }
 
-    fun getStudentImage(cookies: String): Bitmap?{
+    fun getStudentImage(cookies: String): Bitmap? {
         val request = okhttp3.Request.Builder()
             .url("$erpUrl/Account/show")
             .header("Cookie", cookies)
@@ -220,9 +225,47 @@ object ErpNetUtils {
             val json = body?.replace("\\", "")?.replace("\"[", "[")?.replace("]\"", "]")
             val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
             val attendanceGson = gson.fromJson(json, AttendanceGson::class.java)
-            val attendance = Attendance(attendanceGson.subjectAttendance, attendanceGson.totalAttendance[0])
+            val attendance =
+                Attendance(attendanceGson.subjectAttendance, attendanceGson.totalAttendance[0])
             response.body?.close()
             attendance
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun getSubjectAttendance(
+        cookies: String,
+        regID: String,
+        subjectID: String,
+        periodAssignID: String,
+        ttid: String,
+        lectureTypeID: String,
+        dateFrom: String,
+        dateTo: String
+    ): PresentAbsentWrapper? {
+        val request = okhttp3.Request.Builder()
+            .url("$erpUrl/Web_StudentAcademic/GetSubjectDetailStudentAcademicFromLive")
+            .header("Cookie", cookies)
+            .post(FormBody.Builder()
+                .add("RegID", regID)
+                .add("SubjectID", subjectID)
+                .add("PeriodAssignID", periodAssignID)
+                .add("TTID", ttid)
+                .add("LectureTypeID", lectureTypeID)
+                .add("DateFrom", dateFrom)
+                .add("DateTo", dateTo)
+                .build())
+            .build()
+        return try {
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+
+            val json = body?.replace("\\", "")?.replace("\"[", "[")?.replace("]\"", "]")
+            val gson: Gson = GsonBuilder().setDateFormat("dd/MM/yyyy").create()
+            val presentAbsentWrapper = gson.fromJson(json, PresentAbsentWrapper::class.java)
+            response.body?.close()
+            presentAbsentWrapper
         } catch (e: Exception) {
             null
         }
@@ -270,7 +313,10 @@ object ErpNetUtils {
         val request = okhttp3.Request.Builder()
             .url("$erpUrl/Web_StudentFinance/FillHead")
             .header("Cookie", cookies)
-            .post(FormBody.Builder().add("FeeType", feeType.toString()).add("duration", duration.toString()).build())
+            .post(
+                FormBody.Builder().add("FeeType", feeType.toString())
+                    .add("duration", duration.toString()).build()
+            )
             .build()
 
         return try {
@@ -286,43 +332,43 @@ object ErpNetUtils {
         }
     }
 
-    fun updateChannel(url: String, json: String): String{
+    fun updateChannel(url: String, json: String): String {
         val request = okhttp3.Request.Builder()
             .url(url)
             .post(json.toRequestBody("application/json".toMediaTypeOrNull()))
             .build()
-        return try{
+        return try {
             val response = client.newCall(request).execute()
             val body = response.body?.string()
             response.body?.close()
             body ?: ""
-        } catch (e: Exception){
+        } catch (e: Exception) {
             return "x"
         }
     }
 
-    fun resetErpPassword(cookies: String, params: String): String{
+    fun resetErpPassword(cookies: String, params: String): String {
         val request = okhttp3.Request.Builder()
             .url("$erpUrl/Account/ResetPassword?$params")
             .header("Cookie", cookies)
             .build()
-        return try{
+        return try {
             val response = client.newCall(request).execute()
             val body = response.body?.string()
             response.body?.close()
             body ?: ""
-        } catch (e: Exception){
+        } catch (e: Exception) {
             return ""
         }
     }
 
-    fun preChangeErpPassword(cookies: String, link: String): String{
+    fun preChangeErpPassword(cookies: String, link: String): String {
         val request = okhttp3.Request.Builder()
             .method("GET", null)
             .url(link)
             .header("Cookie", cookies)
             .build()
-        return try{
+        return try {
             val response = client.newCall(request).execute()
             val body = response.body?.string()
 //            Log.d("ErpNetUtils", "preChangeErpPassword: $body")
@@ -331,12 +377,12 @@ object ErpNetUtils {
             response.body?.close()
             if (body != null && body.contains("This Reset Password Link is expired")) return "x"
             newCookies
-        } catch (e: Exception){
+        } catch (e: Exception) {
             return ""
         }
     }
 
-    fun changeErpPassword(cookies: String, password: String): String{
+    fun changeErpPassword(cookies: String, password: String): String {
         val mediaType = "application/json; charset=utf-8".toMediaType()
         val json = "{Password: '$password'}".toRequestBody(mediaType)
         val request = okhttp3.Request.Builder()
@@ -344,12 +390,12 @@ object ErpNetUtils {
             .header("Cookie", cookies)
             .post(json)
             .build()
-        return try{
+        return try {
             val response = client.newCall(request).execute()
             val body = response.body?.string()
             response.body?.close()
             body ?: ""
-        } catch (e: Exception){
+        } catch (e: Exception) {
             return ""
         }
     }

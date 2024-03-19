@@ -79,6 +79,31 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
+    fun fetchSubjectAttendance(
+        erpViewModel: ErpViewModel,
+        subjectID: String,
+        periodAssignID: String,
+        ttid: String,
+        lectureTypeID: String,
+        dateFrom: String,
+        dateTo: String
+    ) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val regID = erpViewModel.studentData.value?.regID ?: ""
+            val subjectAttendance = ErpNetUtils.getSubjectAttendance(
+                cookies,
+                regID,
+                subjectID,
+                periodAssignID,
+                ttid,
+                lectureTypeID,
+                dateFrom,
+                dateTo
+            )
+            erpViewModel.subjectAttendanceData.postValue(subjectAttendance)
+        }
+    }
+
     fun fetchImage(erpViewModel: ErpViewModel) {
         GlobalScope.launch(Dispatchers.IO) {
             val image = ErpNetUtils.getStudentImage(cookies)
@@ -145,7 +170,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
             Log.d("ErpRepository", "GGG updateChannel")
             var gson = ""
             erpViewModel.studentData.value?.token = fbToken
-            if(fbToken == "") gson = erpViewModel.studentData.value?.toIdGson() ?: return@launch
+            if (fbToken == "") gson = erpViewModel.studentData.value?.toIdGson() ?: return@launch
             else gson = erpViewModel.studentData.value?.toGson() ?: return@launch
             val res = ErpNetUtils.updateChannel(url, gson)
             Log.d("ErpRepository", "GGG updateChannel $res")

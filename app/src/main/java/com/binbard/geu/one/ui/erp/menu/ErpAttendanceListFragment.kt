@@ -83,11 +83,11 @@ class ErpAttendanceListFragment : Fragment() {
                     Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                bundle.putString("regId", evm.studentData.value?.regID)
-                bundle.putString("subjectId", attendance.subjectId)
-                bundle.putString("periodAssignId", attendance.periodAssignId)
+                bundle.putString("regID", evm.studentData.value?.regID)
+                bundle.putString("subjectID", attendance.subjectId)
+                bundle.putString("periodAssignID", attendance.periodAssignId)
                 bundle.putString("ttid", attendance.ttid)
-                bundle.putString("lectureTypeId", attendance.lectureTypeId)
+                bundle.putString("lectureTypeID", attendance.lectureTypeId)
                 bundle.putSerializable("dateFrom", totalAttendance.dateFrom)
                 bundle.putSerializable("dateTo", totalAttendance.dateTo)
                 bundle.putString("employee", attendance.employee)

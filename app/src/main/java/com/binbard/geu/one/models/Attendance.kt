@@ -4,6 +4,16 @@ import com.google.gson.annotations.SerializedName
 import java.util.*
 
 
+data class PresentAbsent(
+    @SerializedName("AttendanceDate") var date: Date,
+    @SerializedName("AttendanceType") var present: String,
+    @SerializedName("InsertDate") var insertDate: Date,
+)
+
+data class PresentAbsentWrapper(
+    @SerializedName("state") var presentAbsent: List<PresentAbsent>
+)
+
 data class SubjectAttendance(
     @SerializedName("SubjectID") var subjectId: String,
     @SerializedName("Subject") var subject: String,

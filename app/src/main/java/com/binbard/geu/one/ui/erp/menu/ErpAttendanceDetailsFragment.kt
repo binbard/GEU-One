@@ -2,32 +2,25 @@ package com.binbard.geu.one.ui.erp.menu
 
 import android.graphics.Color
 import android.os.Bundle
-import android.text.SpannableString
-import android.util.TypedValue
 import android.view.*
-import android.widget.Toast
-import android.widget.TableRow
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
-import com.binbard.geu.one.databinding.FragmentErpAttendanceBinding
 import com.binbard.geu.one.databinding.FragmentErpAttendanceDetailsBinding
-import com.binbard.geu.one.databinding.FragmentErpAttendanceListBinding
 import com.binbard.geu.one.ui.erp.ErpViewModel
 import com.google.android.gms.common.util.CollectionUtils.listOf
 import com.kizitonwose.calendar.core.CalendarDay
-import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import com.kizitonwose.calendar.core.nextMonth
+import com.kizitonwose.calendar.core.previousMonth
 import com.kizitonwose.calendar.view.MonthDayBinder
-import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
-import okhttp3.internal.immutableListOf
+import java.text.SimpleDateFormat
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.TextStyle
@@ -47,15 +40,15 @@ class ErpAttendanceDetailsFragment : Fragment() {
 
         evm = ViewModelProvider(requireActivity())[ErpViewModel::class.java]
 
-        val regId = arguments?.getString("regId")
-        val subjectId = arguments?.getString("subjectId")
-        val periodAssignId = arguments?.getString("periodAssignId")
+        val regID = arguments?.getString("regID")
+        val subjectID = arguments?.getString("subjectID")
+        val periodAssignID = arguments?.getString("periodAssignID")
         val ttid = arguments?.getString("ttid")
-        val lectureTypeId = arguments?.getString("lectureTypeId")
+        val lectureTypeID = arguments?.getString("lectureTypeID")
         val dateFrom = arguments?.getSerializable("dateFrom") as Date
         val dateTo = arguments?.getSerializable("dateTo") as Date
 
-        val subjectCode = arguments?.getString("SubjectCode")
+        val subjectCode = arguments?.getString("subjectCode")
         val subject = arguments?.getString("Subject")
         val employee = arguments?.getString("Employee")
         val totalLecture = arguments?.getString("TotalLecture")
@@ -92,19 +85,26 @@ class ErpAttendanceDetailsFragment : Fragment() {
             }
         }
 
-        val daysOfWeek = daysOfWeek()
-        binding.calendarView.monthHeaderBinder =
-            object : MonthHeaderFooterBinder<MonthViewContainer> {
-                override fun create(view: View) = MonthViewContainer(view)
-                override fun bind(container: MonthViewContainer, data: CalendarMonth) {
-                    val txt1 = data.yearMonth.month.getDisplayName(
-                        TextStyle.FULL,
-                        Locale.ENGLISH
-                    ) + " " + data.yearMonth.year.toString()
-                    binding.tvMonthYear.text = txt1
-                }
-            }
+//        binding.calendarView.monthScrollListener = {
+//            val txt1 = it.yearMonth.month.getDisplayName(
+//                TextStyle.FULL,
+//                Locale.ENGLISH
+//            ) + " " + it.yearMonth.year.toString()
+//            binding.tvMonthYear.text = txt1
+//        }
 
+        binding.tvPrevBtn.setOnClickListener{
+            binding.calendarView.findFirstVisibleMonth()?.let {
+                binding.calendarView.smoothScrollToMonth(it.yearMonth.previousMonth)
+            }
+        }
+        binding.tvNextBtn.setOnClickListener{
+            binding.calendarView.findFirstVisibleMonth()?.let {
+                binding.calendarView.smoothScrollToMonth(it.yearMonth.nextMonth)
+            }
+        }
+
+        val daysOfWeek = daysOfWeek()
         binding.titlesContainer.root.children
             .map { it as TextView }
             .forEachIndexed { index, textView ->
@@ -113,7 +113,6 @@ class ErpAttendanceDetailsFragment : Fragment() {
                 textView.text = title
                 textView.setTextColor(Color.GRAY)
             }
-
 
 
         val currentMonth = YearMonth.now()

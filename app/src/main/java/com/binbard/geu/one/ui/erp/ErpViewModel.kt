@@ -27,6 +27,9 @@ class ErpViewModel : ViewModel() {
     val attendanceData = MutableLiveData<Attendance>().apply {
         value = null
     }
+    val subjectAttendanceData = MutableLiveData<PresentAbsentWrapper>().apply {
+        value = null
+    }
 
     val midtermMarksData = MutableLiveData<MidtermMarksData>().apply {
         value = null
