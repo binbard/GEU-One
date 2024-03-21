@@ -2,6 +2,9 @@ package com.binbard.geu.one.ui.erp.menu
 
 import android.graphics.Color
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.TextUtils
+import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -11,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpAttendanceDetailsBinding
 import com.binbard.geu.one.ui.erp.ErpViewModel
-import com.google.android.gms.common.util.CollectionUtils.listOf
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
@@ -48,21 +50,81 @@ class ErpAttendanceDetailsFragment : Fragment() {
         val dateFrom = arguments?.getSerializable("dateFrom") as Date
         val dateTo = arguments?.getSerializable("dateTo") as Date
 
-        val subjectCode = arguments?.getString("subjectCode")
+        val subjectCode = arguments?.getString("SubjectCode")
         val subject = arguments?.getString("Subject")
         val employee = arguments?.getString("Employee")
         val totalLecture = arguments?.getString("TotalLecture")
         val totalPresent = arguments?.getString("TotalPresent")
         val percentage = arguments?.getString("Percentage")
 
-        val txt =
-            "$subjectCode | $subject | Total Attendance: $percentage%\nFrom $dateFrom to $dateTo | $totalPresent/$totalLecture | $employee"
+        val employeeName = employee?.replace("\\s+".toRegex(), " ")?.split(" ")?.joinToString(" ") {
+            it.toLowerCase(Locale.ROOT).capitalize(Locale.ROOT)
+        }
 
-        binding.tvAttendance.text = txt
+        binding.tvAttendance.text = getSpannableAttendanceTitle(
+            subject,
+            subjectCode,
+            percentage,
+            totalPresent,
+            totalLecture,
+            employeeName
+        )
 
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ROOT)
 
-        val presentDays = listOf(3, 6, 14, 16, 19, 20)
-        val absentDays = listOf(4, 7, 12, 18, 25)
+        if (evm.subjectAttendanceData.value == null) {
+            binding.calendarView.visibility = View.GONE
+            evm.erpRepository?.fetchSubjectAttendance(
+                evm,
+                subjectID!!,
+                periodAssignID!!,
+                ttid!!,
+                lectureTypeID!!,
+                sdf.format(dateFrom),
+                sdf.format(dateTo)
+            )
+        }
+
+        evm.subjectAttendanceData.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+            binding.progressBar.visibility = View.GONE
+            binding.calendarView.visibility = View.VISIBLE
+            val presentAbsent = it.presentAbsent
+            val presentDays = presentAbsent.filter { it.present == "P" }.map { it.date }
+            val absentDays = presentAbsent.filter { it.present == "A" }.map { it.date }
+
+            Log.d("PresentDays", presentDays.toString())
+            Log.d("AbsentDays", absentDays.toString())
+
+            binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
+                override fun create(view: View) = DayViewContainer(view)
+                override fun bind(container: DayViewContainer, data: CalendarDay) {
+                    if (data.position != DayPosition.MonthDate) {
+                        container.textView.text = ""
+                        container.textView.setBackgroundColor(Color.TRANSPARENT)
+                        return
+                    }
+                    container.textView.text = data.date.dayOfMonth.toString()
+                    val mDate =
+                        Date.from(data.date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+                    if (mDate in presentDays) {
+                        val period = presentAbsent.find { it.date == mDate }?.period
+                        container.textView.tooltipText = "Present\nPeriod - $period"
+                        container.textView.setTextColor(Color.WHITE)
+                        container.textView.setBackgroundResource(R.drawable.rounded_corner_present)
+                    } else if (mDate in absentDays) {
+                        val period = presentAbsent.find { it.date == mDate }?.period
+                        container.textView.tooltipText = "Absent\nPeriod - $period"
+                        container.textView.setTextColor(Color.WHITE)
+                        container.textView.setBackgroundResource(R.drawable.rounded_corner_absent)
+                    } else {
+                        container.textView.setBackgroundColor(Color.TRANSPARENT)
+                    }
+                }
+            }
+//            binding.calendarView.notifyCalendarChanged()
+        }
 
         binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(view)
@@ -73,32 +135,24 @@ class ErpAttendanceDetailsFragment : Fragment() {
                     return
                 }
                 container.textView.text = data.date.dayOfMonth.toString()
-                if (data.date.dayOfMonth in presentDays) {
-                    container.textView.setTextColor(Color.WHITE)
-                    container.textView.setBackgroundResource(R.drawable.rounded_corner_present)
-                } else if (data.date.dayOfMonth in absentDays) {
-                    container.textView.setTextColor(Color.WHITE)
-                    container.textView.setBackgroundResource(R.drawable.rounded_corner_absent)
-                } else {
-                    container.textView.setBackgroundColor(Color.TRANSPARENT)
-                }
+                container.textView.setBackgroundColor(Color.TRANSPARENT)
             }
         }
 
-//        binding.calendarView.monthScrollListener = {
-//            val txt1 = it.yearMonth.month.getDisplayName(
-//                TextStyle.FULL,
-//                Locale.ENGLISH
-//            ) + " " + it.yearMonth.year.toString()
-//            binding.tvMonthYear.text = txt1
-//        }
+        binding.calendarView.monthScrollListener = {
+            val txt1 = it.yearMonth.month.getDisplayName(
+                TextStyle.FULL,
+                Locale.ENGLISH
+            ) + " " + it.yearMonth.year.toString()
+            binding.tvMonthYear.text = txt1
+        }
 
-        binding.tvPrevBtn.setOnClickListener{
+        binding.tvPrevBtn.setOnClickListener {
             binding.calendarView.findFirstVisibleMonth()?.let {
                 binding.calendarView.smoothScrollToMonth(it.yearMonth.previousMonth)
             }
         }
-        binding.tvNextBtn.setOnClickListener{
+        binding.tvNextBtn.setOnClickListener {
             binding.calendarView.findFirstVisibleMonth()?.let {
                 binding.calendarView.smoothScrollToMonth(it.yearMonth.nextMonth)
             }
@@ -142,6 +196,58 @@ class ErpAttendanceDetailsFragment : Fragment() {
 
     class MonthViewContainer(view: View) : ViewContainer(view) {
         val titlesContainer = view as ViewGroup
+    }
+
+    private fun getSpannableAttendanceTitle(
+        subject: String?,
+        subjectCode: String?,
+        percentage: String?,
+        totalPresent: String?,
+        totalLecture: String?,
+        employeeName: String?
+    ): SpannableString {
+        val subjectSpan = SpannableString("$subject \n")
+        val ap = if(totalPresent.toString().length > 5) "" else "($totalPresent/$totalLecture)"
+        val attendanceSpan =
+            SpannableString("Attendance: $percentage% $ap \n")
+        val facultySpan = SpannableString("Faculty: $employeeName")
+
+        subjectSpan.setSpan(
+            android.text.style.RelativeSizeSpan(1.2f),
+            0,
+            subjectSpan.length,
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        subjectSpan.setSpan(
+            android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+            0,
+            subjectSpan.length,
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        attendanceSpan.setSpan(
+            android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+            attendanceSpan.indexOf(":") + 2,
+            attendanceSpan.indexOf("%") + 1,
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        attendanceSpan.setSpan(
+            android.text.style.UnderlineSpan(),
+            attendanceSpan.indexOf(":") + 2,
+            attendanceSpan.indexOf("%"),
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        facultySpan.setSpan(
+            android.text.style.StyleSpan(android.graphics.Typeface.ITALIC),
+            facultySpan.indexOf(":") + 2,
+            facultySpan.length,
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        return SpannableString(TextUtils.concat(subjectSpan, attendanceSpan, facultySpan))
     }
 
 

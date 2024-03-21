@@ -245,7 +245,7 @@ object ErpNetUtils {
         dateTo: String
     ): PresentAbsentWrapper? {
         val request = okhttp3.Request.Builder()
-            .url("$erpUrl/Web_StudentAcademic/GetSubjectDetailStudentAcademicFromLive")
+            .url("$erpUrl/Web_StudentAcademic/FillAttendanceDetail")
             .header("Cookie", cookies)
             .post(FormBody.Builder()
                 .add("RegID", regID)
@@ -267,6 +267,7 @@ object ErpNetUtils {
             response.body?.close()
             presentAbsentWrapper
         } catch (e: Exception) {
+            Log.d("ErpNetUtils", "getSubjectAttendance: ${e.message}")
             null
         }
     }

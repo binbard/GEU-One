@@ -7,7 +7,8 @@ import java.util.*
 data class PresentAbsent(
     @SerializedName("AttendanceDate") var date: Date,
     @SerializedName("AttendanceType") var present: String,
-    @SerializedName("InsertDate") var insertDate: Date,
+    @SerializedName("Period") var period: String,
+    @SerializedName("InsertDate") var insertDate: String,
 )
 
 data class PresentAbsentWrapper(
