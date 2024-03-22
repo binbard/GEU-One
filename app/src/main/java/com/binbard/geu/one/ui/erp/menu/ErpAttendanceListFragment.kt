@@ -92,13 +92,14 @@ class ErpAttendanceListFragment : Fragment() {
                 bundle.putSerializable("dateTo", totalAttendance.dateTo)
                 bundle.putString("employee", attendance.employee)
 
-                bundle.putString("SubjectCode", attendance.totalLecture)
+                bundle.putString("SubjectCode", attendance.subjectCode)
                 bundle.putString("Subject", attendance.subject)
                 bundle.putString("Employee", attendance.employee)
                 bundle.putString("TotalLecture", attendance.totalLecture)
                 bundle.putString("TotalPresent", attendance.totalPresent)
                 bundle.putString("Percentage", attendance.percentage)
 
+                evm.subjectAttendanceData.value = null
                 fragment.arguments = bundle
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainerView4, fragment)
@@ -151,30 +152,16 @@ class ErpAttendanceListFragment : Fragment() {
             txt.indexOf("\n") - 1,
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-        val typedValue1 = TypedValue()
-        context?.theme?.resolveAttribute(android.R.attr.colorPrimary, typedValue1, true)
         spannableString.setSpan(
-            android.text.style.ForegroundColorSpan(typedValue1.data),
+            android.text.style.StyleSpan(android.graphics.Typeface.ITALIC),
             txt.indexOf("\n"),
             txt.length,
-            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        spannableString.setSpan(
-            android.text.style.ForegroundColorSpan(typedValue1.data),
-            0,
-            txt.indexOf("\n"),
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         spannableString.setSpan(
             android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
             0,
             txt.indexOf("\n"),
-            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        spannableString.setSpan(
-            android.text.style.ForegroundColorSpan(typedValue1.data),
-            txt.indexOf("\n"),
-            txt.length,
             SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         return spannableString

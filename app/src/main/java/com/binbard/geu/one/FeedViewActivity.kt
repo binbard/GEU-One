@@ -65,10 +65,6 @@ class FeedViewActivity : AppCompatActivity() {
             }
         }
 
-        // <item name="android:tint">@color/material_dynamic_primary20</item>
-        //        <item name="colorPrimary">@color/material_dynamic_primary70</item>
-        //        <item name="contentScrim">@color/material_dynamic_primary60</item>
-
         try{
             if (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
                 binding.postToolbarLayout.setBackgroundColor(resources.getColor(com.google.android.material.R.color.material_dynamic_primary50))
