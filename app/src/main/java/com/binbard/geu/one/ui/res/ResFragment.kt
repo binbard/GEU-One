@@ -89,6 +89,7 @@ class ResFragment : Fragment() {
                 val resCardBinding = ItemResCardBinding.inflate(inflater, container, false)
                 resCardBinding.tvResCardTitle.text = resTitle
                 resCardBinding.rvResCardBody.layoutManager = GridLayoutManager(context, 3)
+
                 resCardBinding.rvResCardBody.adapter = GridAdapter(filteredList)
 
                 binding.llResBox.addView(resCardBinding.root)
@@ -107,9 +108,12 @@ class ResFragment : Fragment() {
         val yearSem = student.yearSem
 
         val iCourse = onlyFor.substringBefore('#').substringBefore('@')
-        val iSpecialization =
+        var iSpecialization =
             if (onlyFor.contains('@')) onlyFor.substringAfter('@').substringBefore('#') else null
-        val iYearSem = if (onlyFor.contains('#')) onlyFor.substringAfter('#') else null
+        var iYearSem = if (onlyFor.contains('#')) onlyFor.substringAfter('#') else null
+
+        if(iSpecialization=="") iSpecialization=null
+        if(iYearSem=="") iYearSem=null
 
         if (iCourse != course) return false
         if (iSpecialization != null && iSpecialization != specialization) return false

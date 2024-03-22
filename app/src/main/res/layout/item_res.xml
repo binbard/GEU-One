@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_notes_item"
+    android:layout_marginBottom="6dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:clickable="true"
