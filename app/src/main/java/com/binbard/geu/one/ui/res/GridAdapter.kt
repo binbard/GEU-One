@@ -42,6 +42,14 @@ class GridAdapter(private val itemList: List<ResObj>) : RecyclerView.Adapter<Gri
             holder.mView.setOnClickListener {
                 intent.launchUrl(it.context, item.url.toUri())
             }
+        } else if (item.type == "web") {
+            holder.mView.setOnClickListener {
+                val intent = Intent(it.context, com.binbard.geu.one.ViewWebActivity::class.java)
+                intent.putExtra("url", item.url)
+                intent.putExtra("title", item.name)
+                intent.putExtra("options", item.options)
+                it.context.startActivity(intent)
+            }
         }
     }
 

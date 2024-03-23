@@ -59,13 +59,15 @@
             android:name=".ui.initial.InitialActivity"
             android:exported="false" />
         <activity
+            android:name=".ViewWebActivity"
+            android:exported="false" />
+        <activity
             android:name=".FeedViewActivity"
             android:exported="false"
             android:label="@string/title_activity_feed_view"
             android:theme="@style/Theme.GEUOne.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.POST" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

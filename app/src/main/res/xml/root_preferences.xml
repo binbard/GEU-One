@@ -41,12 +41,15 @@
             app:summary="N/A" />
 
         <Preference
+            app:key="privacy_policy"
             app:title="Privacy Policy" />
 
         <Preference
+            app:key="terms"
             app:title="Terms &amp; Conditions" />
 
         <Preference
+            app:key="contributors"
             app:title="Contributors" />
 
     </PreferenceCategory>
