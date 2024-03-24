@@ -75,7 +75,19 @@ data class FSItem(
 
     fun getFileDisplayName(): String {
         return if(isFolder()) name
-        else name.substringAfterLast("_").substringBeforeLast(".pdf")
+        else{
+            val fname = name.substringAfter("_")
+            if(fname.contains("@")) return fname.substringBefore("@")
+            else return fname.substringBeforeLast(".pdf")
+        }
+    }
+
+    fun getFileAuthor(): String {
+        return if(isFolder()) ""
+        else{
+            if(name.contains("@")) return name.substringAfter("@").substringBeforeLast(".pdf")
+            else return ""
+        }
     }
 
     fun getPath(): String {

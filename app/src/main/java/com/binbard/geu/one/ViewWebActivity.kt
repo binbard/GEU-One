@@ -1,10 +1,12 @@
 package com.binbard.geu.one
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Context.CONNECTIVITY_SERVICE
 import android.content.Intent
 import android.graphics.Color
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -60,7 +62,6 @@ class ViewWebActivity : AppCompatActivity() {
                 super.onPageFinished(view, url)
                 if (optionsList.contains("bg_transparent")) {
                     view?.loadUrl("javascript:(function() { document.body.style.backgroundColor = 'transparent'; })()")
-                    binding.webView.setBackgroundColor(Color.TRANSPARENT)
                 }
             }
 
@@ -70,16 +71,18 @@ class ViewWebActivity : AppCompatActivity() {
                 description: String?,
                 failingUrl: String?
             ) {
-                if (isappOnline()) {
-                    super.onReceivedError(view, errorCode, description, failingUrl)
-                    return
-                }
+                binding.webView.loadUrl("file:///android_asset/error.html")
             }
         }
 
+        binding.webView.setBackgroundColor(Color.TRANSPARENT)
         binding.webView.settings.javaScriptEnabled = true
 
-        binding.webView.loadUrl(url)
+        if(isNetworkAvailable()){
+            binding.webView.loadUrl(url)
+        } else{
+            binding.webView.loadUrl("file:///android_asset/error.html")
+        }
 
     }
 
@@ -90,9 +93,12 @@ class ViewWebActivity : AppCompatActivity() {
     }
 
 
-    private fun isappOnline(): Boolean {
-        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        return cm.activeNetworkInfo != null
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+        return networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
     }
+
 
 }

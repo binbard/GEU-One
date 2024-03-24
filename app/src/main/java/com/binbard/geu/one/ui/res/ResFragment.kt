@@ -12,6 +12,7 @@ import androidx.core.view.MenuCompat
 import androidx.core.view.marginStart
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.binbard.geu.one.R
@@ -136,9 +137,15 @@ class ResFragment : Fragment() {
             R.id.item_res_add -> {
                 val dialogAddResourceBinding =
                     DialogAddResourceBinding.inflate(layoutInflater, null, false)
+
+                val dsp = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val sigName = dsp.getString("signature","Anonymous")
+
+                dialogAddResourceBinding.etResAuthorName.setText(sigName)
+
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Add Resource")
-                    .setMessage("You can volunteer by providing a resource here. This will be sent for review.")
+                    .setMessage("You can volunteer by providing a resource. This will be sent for review.")
                     .setView(dialogAddResourceBinding.root)
                     .setNegativeButton("Cancel") { dialog, which ->
                         // Negative btn pressed

@@ -49,8 +49,8 @@
             app:title="Terms &amp; Conditions" />
 
         <Preference
-            app:key="contributors"
-            app:title="Contributors" />
+            app:key="about"
+            app:title="About" />
 
     </PreferenceCategory>
 

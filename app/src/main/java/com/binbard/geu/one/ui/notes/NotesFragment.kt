@@ -15,6 +15,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.one.R
@@ -23,6 +24,7 @@ import com.binbard.geu.one.databinding.DialogAddResourceBinding
 import com.binbard.geu.one.databinding.FragmentNotesBinding
 import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.helpers.PdfUtils
+import com.binbard.geu.one.helpers.Snack
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class NotesFragment : Fragment() {
@@ -103,6 +105,15 @@ class NotesFragment : Fragment() {
             R.id.item_notes_upload -> {
                 val dialogAddNotesBinding =
                     DialogAddNotesBinding.inflate(layoutInflater, null, false)
+
+                val dsp = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val sigName = dsp.getString("signature","Anonymous")
+
+                dialogAddNotesBinding.etNotesAuthorName.setText(sigName)
+                dialogAddNotesBinding.etNotesAuthorName.setOnClickListener {
+                    Toast.makeText(requireContext(), "Change your signature in Settings", Toast.LENGTH_SHORT).show()
+                }
+
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Add Notes")
                     .setMessage("You can volunteer by providing Notes here. This will be sent for review.")
