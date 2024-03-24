@@ -30,6 +30,9 @@ import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
 import com.binbard.geu.one.ui.initial.InitialActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import java.net.URL
 import java.time.ZoneId
 import java.util.*
@@ -73,17 +76,19 @@ class MainActivity : AppCompatActivity() {
         )
 
         erpViewModel.studentData.observe(this) {
-            if(it == null || erpViewModel.firstTimeLogin) return@observe
+            if (it == null || erpViewModel.firstTimeLogin) return@observe
             val lastSyncTime = sharedPreferencesHelper.getLastSyncTime()
             val lastTime = Date(lastSyncTime)
             val currentTime = Date()
-            val lastLocalTime = lastTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
-            val currentLocalTime = currentTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
-            if(lastLocalTime.dayOfYear != currentLocalTime.dayOfYear) {
+            val lastLocalTime =
+                lastTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
+            val currentLocalTime =
+                currentTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
+            if (lastLocalTime.dayOfYear != currentLocalTime.dayOfYear) {
                 val channel = resources.getString(R.string.channelUrl)
                 erpViewModel.erpRepository?.updateChannel(erpViewModel, channel, "")
                 sharedPreferencesHelper.setLastSyncTime(currentTime.time)
-            } else{
+            } else {
                 Log.d("Sync", "Already synced")
             }
         }
@@ -99,15 +104,19 @@ class MainActivity : AppCompatActivity() {
                 R.id.FeedFragment -> {
                     changeToolbar(findViewById(R.id.toolbarFeed))
                 }
+
                 R.id.ResourcesFragment -> {
                     changeToolbar(findViewById(R.id.toolbarRes))
                 }
+
                 R.id.NotesFragment -> {
                     changeToolbar(findViewById(R.id.toolbarNotes))
                 }
+
                 R.id.ErpFragment -> {
                     changeToolbar(findViewById(R.id.toolbarErp))
                 }
+
                 R.id.ErpLoginFragment -> {
                     supportActionBar?.hide()
                     binding.bottomNavView.visibility = View.GONE
@@ -117,6 +126,21 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(bottomNavController, appBarConfiguration)
         binding.bottomNavView.setupWithNavController(bottomNavController)
+
+
+        val appUpdateManager = AppUpdateManagerFactory.create(this)
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+            ) {
+                appUpdateManager.startUpdateFlowForResult(
+                    appUpdateInfo,
+                    AppUpdateType.IMMEDIATE,
+                    this,
+                    1
+                )
+            }
+        }
 
     }
 
@@ -132,6 +156,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+
             R.id.item_gen_feedback -> {
                 val dialogFeedbackBinding =
                     DialogFeedbackBinding.inflate(layoutInflater, null, false)
@@ -162,7 +187,7 @@ class MainActivity : AppCompatActivity() {
                         // Negative btn pressed
                     }
                     .setPositiveButton("SEND") { dialog, which ->
-                        if(dialogFeedbackBinding.etFeedback.text.isEmpty()) return@setPositiveButton
+                        if (dialogFeedbackBinding.etFeedback.text.isEmpty()) return@setPositiveButton
                         val feedbackUrl = resources.getString(R.string.feedbackUrl)
                         NetUtils.sendFeedback(
                             this,
@@ -174,6 +199,7 @@ class MainActivity : AppCompatActivity() {
                     .show()
                 true
             }
+
             else -> false
         }
     }
