@@ -16,7 +16,8 @@ import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.models.ResObj
 import com.bumptech.glide.Glide
 
-class GridAdapter(private val itemList: List<ResObj>) : RecyclerView.Adapter<GridAdapter.GridViewHolder>() {
+class GridAdapter(private val itemList: List<ResObj>) :
+    RecyclerView.Adapter<GridAdapter.GridViewHolder>() {
     val intent = CustomTabsIntent.Builder().build()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GridViewHolder {
@@ -26,10 +27,10 @@ class GridAdapter(private val itemList: List<ResObj>) : RecyclerView.Adapter<Gri
 
     override fun onBindViewHolder(holder: GridViewHolder, position: Int) {
         val item = itemList[position]
-        if(item.imgUrl != null){
+        if (item.imgUrl != null) {
             Glide.with(holder.imgNoteItem.context).load(item.imgUrl).into(holder.imgNoteItem)
         }
-        holder.tvNoteItem.text = item.name
+        if (item.author != null) holder.mView.tooltipText = "By ${item.author}"
         if (item.type == "pdf") {
             holder.mView.setOnClickListener {
                 PdfUtils.openOrDownloadPdf(

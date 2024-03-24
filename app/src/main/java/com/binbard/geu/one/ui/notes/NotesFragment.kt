@@ -18,8 +18,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.binbard.geu.one.R
+import com.binbard.geu.one.databinding.DialogAddNotesBinding
+import com.binbard.geu.one.databinding.DialogAddResourceBinding
 import com.binbard.geu.one.databinding.FragmentNotesBinding
+import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.helpers.PdfUtils
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class NotesFragment : Fragment() {
     private lateinit var binding: FragmentNotesBinding
@@ -97,7 +101,26 @@ class NotesFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_notes_upload -> {
-                Toast.makeText(requireActivity(), "Coming soon", Toast.LENGTH_SHORT).show()
+                val dialogAddNotesBinding =
+                    DialogAddNotesBinding.inflate(layoutInflater, null, false)
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Add Notes")
+                    .setMessage("You can volunteer by providing Notes here. This will be sent for review.")
+                    .setView(dialogAddNotesBinding.root)
+                    .setNegativeButton("Cancel") { dialog, which ->
+                        // Negative btn pressed
+                    }
+                    .setPositiveButton("ADD") { dialog, which ->
+                        if(dialogAddNotesBinding.etNotesTitle.text.isEmpty() || dialogAddNotesBinding.etNotesUrl.text.isEmpty()) return@setPositiveButton
+                        val feedbackUrl = resources.getString(R.string.feedbackUrl)
+                        NetUtils.sendNotes(
+                            requireContext(),
+                            feedbackUrl,
+                            "${dialogAddNotesBinding.etNotesTitle.text} | ${dialogAddNotesBinding.etNotesUrl.text}"
+                        )
+                    }
+                    .show()
+                true
                 true
             }
             else -> false

@@ -15,8 +15,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.binbard.geu.one.R
+import com.binbard.geu.one.databinding.DialogAddResourceBinding
+import com.binbard.geu.one.databinding.DialogFeedbackBinding
 import com.binbard.geu.one.databinding.FragmentResBinding
 import com.binbard.geu.one.databinding.ItemResCardBinding
+import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpViewModel
@@ -24,6 +27,7 @@ import com.binbard.geu.one.ui.erp.menu.Student
 import com.binbard.geu.one.ui.notes.NotesFragment
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.*
 
 
@@ -130,7 +134,25 @@ class ResFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_res_add -> {
-                Toast.makeText(requireActivity(), "Coming soon", Toast.LENGTH_SHORT).show()
+                val dialogAddResourceBinding =
+                    DialogAddResourceBinding.inflate(layoutInflater, null, false)
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Add Resource")
+                    .setMessage("You can volunteer by providing a resource here. This will be sent for review.")
+                    .setView(dialogAddResourceBinding.root)
+                    .setNegativeButton("Cancel") { dialog, which ->
+                        // Negative btn pressed
+                    }
+                    .setPositiveButton("ADD") { dialog, which ->
+                        if(dialogAddResourceBinding.etResTitle.text.isEmpty()) return@setPositiveButton
+                        val feedbackUrl = resources.getString(R.string.feedbackUrl)
+                        NetUtils.sendResource(
+                            requireContext(),
+                            feedbackUrl,
+                            "${dialogAddResourceBinding.etResTitle.text} | ${dialogAddResourceBinding.etResUrl.text}"
+                        )
+                    }
+                    .show()
                 true
             }
             else -> false

@@ -29,24 +29,82 @@ object NetUtils {
                             .build()
                     )
                     .build()
-                Log.d("NetUtils", "FEEDBACK $request")
-                try{
+                try {
                     val response = client.newCall(request).execute()
                     Log.d("NetUtils", "RESPONSE ${response.body?.string()}")
-                    letsDoThis2(context)
+                    val message = "Feedback received. Thankyou for your valuable time."
+                    sentNotification(context, message)
                     response.body?.close()
-                } catch (e: Exception){
-                    Log.d("NetUtils","Failed to give Feedback")
+                } catch (e: Exception) {
+                    val message = "Failed to send Feedback. Please try again later."
+                    Log.d("NetUtils", message)
+                    sentNotification(context, message)
                 }
             }
         }
     }
 
-    fun letsDoThis2(context: Context) {
+    fun sendResource(context: Context, url: String, msg: String) {
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+
+                val request = Request.Builder()
+                    .url(url)
+                    .post(
+                        FormBody.Builder()
+                            .add("type", "RESOURCE")
+                            .add("msg", msg)
+                            .build()
+                    )
+                    .build()
+                try {
+                    val response = client.newCall(request).execute()
+                    Log.d("NetUtils", "RESPONSE ${response.body?.string()}")
+                    val message = "Resource sent for review. Thankyou for your valuable time."
+                    sentNotification(context, message)
+                    response.body?.close()
+                } catch (e: Exception) {
+                    val message = "Failed to send Resource. Please try again later."
+                    Log.d("NetUtils", message)
+                    sentNotification(context, message)
+                }
+            }
+        }
+    }
+
+    fun sendNotes(context: Context, url: String, msg: String) {
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+
+                val request = Request.Builder()
+                    .url(url)
+                    .post(
+                        FormBody.Builder()
+                            .add("type", "NOTES")
+                            .add("msg", msg)
+                            .build()
+                    )
+                    .build()
+                try {
+                    val response = client.newCall(request).execute()
+                    Log.d("NetUtils", "RESPONSE ${response.body?.string()}")
+                    val message = "Notes sent for review. Thankyou for your valuable time."
+                    sentNotification(context, message)
+                    response.body?.close()
+                } catch (e: Exception) {
+                    val message = "Failed to send Notes. Please try again later."
+                    Log.d("NetUtils", message)
+                    sentNotification(context, message)
+                }
+            }
+        }
+    }
+
+    fun sentNotification(context: Context, message: String) {
         val nanoMessagingService = NanoMessagingService()
         nanoMessagingService.sendNotification(
             context,
-            "Feedback received. Thankyou for your valuable time."
+            message
         )
     }
 }
