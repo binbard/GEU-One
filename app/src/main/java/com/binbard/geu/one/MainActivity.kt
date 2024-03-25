@@ -1,6 +1,7 @@
 package com.binbard.geu.one
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
@@ -9,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
@@ -23,6 +25,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.binbard.geu.one.databinding.ActivityMainBinding
 import com.binbard.geu.one.databinding.DialogFeedbackBinding
+import com.binbard.geu.one.helpers.AlertMsg
 import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
@@ -32,6 +35,7 @@ import com.binbard.geu.one.ui.initial.InitialActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import java.net.URL
 import java.time.ZoneId
@@ -44,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var erpViewModel: ErpViewModel
     private lateinit var bottomNavController: NavController
     private var shouldGotoChangePassword = false
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         sharedPreferencesHelper = SharedPreferencesHelper(this)
@@ -128,20 +133,75 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavView.setupWithNavController(bottomNavController)
 
 
-        val appUpdateManager = AppUpdateManagerFactory.create(this)
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-            ) {
-                appUpdateManager.startUpdateFlowForResult(
-                    appUpdateInfo,
-                    AppUpdateType.IMMEDIATE,
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        AppUpdateType.IMMEDIATE,
+                        this,
+                        1
+                    )
+                } else if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        AppUpdateType.FLEXIBLE,
+                        this,
+                        1
+                    )
+                }
+            }
+        }
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                Toast.makeText(this, "Update Completed", Toast.LENGTH_SHORT).show()
+            } else if (it.resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Update Cancelled", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Update Failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        NetUtils.getAppUpdateInfo(this, BuildConfig.VERSION_CODE, erpViewModel)
+        erpViewModel.updateAvailable.observe(this) {
+            val priorityMap = mapOf(
+                0 to "No",
+                1 to "Very Low",
+                2 to "Low",
+                3 to "Medium",
+                4 to "High",
+                5 to "Very High"
+            )
+            if (it > 0) {
+                AlertMsg.showMessage(
                     this,
-                    1
+                    "Update Available",
+                    "A new update is available.\nPriority: ${priorityMap[it]}\n\nDo you want to update now?",
+                    {
+                        val intent = Intent()
+                        intent.action = Intent.ACTION_VIEW
+                        intent.data =
+                            Uri.parse("https://play.google.com/store/apps/details?id=${packageName}")
+                        startActivity(intent)
+                    }, it <= 3
                 )
             }
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val appUpdateManager = AppUpdateManagerFactory.create(this)
+        appUpdateManager
+            .appUpdateInfo
+            .addOnSuccessListener { appUpdateInfo ->
+                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                    appUpdateManager.completeUpdate()
+                }
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

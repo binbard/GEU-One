@@ -48,6 +48,10 @@ class ErpViewModel : ViewModel() {
     var shouldHandleInitPage = true
     var isCacheEnabled = true
 
+    val updateAvailable = MutableLiveData<Int>().apply {
+        value = -1
+    }
+
     var erpCacheHelper: ErpCacheHelper? = null
     var erpRepository: ErpRepository? = null
 }
