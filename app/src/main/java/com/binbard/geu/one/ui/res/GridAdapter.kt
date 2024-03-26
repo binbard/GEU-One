@@ -28,13 +28,15 @@ class GridAdapter(private val itemList: List<ResObj>) :
     override fun onBindViewHolder(holder: GridViewHolder, position: Int) {
         val item = itemList[position]
         if (item.imgUrl != null) {
-            Glide.with(holder.imgNoteItem.context).load(item.imgUrl).into(holder.imgNoteItem)
+            Glide.with(holder.imgResItem.context).load(item.imgUrl).into(holder.imgResItem)
         }
+        holder.tvResItem.text = item.name
         if (item.author != null) holder.mView.tooltipText = "By ${item.author}"
+
         if (item.type == "pdf") {
             holder.mView.setOnClickListener {
                 PdfUtils.openOrDownloadPdf(
-                    context = holder.tvNoteItem.context,
+                    context = holder.tvResItem.context,
                     item.url,
                     isExternalSource = true
                 )
@@ -60,7 +62,7 @@ class GridAdapter(private val itemList: List<ResObj>) :
 
     inner class GridViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val mView: View = itemView
-        val imgNoteItem: ImageView = itemView.findViewById(R.id.imgNoteItem)
-        val tvNoteItem: TextView = itemView.findViewById(R.id.tvNoteItem)
+        val imgResItem: ImageView = itemView.findViewById(R.id.imgResItem)
+        val tvResItem: TextView = itemView.findViewById(R.id.tvResItem)
     }
 }

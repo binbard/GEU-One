@@ -1,6 +1,9 @@
 package com.binbard.geu.one.ui.erp
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +13,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpLoginResetBinding
+import com.binbard.geu.one.helpers.AlertMsg
 import com.binbard.geu.one.helpers.Snack
 import com.binbard.geu.one.models.LoginStatus
+
 
 class ErpLoginResetFragment : Fragment() {
     private lateinit var binding: FragmentErpLoginResetBinding
@@ -77,7 +82,7 @@ class ErpLoginResetFragment : Fragment() {
             if (email == "") binding.etEmail.error = "Required"
             if (dob == "") binding.etDob.error = "Required"
 
-            if (id != "" && email != "" && dob != "") {
+            if (id != "" && email != "" && dob != "" && isAppLinkDefault()) {
                 val iim =
                     requireActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
                 iim.hideSoftInputFromWindow(view?.windowToken, 0)
@@ -86,8 +91,39 @@ class ErpLoginResetFragment : Fragment() {
                 binding.btReset.isEnabled = false
                 evm.erpRepository?.resetErpPassword(evm, id, email, dob)
             }
+            showAddLinkDialog()
         }
 
         return binding.root
+    }
+
+    fun isAppLinkDefault(): Boolean {
+        val url1 = "https://student.geu.ac.in"
+        val url2 = "https://student.gehu.ac.in"
+        val intent1 = Intent(Intent.ACTION_VIEW, Uri.parse(url1))
+        val intent2 = Intent(Intent.ACTION_VIEW, Uri.parse(url2))
+        val pm = requireContext().packageManager
+        return intent1.resolveActivity(pm) != null && intent2.resolveActivity(pm) != null
+    }
+
+    private fun showAddLinkDialog() {
+        if(isAppLinkDefault()) return
+
+        AlertMsg.showMessage(
+            requireContext(),
+            "Open by default",
+            "Hey, It looks like you have not added App Links.\n\n" +
+                    "Here is how you can do it:\n\n" +
+                    "Open by default > Add link > [Tick all] > Add\n\n" +
+                    "Then try again.",
+            {
+                if(isAppLinkDefault()) return@showMessage
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", context?.packageName, null)
+                intent.data = uri
+                startActivity(intent)
+                showAddLinkDialog()
+            }, repeat = 0
+        )
     }
 }

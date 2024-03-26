@@ -4,15 +4,15 @@ import android.content.Context
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 object AlertMsg {
-    fun showMessage(context: Context, title: String, message: String, okAction: () -> Unit = {}, cancellable: Boolean = true) {
+    fun showMessage(context: Context, title: String, message: String, okAction: () -> Unit = {}, repeat: Int = 0) {
         MaterialAlertDialogBuilder(context)
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton("OK") { _, _ ->
                 okAction()
-                if(!cancellable) showMessage(context, title, message, okAction, cancellable)
+                if(repeat!=0) showMessage(context, title, message, okAction, repeat - 1)
             }
-            .setCancelable(cancellable)
+            .setCancelable(repeat>=0)
             .show()
     }
 }

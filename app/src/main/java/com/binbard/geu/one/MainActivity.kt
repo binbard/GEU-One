@@ -174,6 +174,7 @@ class MainActivity : AppCompatActivity() {
                 5 to "Very High"
             )
             if (it > 0) {
+                val repeat = if (it==1 || it==2) 0 else if(it==3) 1 else -1
                 AlertMsg.showMessage(
                     this,
                     "Update Available",
@@ -184,7 +185,7 @@ class MainActivity : AppCompatActivity() {
                         intent.data =
                             Uri.parse("https://play.google.com/store/apps/details?id=${packageName}")
                         startActivity(intent)
-                    }, it <= 3
+                    }, repeat
                 )
             }
         }

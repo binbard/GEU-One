@@ -53,6 +53,7 @@ class ErpLoginChangeFragment : Fragment() {
                 binding.btChange.setOnClickListener {
                     evm.loginStatus.value = LoginStatus.UNKNOWN
                     parentFragmentManager.popBackStack()
+                    parentFragmentManager.beginTransaction().replace(R.id.fragmentContainerView2, ErpLoginFragment()).commit()
                 }
                 if(it == LoginStatus.CHANGE_PASSWORD_EXPIRED){
                     binding.tvChangePassSuccess.text = "The Reset Password Link is expired."
