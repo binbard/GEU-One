@@ -44,7 +44,7 @@
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
                     app:srcCompat="@android:drawable/btn_star_big_on"
-                    app:strokeColor="@color/material_dynamic_neutral90"
+                    app:strokeColor="@color/white_sip"
                     app:strokeWidth="2dp" />
 
                 <LinearLayout
@@ -79,7 +79,7 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:text="Update Photo"
-                        android:textColor="@color/material_dynamic_neutral90"
+                        android:textColor="@color/white_sip"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -95,7 +95,7 @@
                     android:maxLines="1"
                     android:paddingTop="5dp"
                     android:textAllCaps="true"
-                    android:textColor="#FAD4E1"
+                    android:textColor="@color/white_dyn"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -104,7 +104,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="20124023"
-                    android:textColor="#FAD4E1"
+                    android:textColor="@color/white_dyn"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -121,7 +121,7 @@
                         android:layout_gravity="center"
                         android:layout_weight="1"
                         app:srcCompat="@drawable/ic_email"
-                        app:tint="#FAD4E1" />
+                        app:tint="@color/white_dyn" />
 
                     <TextView
                         android:id="@+id/tvErpStuEmail"
@@ -130,7 +130,7 @@
                         android:layout_weight="1"
                         android:contentDescription="davidsmalpalgd@gmail.com"
                         android:gravity="center_vertical"
-                        android:textColor="@color/material_dynamic_neutral90"
+                        android:textColor="@color/white_sip"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -144,7 +144,7 @@
                         android:layout_width="24dp"
                         android:layout_height="match_parent"
                         app:srcCompat="@drawable/ic_phone"
-                        app:tint="#FAD4E1" />
+                        app:tint="@color/white_dyn" />
 
                     <TextView
                         android:id="@+id/tvErpStuPhone"
@@ -152,7 +152,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="9230492945"
                         android:gravity="center_vertical"
-                        android:textColor="@color/material_dynamic_neutral90"
+                        android:textColor="@color/white_sip"
                         android:textSize="12sp" />
                 </LinearLayout>
 
