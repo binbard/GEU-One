@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
             erpViewModel.erpCacheHelper = ErpCacheHelper(this)
         }
         if (erpViewModel.erpRepository == null) {
-            erpViewModel.erpRepository = ErpRepository(erpViewModel.erpCacheHelper!!)
+            erpViewModel.erpRepository = ErpRepository(this, erpViewModel.erpCacheHelper!!)
         }
         if (erpViewModel.studentData.value == null) erpViewModel.erpCacheHelper?.loadLocalStudentData(
             erpViewModel

@@ -4,14 +4,18 @@ import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.RECEIVER_EXPORTED
+import android.content.Context.RECEIVER_NOT_EXPORTED
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.RequiresApi
 import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -45,12 +49,12 @@ class NotesFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        if(nvm.notesRepository == null){
-            nvm.notesRepository = NotesRepository(requireContext(),nvm)
+        if (nvm.notesRepository == null) {
+            nvm.notesRepository = NotesRepository(requireContext(), nvm)
             nvm.notesRepository!!.fetchData()
         }
 
-        if(nvm.rvAdapter == null) nvm.rvAdapter = NotesRecyclerAdapter(requireContext(), nvm)
+        if (nvm.rvAdapter == null) nvm.rvAdapter = NotesRecyclerAdapter(requireContext(), nvm)
         rvNotes = binding.rvNotes
         rvNotes.adapter = nvm.rvAdapter
 
@@ -70,7 +74,7 @@ class NotesFragment : Fragment() {
         }
 
         nvm.thumbDownloaded.observe(viewLifecycleOwner) {
-            if(it.isNotEmpty()) nvm.rvAdapter?.notifyDataSetChanged()
+            if (it.isNotEmpty()) nvm.rvAdapter?.notifyDataSetChanged()
         }
 
         val onComplete = object : BroadcastReceiver() {
@@ -78,11 +82,26 @@ class NotesFragment : Fragment() {
                 val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
                 if (id != null && id != -1L) {
                     val fileName = PdfUtils.removeDownloading(id)
-                    if (fileName!=null) nvm.rvAdapter?.updateItem(fileName)
+                    if (fileName != null) nvm.rvAdapter?.updateItem(fileName)
                 }
             }
         }
-        requireActivity().registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireActivity().registerReceiver(
+                onComplete,
+                IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+                RECEIVER_EXPORTED
+            )
+        }
+        else{
+            requireActivity().registerReceiver(
+                onComplete,
+                IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+            )
+        }
+
+
 
         requireActivity()
             .onBackPressedDispatcher
@@ -100,6 +119,7 @@ class NotesFragment : Fragment() {
         inflater.inflate(R.menu.menu_notes_top, menu)
         MenuCompat.setGroupDividerEnabled(menu, true)
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.item_notes_upload -> {
@@ -107,11 +127,15 @@ class NotesFragment : Fragment() {
                     DialogAddNotesBinding.inflate(layoutInflater, null, false)
 
                 val dsp = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                val sigName = dsp.getString("signature","Anonymous")
+                val sigName = dsp.getString("signature", "Anonymous")
 
                 dialogAddNotesBinding.etNotesAuthorName.setText(sigName)
                 dialogAddNotesBinding.etNotesAuthorName.setOnClickListener {
-                    Toast.makeText(requireContext(), "Change your signature in Settings", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Change your signature in Settings",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 MaterialAlertDialogBuilder(requireContext())
@@ -122,7 +146,7 @@ class NotesFragment : Fragment() {
                         // Negative btn pressed
                     }
                     .setPositiveButton("ADD") { dialog, which ->
-                        if(dialogAddNotesBinding.etNotesTitle.text.isEmpty() || dialogAddNotesBinding.etNotesUrl.text.isEmpty()) return@setPositiveButton
+                        if (dialogAddNotesBinding.etNotesTitle.text.isEmpty() || dialogAddNotesBinding.etNotesUrl.text.isEmpty()) return@setPositiveButton
                         val feedbackUrl = resources.getString(R.string.feedbackUrl)
                         NetUtils.sendNotes(
                             requireContext(),
@@ -134,6 +158,7 @@ class NotesFragment : Fragment() {
                 true
                 true
             }
+
             else -> false
         }
     }
