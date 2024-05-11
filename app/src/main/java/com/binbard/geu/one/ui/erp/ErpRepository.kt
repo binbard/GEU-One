@@ -5,8 +5,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContentProviderCompat.requireContext
 import com.binbard.geu.one.helpers.FirebaseUtils
+import com.binbard.geu.one.models.FetchStatus
 import com.binbard.geu.one.models.LoginStatus
+import com.binbard.geu.one.models.QrScanInput
+import com.binbard.geu.one.models.QrScanResult
 import com.binbard.geu.one.utils.BitmapHelper
+import com.google.gson.Gson
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.util.*
@@ -219,6 +223,43 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
                     LoginStatus.CHANGE_PASSWORD_SUCCESS
                 else erpViewModel.loginStatus.value = LoginStatus.CHANGE_PASSWORD_FAILED
             }
+        }
+    }
+
+    fun scanQrCode(
+        erpViewModel: ErpViewModel,
+        qrScanInput: QrScanInput
+    ) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val res = erpNetUtils.scanQrCode(qrScanInput)
+            if (res == "") {
+                withContext(Dispatchers.Main) {
+                    erpViewModel.qrScanResult.value = QrScanResult(
+                        "ERROR",
+                        "Something went wrong",
+                        "Check your internet connection",
+                        -1
+                    )
+                }
+                return@launch
+            }
+            try{
+                val scanResult = Gson().fromJson(res, QrScanResult::class.java)
+                withContext(Dispatchers.Main) {
+                    erpViewModel.qrScanResult.value = scanResult
+                }
+            } catch (e: Exception) {
+                Log.d("ErpRepository", "Failed to parse QR Result")
+                withContext(Dispatchers.Main) {
+                    erpViewModel.qrScanResult.value = QrScanResult(
+                        "ERROR",
+                        "Something went wrong",
+                        "Please Scan a valid QR Code",
+                        -1
+                    )
+                }
+            }
+
         }
     }
 

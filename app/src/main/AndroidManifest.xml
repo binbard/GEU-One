@@ -62,6 +62,9 @@
             android:name=".ViewWebActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.erp.ScanqrActivity"
+            android:exported="false" />
+        <activity
             android:name=".FeedViewActivity"
             android:exported="false"
             android:label="@string/title_activity_feed_view"
@@ -73,14 +76,11 @@
         </activity>
 
         <meta-data
-            android:name="com.google.mlkit.vision.DEPENDENCIES"
-            android:value="ocr" />
-        <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_feeds" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/material_dynamic_primary30" />
+            android:resource="@color/red_600" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="default" />

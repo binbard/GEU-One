@@ -54,4 +54,8 @@ class ErpViewModel : ViewModel() {
 
     var erpCacheHelper: ErpCacheHelper? = null
     var erpRepository: ErpRepository? = null
+
+    val qrScanResult = MutableLiveData<QrScanResult>().apply {
+        value = null
+    }
 }

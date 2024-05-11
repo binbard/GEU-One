@@ -410,4 +410,25 @@ class ErpNetUtils(context: Context) {
         }
     }
 
+    fun scanQrCode(qrScanInput: QrScanInput): String {
+        val formBody = FormBody.Builder()
+            .add("token", qrScanInput.token)
+            .add("name", qrScanInput.name)
+            .add("uid", qrScanInput.uid)
+            .add("type", qrScanInput.type)
+            .build()
+        val request = okhttp3.Request.Builder()
+            .url(qrScanInput.url)
+            .post(formBody)
+            .build()
+        return try {
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+            response.body?.close()
+            body ?: ""
+        } catch (e: Exception) {
+            return ""
+        }
+    }
+
 }
