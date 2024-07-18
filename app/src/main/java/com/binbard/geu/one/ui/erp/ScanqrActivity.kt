@@ -112,7 +112,7 @@ class ScanqrActivity : AppCompatActivity() {
         val qrScanInput = parseQrInput(qrValue)
         if (qrScanInput == null) {
             evm.qrScanResult.value =
-                QrScanResult("ERROR", "Something went wrong", "Please Scan a valid QR Code", -1)
+                QrScanResult("ERROR", "Something went wrong", "Scan a valid QR Code", -1)
             return
         }
         evm.erpRepository?.scanQrCode(
@@ -146,7 +146,6 @@ class ScanqrActivity : AppCompatActivity() {
         } catch (e: Exception) {
             return null
         }
-
     }
 
 }

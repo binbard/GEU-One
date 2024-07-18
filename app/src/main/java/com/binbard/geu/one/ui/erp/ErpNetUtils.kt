@@ -162,6 +162,9 @@ class ErpNetUtils(context: Context) {
                     return@withContext "INVALID_CREDENTIALS"
                 }
             }
+            Log.d("ErpNetUtils", "got login code: ${response.code}")
+            val cookiesList = response.headers("Set-Cookie")
+            Log.d("ErpNetUtils", "got login cookies: $cookiesList")
             response.body?.close()
             return@withContext "xAB"
 

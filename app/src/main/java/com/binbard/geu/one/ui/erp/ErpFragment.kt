@@ -116,7 +116,7 @@ class ErpFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if(mPageId==R.id.item_erp_student){
-            inflater.inflate(R.menu.menu_scan, menu)
+//            inflater.inflate(R.menu.menu_scan, menu)
             inflater.inflate(R.menu.menu_erp_top, menu)
         } else {
             inflater.inflate(R.menu.menu_erp_top, menu)

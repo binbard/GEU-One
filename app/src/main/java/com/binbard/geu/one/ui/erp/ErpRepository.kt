@@ -2,24 +2,18 @@ package com.binbard.geu.one.ui.erp
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
-import com.binbard.geu.one.helpers.FirebaseUtils
-import com.binbard.geu.one.models.FetchStatus
 import com.binbard.geu.one.models.LoginStatus
 import com.binbard.geu.one.models.QrScanInput
 import com.binbard.geu.one.models.QrScanResult
 import com.binbard.geu.one.utils.BitmapHelper
 import com.google.gson.Gson
 import kotlinx.coroutines.*
-import org.json.JSONObject
-import java.util.*
 
 @OptIn(DelicateCoroutinesApi::class)
 class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper) {
     var cookies: String
-    val ocrUtils = OCRUtils()
-    val erpNetUtils = ErpNetUtils(context)
+    private val ocrUtils = OCRUtils()
+    private val erpNetUtils = ErpNetUtils(context)
 
     init {
         cookies = erpCacheHelper.getCookies()
@@ -47,24 +41,29 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
             withContext(Dispatchers.Main) {
                 Log.d("ErpRepository", "$loginResponse $id $password $captchaTxt $token\n$cookies")
 
-                if (loginResponse == "SUCCESS") {
-                    if (erpViewModel.loginStatus.value == LoginStatus.PREV_LOGGED_IN) {
-                        Log.d("ErpRepository", "Auto Login Successful")
-                    } else {
-                        Log.d("ErpRepository", "Login Successful")
+                when (loginResponse) {
+                    "SUCCESS" -> {
+                        if (erpViewModel.loginStatus.value == LoginStatus.PREV_LOGGED_IN) {
+                            Log.d("ErpRepository", "Auto Login Successful")
+                        } else {
+                            Log.d("ErpRepository", "Login Successful")
+                        }
+                        erpViewModel.loginStatus.value = LoginStatus.LOGIN_SUCCESS
                     }
-                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_SUCCESS
-                } else if (loginResponse == "INVALID_CAPTCHA") {
-                    Log.d("ErpRepository", "Login Failed (Invalid Captcha). Retrying...")
-                    preLogin(erpViewModel)
-                } else if (loginResponse == "INVALID_CREDENTIALS") {
-                    Log.d("ErpRepository", "Login Failed")
-                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
-                } else {
-                    Log.d("ErpRepository", "Login Failed")
-                    erpViewModel.comments.value = "Something went wrong"
-                    erpViewModel.erpCacheHelper?.saveLog(loginResponse)
-                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
+                    "INVALID_CAPTCHA" -> {
+                        Log.d("ErpRepository", "Login Failed (Invalid Captcha). Retrying...")
+                        preLogin(erpViewModel)
+                    }
+                    "INVALID_CREDENTIALS" -> {
+                        Log.d("ErpRepository", "Login Failed")
+                        erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
+                    }
+                    else -> {
+                        Log.d("ErpRepository", "Login Failed")
+                        erpViewModel.comments.value = "Something went wrong"
+                        erpViewModel.erpCacheHelper?.saveLog(loginResponse)
+                        erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
+                    }
                 }
             }
 
@@ -112,7 +111,7 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
         }
     }
 
-    fun fetchImage(erpViewModel: ErpViewModel) {
+    private fun fetchImage(erpViewModel: ErpViewModel) {
         GlobalScope.launch(Dispatchers.IO) {
             val image = erpNetUtils.getStudentImage(cookies)
             if (image != null) {
@@ -180,10 +179,9 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
     fun updateChannel(erpViewModel: ErpViewModel, url: String, fbToken: String) {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("ErpRepository", "GGG updateChannel")
-            var gson = ""
             erpViewModel.studentData.value?.token = fbToken
-            if (fbToken == "") gson = erpViewModel.studentData.value?.toIdGson() ?: return@launch
-            else gson = erpViewModel.studentData.value?.toGson() ?: return@launch
+            val gson: String = if (fbToken == "") erpViewModel.studentData.value?.toIdGson() ?: return@launch
+            else erpViewModel.studentData.value?.toGson() ?: return@launch
             val res = erpNetUtils.updateChannel(url, gson)
             Log.d("ErpRepository", "GGG updateChannel $res")
         }
@@ -244,6 +242,7 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
                 return@launch
             }
             try{
+                Log.d("ErpRepository", "QR Result: $res")
                 val scanResult = Gson().fromJson(res, QrScanResult::class.java)
                 withContext(Dispatchers.Main) {
                     erpViewModel.qrScanResult.value = scanResult

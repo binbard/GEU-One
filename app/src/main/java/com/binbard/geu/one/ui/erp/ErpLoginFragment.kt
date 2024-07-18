@@ -1,12 +1,10 @@
 package com.binbard.geu.one.ui.erp
 
-import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.URLSpan
-import android.util.TypedValue
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,8 +17,6 @@ import com.binbard.geu.one.databinding.FragmentErpLoginBinding
 import com.binbard.geu.one.helpers.DeviceUtils
 import com.binbard.geu.one.helpers.Snack
 import com.binbard.geu.one.models.LoginStatus
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
 
 class ErpLoginFragment : Fragment() {
     private lateinit var binding: FragmentErpLoginBinding

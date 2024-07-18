@@ -21,6 +21,7 @@ import com.binbard.geu.one.models.LoginStatus
 class ErpLoginResetFragment : Fragment() {
     private lateinit var binding: FragmentErpLoginResetBinding
     private lateinit var evm: ErpViewModel
+    private var count = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -98,6 +99,7 @@ class ErpLoginResetFragment : Fragment() {
     }
 
     fun isAppLinkDefault(): Boolean {
+        if(++count >= 0) return true
         val url1 = "https://student.geu.ac.in"
         val url2 = "https://student.gehu.ac.in"
         val intent1 = Intent(Intent.ACTION_VIEW, Uri.parse(url1))
