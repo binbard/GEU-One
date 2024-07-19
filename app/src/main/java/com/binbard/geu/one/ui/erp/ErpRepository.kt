@@ -2,6 +2,7 @@ package com.binbard.geu.one.ui.erp
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.binbard.geu.one.models.LoginStatus
 import com.binbard.geu.one.models.QrScanInput
 import com.binbard.geu.one.models.QrScanResult
@@ -20,7 +21,6 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
         if (cookies == "") {
             GlobalScope.launch(Dispatchers.IO) {
                 cookies = erpNetUtils.getCookies()
-                erpCacheHelper.saveCookies(cookies)
             }
         }
     }
@@ -37,6 +37,7 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
                 return@launch
             }
             val captchaTxt = ocrUtils.getText(captchaImg)
+
             val loginResponse = erpNetUtils.login(id, password, token, captchaTxt, cookies)
             withContext(Dispatchers.Main) {
                 Log.d("ErpRepository", "$loginResponse $id $password $captchaTxt $token\n$cookies")
@@ -48,11 +49,13 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
                         } else {
                             Log.d("ErpRepository", "Login Successful")
                         }
+                        erpCacheHelper.saveCookies(cookies)
                         erpViewModel.loginStatus.value = LoginStatus.LOGIN_SUCCESS
                     }
                     "INVALID_CAPTCHA" -> {
                         Log.d("ErpRepository", "Login Failed (Invalid Captcha). Retrying...")
                         preLogin(erpViewModel)
+                        erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
                     }
                     "INVALID_CREDENTIALS" -> {
                         Log.d("ErpRepository", "Login Failed")
@@ -61,6 +64,7 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
                     else -> {
                         Log.d("ErpRepository", "Login Failed")
                         erpViewModel.comments.value = "Something went wrong"
+                        erpCacheHelper.saveCookies("")
                         erpViewModel.erpCacheHelper?.saveLog(loginResponse)
                         erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
                     }

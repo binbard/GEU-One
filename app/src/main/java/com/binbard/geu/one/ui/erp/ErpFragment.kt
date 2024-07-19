@@ -97,6 +97,7 @@ class ErpFragment : Fragment() {
             } else if (it == LoginStatus.LOGOUT) {
                 Toast.makeText(requireContext(), "Logged Out", Toast.LENGTH_SHORT).show()
                 evm.erpCacheHelper!!.saveLoginStatus(LoginStatus.PREV_LOGGED_OUT)
+                evm.erpCacheHelper!!.saveCookies("")
                 evm.erpCacheHelper!!.clearLocalData()
                 setupErpFeatures(unset = true)
                 showErpPage(0)
