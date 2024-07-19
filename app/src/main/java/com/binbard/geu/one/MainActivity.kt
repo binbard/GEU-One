@@ -1,19 +1,19 @@
 package com.binbard.geu.one
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
+import android.text.SpannableString
+import android.text.util.Linkify
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -23,13 +23,19 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.binbard.geu.one.databinding.ActivityMainBinding
 import com.binbard.geu.one.databinding.DialogFeedbackBinding
+import com.binbard.geu.one.helpers.AlertMsg
 import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
+import com.binbard.geu.one.ui.erp.ChangelogSheet
 import com.binbard.geu.one.ui.initial.InitialActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
 import java.net.URL
 import java.time.ZoneId
 import java.util.*
@@ -41,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var erpViewModel: ErpViewModel
     private lateinit var bottomNavController: NavController
     private var shouldGotoChangePassword = false
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         sharedPreferencesHelper = SharedPreferencesHelper(this)
@@ -66,27 +73,11 @@ class MainActivity : AppCompatActivity() {
             erpViewModel.erpCacheHelper = ErpCacheHelper(this)
         }
         if (erpViewModel.erpRepository == null) {
-            erpViewModel.erpRepository = ErpRepository(erpViewModel.erpCacheHelper!!)
+            erpViewModel.erpRepository = ErpRepository(this, erpViewModel.erpCacheHelper!!)
         }
         if (erpViewModel.studentData.value == null) erpViewModel.erpCacheHelper?.loadLocalStudentData(
             erpViewModel
         )
-
-        erpViewModel.studentData.observe(this) {
-            if(it == null || erpViewModel.firstTimeLogin) return@observe
-            val lastSyncTime = sharedPreferencesHelper.getLastSyncTime()
-            val lastTime = Date(lastSyncTime)
-            val currentTime = Date()
-            val lastLocalTime = lastTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
-            val currentLocalTime = currentTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
-            if(lastLocalTime.dayOfYear != currentLocalTime.dayOfYear) {
-                val channel = resources.getString(R.string.channelUrl)
-                erpViewModel.erpRepository?.updateChannel(erpViewModel, channel, "")
-                sharedPreferencesHelper.setLastSyncTime(currentTime.time)
-            } else{
-                Log.d("Sync", "Already synced")
-            }
-        }
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
@@ -99,15 +90,19 @@ class MainActivity : AppCompatActivity() {
                 R.id.FeedFragment -> {
                     changeToolbar(findViewById(R.id.toolbarFeed))
                 }
+
                 R.id.ResourcesFragment -> {
                     changeToolbar(findViewById(R.id.toolbarRes))
                 }
+
                 R.id.NotesFragment -> {
                     changeToolbar(findViewById(R.id.toolbarNotes))
                 }
+
                 R.id.ErpFragment -> {
                     changeToolbar(findViewById(R.id.toolbarErp))
                 }
+
                 R.id.ErpLoginFragment -> {
                     supportActionBar?.hide()
                     binding.bottomNavView.visibility = View.GONE
@@ -118,6 +113,69 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(bottomNavController, appBarConfiguration)
         binding.bottomNavView.setupWithNavController(bottomNavController)
 
+
+        val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo, AppUpdateType.IMMEDIATE, this, 1
+                    )
+                } else if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo, AppUpdateType.FLEXIBLE, this, 1
+                    )
+                }
+            }
+        }
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                Toast.makeText(this, "Update Completed", Toast.LENGTH_SHORT).show()
+            } else if (it.resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Update Cancelled", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Update Failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        NetUtils.getAppUpdateInfo(this, BuildConfig.VERSION_CODE, erpViewModel)
+        erpViewModel.updateAvailable.observe(this) {
+            val priorityMap = mapOf(
+                0 to "No", 1 to "Very Low", 2 to "Low", 3 to "Medium", 4 to "High", 5 to "Very High"
+            )
+            if (it > 0) {
+                val repeat = if (it == 1 || it == 2) 0 else if (it == 3) 1 else -1
+                AlertMsg.showMessage(
+                    this,
+                    "Update Available",
+                    "A new update is available.\nPriority: ${priorityMap[it]}\n\nDo you want to update now?",
+                    {
+                        val intent = Intent()
+                        intent.action = Intent.ACTION_VIEW
+                        intent.data =
+                            Uri.parse("https://play.google.com/store/apps/details?id=${packageName}")
+                        startActivity(intent)
+                    },
+                    repeat
+                )
+            }
+        }
+
+        if(sharedPreferencesHelper.getLastChangelogShown() < BuildConfig.VERSION_CODE && sharedPreferencesHelper.isOldUser()){
+            ChangelogSheet().show(supportFragmentManager, "Changelogs")
+            sharedPreferencesHelper.setLastChangelogShown(BuildConfig.VERSION_CODE)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val appUpdateManager = AppUpdateManagerFactory.create(this)
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                appUpdateManager.completeUpdate()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -132,6 +190,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+
             R.id.item_gen_feedback -> {
                 val dialogFeedbackBinding =
                     DialogFeedbackBinding.inflate(layoutInflater, null, false)
@@ -154,15 +213,13 @@ class MainActivity : AppCompatActivity() {
                 else if (selectedChip == dialogFeedbackBinding.chipReview.id) feedbackType =
                     "review"
 
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Feedback")
-                    .setMessage("Info: This is always shared anonymously.")
+                MaterialAlertDialogBuilder(this).setTitle("Feedback")
+                    .setMessage("Info: This is always shared anonymously. We can't revert back to you. Contact via email for any queries.")
                     .setView(dialogFeedbackBinding.root)
                     .setNegativeButton("Cancel") { dialog, which ->
                         // Negative btn pressed
-                    }
-                    .setPositiveButton("SEND") { dialog, which ->
-                        if(dialogFeedbackBinding.etFeedback.text.isEmpty()) return@setPositiveButton
+                    }.setPositiveButton("SEND") { dialog, which ->
+                        if (dialogFeedbackBinding.etFeedback.text.isEmpty()) return@setPositiveButton
                         val feedbackUrl = resources.getString(R.string.feedbackUrl)
                         NetUtils.sendFeedback(
                             this,
@@ -170,10 +227,40 @@ class MainActivity : AppCompatActivity() {
                             feedbackType,
                             dialogFeedbackBinding.etFeedback.text.toString()
                         )
-                    }
-                    .show()
+                    }.show()
                 true
             }
+
+            R.id.item_gen_contact_support -> {
+                val email = resources.getString(R.string.support_email)
+                val msg = "For any queries, contact us at:\n" + "Email: ${email}\n"
+
+                val s = SpannableString(msg)
+                Linkify.addLinks(s, Linkify.EMAIL_ADDRESSES)
+
+                MaterialAlertDialogBuilder(this).setTitle("Contact Support").setMessage(s)
+                    .setNegativeButton("Cancel") { dialog, which ->
+                        // Negative btn pressed
+                    }.setPositiveButton("Email") { dialog, which ->
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            setPackage("com.google.android.gm")
+                            putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                            putExtra(Intent.EXTRA_SUBJECT, "")
+                            putExtra(Intent.EXTRA_TEXT, "")
+                        }
+
+                        if (intent.resolveActivity(packageManager) != null) {
+                            startActivity(intent)
+                        } else {
+                            Toast.makeText(this, "Email app is not installed", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+
+                    }.show()
+                true
+            }
+
             else -> false
         }
     }

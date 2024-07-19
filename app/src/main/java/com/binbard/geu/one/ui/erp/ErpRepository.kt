@@ -1,24 +1,26 @@
 package com.binbard.geu.one.ui.erp
 
+import android.content.Context
 import android.util.Log
-import com.binbard.geu.one.helpers.FirebaseUtils
+import android.widget.Toast
 import com.binbard.geu.one.models.LoginStatus
+import com.binbard.geu.one.models.QrScanInput
+import com.binbard.geu.one.models.QrScanResult
 import com.binbard.geu.one.utils.BitmapHelper
+import com.google.gson.Gson
 import kotlinx.coroutines.*
-import org.json.JSONObject
-import java.util.*
 
 @OptIn(DelicateCoroutinesApi::class)
-class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
+class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper) {
     var cookies: String
-    val ocrUtils = OCRUtils()
+    private val ocrUtils = OCRUtils()
+    private val erpNetUtils = ErpNetUtils(context)
 
     init {
         cookies = erpCacheHelper.getCookies()
         if (cookies == "") {
             GlobalScope.launch(Dispatchers.IO) {
-                cookies = ErpNetUtils.getCookies()
-                erpCacheHelper.saveCookies(cookies)
+                cookies = erpNetUtils.getCookies()
             }
         }
     }
@@ -28,35 +30,44 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         val password = erpCacheHelper.getPassword()
 
         GlobalScope.launch(Dispatchers.IO) {
-            val token = ErpNetUtils.getToken(cookies)
-            val captchaImg = ErpNetUtils.getCaptcha(cookies)
+            val token = erpNetUtils.getToken(cookies)
+            val captchaImg = erpNetUtils.getCaptcha(cookies)
             if (captchaImg == null) {
                 Log.d("ErpRepository", "Failed to load captcha")
                 return@launch
             }
             val captchaTxt = ocrUtils.getText(captchaImg)
-            val loginResponse = ErpNetUtils.login(id, password, token, captchaTxt, cookies)
+
+            val loginResponse = erpNetUtils.login(id, password, token, captchaTxt, cookies)
             withContext(Dispatchers.Main) {
                 Log.d("ErpRepository", "$loginResponse $id $password $captchaTxt $token\n$cookies")
 
-                if (loginResponse == "SUCCESS") {
-                    if (erpViewModel.loginStatus.value == LoginStatus.PREV_LOGGED_IN) {
-                        Log.d("ErpRepository", "Auto Login Successful")
-                    } else {
-                        Log.d("ErpRepository", "Login Successful")
+                when (loginResponse) {
+                    "SUCCESS" -> {
+                        if (erpViewModel.loginStatus.value == LoginStatus.PREV_LOGGED_IN) {
+                            Log.d("ErpRepository", "Auto Login Successful")
+                        } else {
+                            Log.d("ErpRepository", "Login Successful")
+                        }
+                        erpCacheHelper.saveCookies(cookies)
+                        erpViewModel.loginStatus.value = LoginStatus.LOGIN_SUCCESS
                     }
-                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_SUCCESS
-                } else if (loginResponse == "INVALID_CAPTCHA") {
-                    Log.d("ErpRepository", "Login Failed (Invalid Captcha). Retrying...")
-                    preLogin(erpViewModel)
-                } else if (loginResponse == "INVALID_CREDENTIALS") {
-                    Log.d("ErpRepository", "Login Failed")
-                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
-                } else {
-                    Log.d("ErpRepository", "Login Failed")
-                    erpViewModel.comments.value = "Something went wrong"
-                    erpViewModel.erpCacheHelper?.saveLog(loginResponse)
-                    erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
+                    "INVALID_CAPTCHA" -> {
+                        Log.d("ErpRepository", "Login Failed (Invalid Captcha). Retrying...")
+                        preLogin(erpViewModel)
+                        erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
+                    }
+                    "INVALID_CREDENTIALS" -> {
+                        Log.d("ErpRepository", "Login Failed")
+                        erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
+                    }
+                    else -> {
+                        Log.d("ErpRepository", "Login Failed")
+                        erpViewModel.comments.value = "Something went wrong"
+                        erpCacheHelper.saveCookies("")
+                        erpViewModel.erpCacheHelper?.saveLog(loginResponse)
+                        erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
+                    }
                 }
             }
 
@@ -66,7 +77,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     fun fetchAttendance(erpViewModel: ErpViewModel) {
         GlobalScope.launch(Dispatchers.IO) {
             val attendance = erpViewModel.studentData.value?.regID?.let {
-                ErpNetUtils.getAttendance(
+                erpNetUtils.getAttendance(
                     cookies,
                     it
                 )
@@ -90,7 +101,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     ) {
         GlobalScope.launch(Dispatchers.IO) {
             val regID = erpViewModel.studentData.value?.regID ?: ""
-            val subjectAttendance = ErpNetUtils.getSubjectAttendance(
+            val subjectAttendance = erpNetUtils.getSubjectAttendance(
                 cookies,
                 regID,
                 subjectID,
@@ -104,9 +115,9 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         }
     }
 
-    fun fetchImage(erpViewModel: ErpViewModel) {
+    private fun fetchImage(erpViewModel: ErpViewModel) {
         GlobalScope.launch(Dispatchers.IO) {
-            val image = ErpNetUtils.getStudentImage(cookies)
+            val image = erpNetUtils.getStudentImage(cookies)
             if (image != null) {
                 erpCacheHelper.saveStudentImage(BitmapHelper.bitmapToString(image))
                 erpViewModel.erpStudentImg.postValue(BitmapHelper.bitmapToString(image))
@@ -118,14 +129,18 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         Log.d("ErpRepository", "ZZZ syncStudentData")
         fetchImage(erpViewModel)
         GlobalScope.launch(Dispatchers.IO) {
-            val studentDetails = ErpNetUtils.getStudentDetails(cookies)
+            val studentDetails = erpNetUtils.getStudentDetails(cookies)
             erpViewModel.studentData.postValue(studentDetails)
             if (studentDetails != null) {
                 erpCacheHelper.saveStudentId(studentDetails.studentID)
 
                 erpCacheHelper.saveLocalStudentData(studentDetails)
             } else {
-                erpViewModel.comments.postValue("Failed to Sync Student Details")
+                if (erpViewModel.loginStatus.value == LoginStatus.PREV_LOGGED_IN) {
+                    erpViewModel.comments.postValue("Please wait")
+                } else {
+                    erpViewModel.comments.postValue("Something went wrong")
+                }
             }
         }
     }
@@ -134,7 +149,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("ErpRepository", "YYY fetchMidtermMarks")
             val midtermMarksData = erpViewModel.studentData.value?.regID?.let {
-                ErpNetUtils.getMidtermMarks(
+                erpNetUtils.getMidtermMarks(
                     cookies,
                     it,
                     sem
@@ -148,7 +163,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("ErpRepository", "CCC fetchExamMarks")
             val examMarksData =
-                erpViewModel.studentData.value?.regID?.let { ErpNetUtils.getExamMarks(cookies, it) }
+                erpViewModel.studentData.value?.regID?.let { erpNetUtils.getExamMarks(cookies, it) }
             erpViewModel.examMarksData.postValue(examMarksData)
         }
     }
@@ -156,7 +171,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     fun fetchFeeDetails(erpViewModel: ErpViewModel, feeType: Int) {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("ErpRepository", "MMM fetchFeeDetails")
-            val feeDetails = ErpNetUtils.fetchFeeDetails(cookies, feeType)
+            val feeDetails = erpNetUtils.fetchFeeDetails(cookies, feeType)
             if (feeDetails != null && feeType == 2 && feeDetails.headdatahostel.isEmpty()) {
                 erpViewModel.feeDetails.postValue(null)
                 return@launch
@@ -168,11 +183,10 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     fun updateChannel(erpViewModel: ErpViewModel, url: String, fbToken: String) {
         GlobalScope.launch(Dispatchers.IO) {
             Log.d("ErpRepository", "GGG updateChannel")
-            var gson = ""
             erpViewModel.studentData.value?.token = fbToken
-            if (fbToken == "") gson = erpViewModel.studentData.value?.toIdGson() ?: return@launch
-            else gson = erpViewModel.studentData.value?.toGson() ?: return@launch
-            val res = ErpNetUtils.updateChannel(url, gson)
+            val gson: String = if (fbToken == "") erpViewModel.studentData.value?.toIdGson() ?: return@launch
+            else erpViewModel.studentData.value?.toGson() ?: return@launch
+            val res = erpNetUtils.updateChannel(url, gson)
             Log.d("ErpRepository", "GGG updateChannel $res")
         }
     }
@@ -180,7 +194,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     fun resetErpPassword(erpViewModel: ErpViewModel, id: String, email: String, dob: String) {
         GlobalScope.launch(Dispatchers.IO) {
             val params = "ID=$id&Mob=$email&db=${dob.replace("/", "%2F")}"
-            val code = ErpNetUtils.resetErpPassword(cookies, params)
+            val code = erpNetUtils.resetErpPassword(cookies, params)
             Log.d("ErpRepository", "DDD resetErpPassword $code")
             withContext(Dispatchers.Main) {
                 if (code == "NotMatch") erpViewModel.loginStatus.value = LoginStatus.RESET_NOTMATCH
@@ -192,7 +206,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
     fun changeErpPassword(erpViewModel: ErpViewModel, password: String, url: String) {
         GlobalScope.launch(Dispatchers.IO) {
             if (url == "") return@launch
-            val newCookies = ErpNetUtils.preChangeErpPassword(cookies, url)
+            val newCookies = erpNetUtils.preChangeErpPassword(cookies, url)
             if (newCookies == "x") {
                 withContext(Dispatchers.Main) {
                     erpViewModel.loginStatus.value = LoginStatus.CHANGE_PASSWORD_EXPIRED
@@ -202,7 +216,7 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
             erpCacheHelper.saveCookies(newCookies)
             cookies = newCookies
             Log.d("ErpRepository", "EEE preChangeErpPassword $newCookies")
-            val result = ErpNetUtils.changeErpPassword(cookies, password)
+            val result = erpNetUtils.changeErpPassword(cookies, password)
             // result: "{"data":1}"
             val code = result.substringAfter(":").substringBefore("}")
             Log.d("ErpRepository", "EEE resetErpPassword $result  |  $code")
@@ -211,6 +225,44 @@ class ErpRepository(private val erpCacheHelper: ErpCacheHelper) {
                     LoginStatus.CHANGE_PASSWORD_SUCCESS
                 else erpViewModel.loginStatus.value = LoginStatus.CHANGE_PASSWORD_FAILED
             }
+        }
+    }
+
+    fun scanQrCode(
+        erpViewModel: ErpViewModel,
+        qrScanInput: QrScanInput
+    ) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val res = erpNetUtils.scanQrCode(qrScanInput)
+            if (res == "") {
+                withContext(Dispatchers.Main) {
+                    erpViewModel.qrScanResult.value = QrScanResult(
+                        "ERROR",
+                        "Something went wrong",
+                        "Check your internet connection",
+                        -1
+                    )
+                }
+                return@launch
+            }
+            try{
+                Log.d("ErpRepository", "QR Result: $res")
+                val scanResult = Gson().fromJson(res, QrScanResult::class.java)
+                withContext(Dispatchers.Main) {
+                    erpViewModel.qrScanResult.value = scanResult
+                }
+            } catch (e: Exception) {
+                Log.d("ErpRepository", "Failed to parse QR Result")
+                withContext(Dispatchers.Main) {
+                    erpViewModel.qrScanResult.value = QrScanResult(
+                        "ERROR",
+                        "Something went wrong",
+                        "Please Scan a valid QR Code",
+                        -1
+                    )
+                }
+            }
+
         }
     }
 

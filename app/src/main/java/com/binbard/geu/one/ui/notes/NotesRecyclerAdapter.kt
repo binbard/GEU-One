@@ -35,6 +35,8 @@ class NotesRecyclerAdapter(private val context: Context, private val nvm: NotesV
         if (item.isFolder()) {
             holder.imgNoteItem.setImageResource(R.drawable.ic_folder_with_files)
         } else {
+            val author = item.getFileAuthor()
+            if(author!="") holder.card.tooltipText = "By $author"
             showThumbnail(holder.imgNoteItem, item)
         }
         changeAlpha(holder.card, holder.imgNoteItem, holder.imgNoteDownload, item)

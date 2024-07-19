@@ -4,6 +4,7 @@
     <string name="navigation_drawer_close">Close</string>
     <string name="title_activity_feed_view">FeedView</string>
     <string name="action_settings">Settings</string>
+    <string name="support_email">geu.one.app@binbard.org</string>
     <string name="feedsHostDeemed">https://csitgeu.in/wp/</string>
     <string name="feedsHostHill">http://btechcsegehu.in/</string>
     <string name="erpHostUrlDeemed">https://student.geu.ac.in/</string>
@@ -11,6 +12,7 @@
     <string name="erpExtHost">student.geu.ac.in</string>
     <string name="resHostUrlDeemed">https://api.npoint.io/0640fc3b63efe7955f6f</string>
     <string name="resHostUrlHill">https://api.npoint.io/2b08cbef91d1d92f68c2</string>
+    <string name="updateUrl">https://api.npoint.io/3744e4fb4d838452cf4e</string>
     <string name="channelUrl">https://kmutxlmdjvpunbafs5suxuymxu0mgcee.lambda-url.eu-north-1.on.aws/</string>
     <string name="feedbackUrl">https://script.google.com/macros/s/AKfycbwV5Vw-5jf-H5_rekeW85Wd-Gdym6f_UIUOkFjPzEU4IOmm04q71S9-4MFsfpFW17Pj/exec</string>
     <string name="notesUrl">https://raw.githubusercontent.com/geu-one-static/notes/master/notes.txt</string>
@@ -30,4 +32,5 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="scan_barcode">Scan Hostel QR Code</string>
 </resources>

@@ -16,7 +16,8 @@ import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.models.ResObj
 import com.bumptech.glide.Glide
 
-class GridAdapter(private val itemList: List<ResObj>) : RecyclerView.Adapter<GridAdapter.GridViewHolder>() {
+class GridAdapter(private val itemList: List<ResObj>) :
+    RecyclerView.Adapter<GridAdapter.GridViewHolder>() {
     val intent = CustomTabsIntent.Builder().build()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GridViewHolder {
@@ -26,14 +27,16 @@ class GridAdapter(private val itemList: List<ResObj>) : RecyclerView.Adapter<Gri
 
     override fun onBindViewHolder(holder: GridViewHolder, position: Int) {
         val item = itemList[position]
-        if(item.imgUrl != null){
-            Glide.with(holder.imgNoteItem.context).load(item.imgUrl).into(holder.imgNoteItem)
+        if (item.imgUrl != null) {
+            Glide.with(holder.imgResItem.context).load(item.imgUrl).into(holder.imgResItem)
         }
-        holder.tvNoteItem.text = item.name
+        holder.tvResItem.text = item.name
+        if (item.author != null) holder.mView.tooltipText = "By ${item.author}"
+
         if (item.type == "pdf") {
             holder.mView.setOnClickListener {
                 PdfUtils.openOrDownloadPdf(
-                    context = holder.tvNoteItem.context,
+                    context = holder.tvResItem.context,
                     item.url,
                     isExternalSource = true
                 )
@@ -41,6 +44,14 @@ class GridAdapter(private val itemList: List<ResObj>) : RecyclerView.Adapter<Gri
         } else if (item.type == "link") {
             holder.mView.setOnClickListener {
                 intent.launchUrl(it.context, item.url.toUri())
+            }
+        } else if (item.type == "web") {
+            holder.mView.setOnClickListener {
+                val intent = Intent(it.context, com.binbard.geu.one.ViewWebActivity::class.java)
+                intent.putExtra("url", item.url)
+                intent.putExtra("title", item.name)
+                intent.putExtra("options", item.options)
+                it.context.startActivity(intent)
             }
         }
     }
@@ -51,7 +62,7 @@ class GridAdapter(private val itemList: List<ResObj>) : RecyclerView.Adapter<Gri
 
     inner class GridViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val mView: View = itemView
-        val imgNoteItem: ImageView = itemView.findViewById(R.id.imgNoteItem)
-        val tvNoteItem: TextView = itemView.findViewById(R.id.tvNoteItem)
+        val imgResItem: ImageView = itemView.findViewById(R.id.imgResItem)
+        val tvResItem: TextView = itemView.findViewById(R.id.tvResItem)
     }
 }

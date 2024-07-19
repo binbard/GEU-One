@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpAttendanceBinding
 import com.binbard.geu.one.databinding.FragmentErpAttendanceListBinding
+import com.binbard.geu.one.models.LoginStatus
 import com.binbard.geu.one.ui.erp.ErpViewModel
 import java.util.*
 
@@ -80,7 +81,11 @@ class ErpAttendanceListFragment : Fragment() {
                 val bundle = Bundle()
 
                 if(evm.studentData.value?.regID == null) {
-                    Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
+                    if(evm.loginStatus.value==LoginStatus.PREV_LOGGED_IN){
+                        Toast.makeText(requireContext(), "Please wait", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
+                    }
                     return@setOnClickListener
                 }
                 bundle.putString("regID", evm.studentData.value?.regID)

@@ -1,8 +1,11 @@
 package com.binbard.geu.one.ui.erp
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import com.binbard.geu.one.R
+import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.models.*
 import com.binbard.geu.one.ui.erp.menu.Student
 import com.binbard.geu.one.ui.erp.menu.StudentGson
@@ -22,10 +25,16 @@ import java.time.Duration
 import java.util.*
 
 
-object ErpNetUtils {
+class ErpNetUtils(context: Context) {
     private val client = OkHttpClient()
+    val sharedPreferencesHelper = SharedPreferencesHelper(context)
+    val campus = sharedPreferencesHelper.getCampus()
 
-    private const val erpUrl = "https://student.geu.ac.in"
+    private val erpUrl = if (campus == "deemed") {
+        context.resources.getString(R.string.erpHostUrlDeemed)
+    } else {
+        context.resources.getString(R.string.erpHostUrlHill)
+    }
 
     suspend fun getCookies(): String = withContext(Dispatchers.IO) {
         val request = okhttp3.Request.Builder()
@@ -153,6 +162,9 @@ object ErpNetUtils {
                     return@withContext "INVALID_CREDENTIALS"
                 }
             }
+            Log.d("ErpNetUtils", "got login code: ${response.code}")
+            val cookiesList = response.headers("Set-Cookie")
+            Log.d("ErpNetUtils", "got login cookies: $cookiesList")
             response.body?.close()
             return@withContext "xAB"
 
@@ -390,6 +402,27 @@ object ErpNetUtils {
             .url("$erpUrl/Account/ChangeUserPassword")
             .header("Cookie", cookies)
             .post(json)
+            .build()
+        return try {
+            val response = client.newCall(request).execute()
+            val body = response.body?.string()
+            response.body?.close()
+            body ?: ""
+        } catch (e: Exception) {
+            return ""
+        }
+    }
+
+    fun scanQrCode(qrScanInput: QrScanInput): String {
+        val formBody = FormBody.Builder()
+            .add("token", qrScanInput.token)
+            .add("name", qrScanInput.name)
+            .add("uid", qrScanInput.uid)
+            .add("type", qrScanInput.type)
+            .build()
+        val request = okhttp3.Request.Builder()
+            .url(qrScanInput.url)
+            .post(formBody)
             .build()
         return try {
             val response = client.newCall(request).execute()

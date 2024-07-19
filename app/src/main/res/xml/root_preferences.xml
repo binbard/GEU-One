@@ -41,13 +41,20 @@
             app:summary="N/A" />
 
         <Preference
+            app:key="changelogs"
+            app:title="Changelogs" />
+
+        <Preference
+            app:key="privacy_policy"
             app:title="Privacy Policy" />
 
         <Preference
+            app:key="terms"
             app:title="Terms &amp; Conditions" />
 
         <Preference
-            app:title="Contributors" />
+            app:key="about"
+            app:title="About" />
 
     </PreferenceCategory>
 

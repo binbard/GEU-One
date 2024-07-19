@@ -15,16 +15,16 @@ data class Feed(
 
         return when {
             diffMinutes < 60 -> "$diffMinutes minutes ago"
-            diffMinutes < 24 * 60 -> formatTime(diffMinutes / 60, "hours")
-            diffMinutes < 7 * 24 * 60 -> formatTime(diffMinutes / (24 * 60), "days")
-            diffMinutes < 30 * 24 * 60 -> formatTime(diffMinutes / (7 * 24 * 60), "weeks")
-            diffMinutes < 365 * 24 * 60 -> formatTime(diffMinutes / (30 * 24 * 60), "months")
+            diffMinutes < 24 * 60 -> formatTime(diffMinutes / 60, "hour")
+            diffMinutes < 7 * 24 * 60 -> formatTime(diffMinutes / (24 * 60), "day")
+            diffMinutes < 30 * 24 * 60 -> formatTime(diffMinutes / (7 * 24 * 60), "week")
+            diffMinutes < 365 * 24 * 60 -> formatTime(diffMinutes / (30 * 24 * 60), "month")
             else -> formatTime(diffMinutes / (365 * 24 * 60), "year")
         }
     }
 
     private fun formatTime(amount: Long, unit: String): String {
-        return if (amount == 1L) "A $unit ago" else "$amount $unit ago"
+        return if (amount == 1L) "A $unit ago" else "$amount ${unit}s ago"
     }
 
 }

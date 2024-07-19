@@ -9,7 +9,7 @@
     <item
         android:id="@+id/ResourcesFragment"
         android:icon="@drawable/ic_book"
-        android:title="Res" />
+        android:title="Resource" />
     <item
         android:id="@+id/NotesFragment"
         android:icon="@drawable/ic_notes"

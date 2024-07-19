@@ -36,7 +36,7 @@ class ErpMidtermMarksFragment: Fragment() {
                 val spAdapter = ArrayAdapter(requireContext(), R.layout.simple_spinner_item, semList.toList())
                 spAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
                 binding.spMidTermSemester.adapter = spAdapter
-                binding.spMidTermSemester.setSelection(max( 0, yearSem-2))
+                binding.spMidTermSemester.setSelection(max( 0, yearSem-1))
             }
         }
 

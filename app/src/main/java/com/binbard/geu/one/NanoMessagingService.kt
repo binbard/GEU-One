@@ -39,7 +39,7 @@ class NanoMessagingService : FirebaseMessagingService() {
         val extras = remoteMessage.data
 
         if (remoteMessage.data.isNotEmpty()) {
-            sendNotification(this, body.toString(), channelId, title, icon, extras)
+            sendNotification(this, body.toString(), title, channelId, icon, extras)
         }
     }
 
@@ -59,8 +59,8 @@ class NanoMessagingService : FirebaseMessagingService() {
     fun sendNotification(
         context: Context,
         messageBody: String,
-        pChannelId: String? = null,
         pTitle: String? = null,
+        pChannelId: String? = null,
         pIcon: String? = null,
         extras: Map<String, String>? = null,
     ) {
@@ -81,8 +81,8 @@ class NanoMessagingService : FirebaseMessagingService() {
         )
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
-            .setContentTitle(title)
             .setSmallIcon(context.resources.getIdentifier(icon, "drawable", context.packageName))
+            .setContentTitle(title)
             .setContentText(messageBody)
             .setAutoCancel(true)
             .setSound(defaultSoundUri)

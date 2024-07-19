@@ -1,11 +1,13 @@
 package com.binbard.geu.one.ui.erp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.app.ActivityCompat.invalidateOptionsMenu
 import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuCompat
@@ -21,6 +23,11 @@ import com.binbard.geu.one.helpers.Snack
 import com.binbard.geu.one.ui.erp.menu.*
 import com.binbard.geu.one.utils.BitmapHelper
 import com.google.android.material.navigation.NavigationView
+import io.github.g00fy2.quickie.QRResult
+import io.github.g00fy2.quickie.ScanCustomCode
+import io.github.g00fy2.quickie.ScanQRCode
+import io.github.g00fy2.quickie.config.BarcodeFormat
+import io.github.g00fy2.quickie.config.ScannerConfig
 import java.net.URL
 
 
@@ -29,6 +36,7 @@ class ErpFragment : Fragment() {
     private lateinit var evm: ErpViewModel
     private lateinit var tvErpTitle: TextView
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
+    private var mPageId = R.id.item_erp_student
     private var campus = ""
 
     override fun onCreateView(
@@ -73,10 +81,10 @@ class ErpFragment : Fragment() {
                 evm.erpRepository?.syncStudentData(evm)
             } else if (it == LoginStatus.LOGIN_FAILED) {
                 if (evm.erpCacheHelper?.getLoginStatus() == LoginStatus.PREV_LOGGED_IN) {
-                    Snack.showMsg(
-                        requireActivity().findViewById(android.R.id.content),
-                        "Session Expired"
-                    )
+//                    Snack.showMsg(
+//                        requireActivity().findViewById(android.R.id.content),
+//                        "Session Expired"
+//                    )
                     evm.erpCacheHelper?.saveLoginStatus(LoginStatus.PREV_LOGGED_OUT)
                 } else {
                     Snack.showMsg(
@@ -89,6 +97,7 @@ class ErpFragment : Fragment() {
             } else if (it == LoginStatus.LOGOUT) {
                 Toast.makeText(requireContext(), "Logged Out", Toast.LENGTH_SHORT).show()
                 evm.erpCacheHelper!!.saveLoginStatus(LoginStatus.PREV_LOGGED_OUT)
+                evm.erpCacheHelper!!.saveCookies("")
                 evm.erpCacheHelper!!.clearLocalData()
                 setupErpFeatures(unset = true)
                 showErpPage(0)
@@ -107,13 +116,25 @@ class ErpFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_erp_top, menu)
+        if(mPageId==R.id.item_erp_student){
+//            inflater.inflate(R.menu.menu_scan, menu)
+            inflater.inflate(R.menu.menu_erp_top, menu)
+        } else {
+            inflater.inflate(R.menu.menu_erp_top, menu)
+        }
         MenuCompat.setGroupDividerEnabled(menu, true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.item_erp_action_scan -> {
+                val intent = Intent(requireContext(), ScanqrActivity::class.java)
+                intent.putExtra("name", evm.studentData.value?.studentName)
+                intent.putExtra("uid", evm.studentData.value?.studentID)
+                startActivity(intent)
+                true
+            }
+
             R.id.item_erp_top_visit_site -> {
                 val intent = CustomTabsIntent.Builder().build()
                 val url =
@@ -161,6 +182,7 @@ class ErpFragment : Fragment() {
         evm.currentErpPage.value = pageId
         childFragmentManager.clearBackStack("xyz")
         val transaction = childFragmentManager.beginTransaction()
+        requireActivity().invalidateOptionsMenu()
         when (pageId) {
             0 -> transaction.replace(R.id.fragmentContainerView2, ErpLoginFragment())
             R.id.ErpLoginChangeFragment -> {
@@ -225,8 +247,8 @@ class ErpFragment : Fragment() {
                 evm.erpCacheHelper?.saveSemester(it.yearSem)
                 val mCourse = it.course.replace(" ", "_")
                 FirebaseUtils.subscribeTo(mCourse)
-                FirebaseUtils.subscribeTo("$campus.$mCourse")
-                FirebaseUtils.subscribeTo("$campus.$mCourse.${it.yearSem}")
+                FirebaseUtils.subscribeTo("$campus/$mCourse")
+                FirebaseUtils.subscribeTo("$campus/$mCourse/${it.yearSem}")
                 evm.firstTimeLogin = false
                 val channel = resources.getString(R.string.channelUrl)
                 val fbToken = sharedPreferencesHelper.getFbToken()
@@ -259,6 +281,7 @@ class ErpFragment : Fragment() {
         drawerLayout.findViewById<NavigationView>(R.id.nav_view)
             .setNavigationItemSelectedListener { menuItem ->
                 drawerLayout.closeDrawers()
+                mPageId = menuItem.itemId
                 when (menuItem.itemId) {
                     R.id.item_erp_student -> showErpPage(R.id.item_erp_student)
                     R.id.item_erp_attendance -> showErpPage(R.id.item_erp_attendance)
