@@ -51,6 +51,7 @@ class SelectCampusFragment: Fragment() {
             }
             sharedPreferencesHelper.setCampus(selectedCampus)
             sharedPreferencesHelper.setInitDone(true)
+            sharedPreferencesHelper.setInstalledTime(System.currentTimeMillis())
             FirebaseUtils.subscribeTo(selectedCampus)
             FirebaseUtils.subscribeTo("$selectedCampus~feed")
             FirebaseUtils.subscribeTo("$selectedCampus~resources")

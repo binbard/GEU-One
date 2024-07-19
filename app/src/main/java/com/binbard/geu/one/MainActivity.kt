@@ -3,21 +3,17 @@ package com.binbard.geu.one
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
 import android.text.SpannableString
 import android.text.util.Linkify
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -30,10 +26,10 @@ import com.binbard.geu.one.databinding.DialogFeedbackBinding
 import com.binbard.geu.one.helpers.AlertMsg
 import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
-import com.binbard.geu.one.helpers.Snack
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
+import com.binbard.geu.one.ui.erp.ChangelogSheet
 import com.binbard.geu.one.ui.initial.InitialActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -82,24 +78,6 @@ class MainActivity : AppCompatActivity() {
         if (erpViewModel.studentData.value == null) erpViewModel.erpCacheHelper?.loadLocalStudentData(
             erpViewModel
         )
-
-        erpViewModel.studentData.observe(this) {
-            if (it == null || erpViewModel.firstTimeLogin) return@observe
-            val lastSyncTime = sharedPreferencesHelper.getLastSyncTime()
-            val lastTime = Date(lastSyncTime)
-            val currentTime = Date()
-            val lastLocalTime =
-                lastTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
-            val currentLocalTime =
-                currentTime.toInstant().atZone(ZoneId.of("Asia/Kolkata")).toLocalDateTime()
-            if (lastLocalTime.dayOfYear != currentLocalTime.dayOfYear) {
-                val channel = resources.getString(R.string.channelUrl)
-                erpViewModel.erpRepository?.updateChannel(erpViewModel, channel, "")
-                sharedPreferencesHelper.setLastSyncTime(currentTime.time)
-            } else {
-                Log.d("Sync", "Already synced")
-            }
-        }
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
@@ -182,7 +160,6 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-
     }
 
     override fun onResume() {

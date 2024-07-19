@@ -13,6 +13,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
+import com.binbard.geu.one.ui.erp.ChangelogSheet
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
@@ -41,6 +42,7 @@ class SettingsActivity : AppCompatActivity() {
             val campusPref = findPreference<Preference>("campus")
             val versionPref = findPreference<Preference>("version")
             val clearFilesPref = findPreference<Preference>("clear_files")
+            val changelogsPref = findPreference<Preference>("changelogs")
             val privacyPolicyPref = findPreference<Preference>("privacy_policy")
             val termsPref = findPreference<Preference>("terms")
             val aboutPref = findPreference<Preference>("about")
@@ -66,6 +68,12 @@ class SettingsActivity : AppCompatActivity() {
                     dialog.dismiss()
                 }
                 builder.show()
+                true
+            }
+
+            changelogsPref?.setOnPreferenceClickListener {
+                val changelogSheet = ChangelogSheet()
+                changelogSheet.show(requireActivity().supportFragmentManager, "changelog")
                 true
             }
 

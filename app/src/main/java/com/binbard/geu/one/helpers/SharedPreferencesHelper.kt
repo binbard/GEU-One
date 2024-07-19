@@ -1,9 +1,12 @@
 package com.binbard.geu.one.helpers
 
 import android.content.Context
+import android.content.SharedPreferences
 
 class SharedPreferencesHelper(context: Context) {
     private val sharedPreferences = context.getSharedPreferences("geu", Context.MODE_PRIVATE)
+    private val sharedPreferencesNotes: SharedPreferences =
+        context.getSharedPreferences("notes", Context.MODE_PRIVATE) // TODO: remove this in next version
 
     fun getInitDone(): Boolean {
         return sharedPreferences.getBoolean("initDone", false)
@@ -17,6 +20,14 @@ class SharedPreferencesHelper(context: Context) {
     }
     fun setFbToken(value: String) {
         sharedPreferences.edit().putString("fbToken", value).apply()
+    }
+
+    fun getInstalledTime(): Long {
+        return sharedPreferences.getLong("installedOnTime", 0)
+    }
+
+    fun setInstalledTime(value: Long) {
+        sharedPreferences.edit().putLong("installedOnTime", value).apply()
     }
 
     fun getLastSyncTime(): Long {
