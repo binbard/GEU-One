@@ -247,8 +247,8 @@ class ErpFragment : Fragment() {
                 evm.erpCacheHelper?.saveSemester(it.yearSem)
                 val mCourse = it.course.replace(" ", "_")
                 FirebaseUtils.subscribeTo(mCourse)
-                FirebaseUtils.subscribeTo("$campus.$mCourse")
-                FirebaseUtils.subscribeTo("$campus.$mCourse.${it.yearSem}")
+                FirebaseUtils.subscribeTo("$campus/$mCourse")
+                FirebaseUtils.subscribeTo("$campus/$mCourse/${it.yearSem}")
                 evm.firstTimeLogin = false
                 val channel = resources.getString(R.string.channelUrl)
                 val fbToken = sharedPreferencesHelper.getFbToken()
