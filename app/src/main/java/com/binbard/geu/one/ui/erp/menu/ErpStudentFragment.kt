@@ -8,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TableRow
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.binbard.geu.one.R
 import com.binbard.geu.one.databinding.FragmentErpStudentBinding
+import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.ui.erp.ErpViewModel
 import com.binbard.geu.one.utils.BitmapHelper
 import com.google.android.material.sidesheet.SideSheetDialog
@@ -39,6 +41,15 @@ class ErpStudentFragment: Fragment() {
             binding.tvErpStuId.setTextColor(resources.getColor(com.google.android.material.R.color.material_dynamic_neutral90))
         } catch (e: Exception){
             Log.e("ErpStudentFragment", "Error: ${e.message}")
+        }
+
+        binding.imgIcard.setOnClickListener {
+            val regId = erpViewModel.studentData.value?.regID
+            if (regId == null) {
+                Toast.makeText(context, "Could not get ID Card", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            PdfUtils.downloadOpenIdCard(requireContext(), regId, "RDLCGEUStudentIDCard", erpViewModel.erpCacheHelper!!.getCookies())
         }
 
         erpViewModel.erpStudentImg.observe(viewLifecycleOwner) {

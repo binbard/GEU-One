@@ -178,7 +178,7 @@
             app:layout_constraintTop_toBottomOf="@+id/cvErpCard">
 
             <ImageView
-                android:id="@+id/imageView7"
+                android:id="@+id/img_icard"
                 app:srcCompat="@drawable/ic_idcard"
                 android:layout_width="match_parent"
                 android:layout_height="24dp"
