@@ -1,4 +1,4 @@
-package com.binbard.geu.one.ui.erp
+package com.binbard.geu.one
 
 import android.app.Dialog
 import android.os.Bundle
@@ -7,12 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.binbard.geu.one.databinding.ChangelogBottomSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import org.checkerframework.checker.units.qual.s
 
 
 class ChangelogSheet: BottomSheetDialogFragment() {

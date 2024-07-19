@@ -3,17 +3,13 @@ package com.binbard.geu.one
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
-import android.text.TextUtils
-import android.text.style.ClickableSpan
 import android.text.util.Linkify
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
-import com.binbard.geu.one.ui.erp.ChangelogSheet
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 

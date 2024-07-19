@@ -29,7 +29,6 @@ import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
-import com.binbard.geu.one.ui.erp.ChangelogSheet
 import com.binbard.geu.one.ui.initial.InitialActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -37,8 +36,6 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import java.net.URL
-import java.time.ZoneId
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
