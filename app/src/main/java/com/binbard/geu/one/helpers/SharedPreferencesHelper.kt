@@ -30,6 +30,20 @@ class SharedPreferencesHelper(context: Context) {
         sharedPreferences.edit().putLong("installedOnTime", value).apply()
     }
 
+    fun isOldUser(): Boolean {
+        val notesData = sharedPreferencesNotes.getString("notesList", "") ?: "" // TODO: remove this in next version
+        return notesData.isNotEmpty()  // TODO: remove this in next version
+        return System.currentTimeMillis() - getInstalledTime() > 5 * 60 * 1000
+    }
+
+    fun getLastChangelogShown(): Int {
+        return sharedPreferences.getInt("lastChangelogShown", 0)
+    }
+
+    fun setLastChangelogShown(value: Int) {
+        sharedPreferences.edit().putInt("lastChangelogShown", value).apply()
+    }
+
     fun getLastSyncTime(): Long {
         return sharedPreferences.getLong("lastSyncTime", 0)
     }

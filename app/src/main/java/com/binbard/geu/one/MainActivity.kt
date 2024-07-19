@@ -160,6 +160,11 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+
+        if(sharedPreferencesHelper.getLastChangelogShown() < BuildConfig.VERSION_CODE && sharedPreferencesHelper.isOldUser()){
+            ChangelogSheet().show(supportFragmentManager, "Changelogs")
+            sharedPreferencesHelper.setLastChangelogShown(BuildConfig.VERSION_CODE)
+        }
     }
 
     override fun onResume() {
