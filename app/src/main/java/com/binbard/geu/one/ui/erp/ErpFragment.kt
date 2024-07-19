@@ -81,10 +81,10 @@ class ErpFragment : Fragment() {
                 evm.erpRepository?.syncStudentData(evm)
             } else if (it == LoginStatus.LOGIN_FAILED) {
                 if (evm.erpCacheHelper?.getLoginStatus() == LoginStatus.PREV_LOGGED_IN) {
-                    Snack.showMsg(
-                        requireActivity().findViewById(android.R.id.content),
-                        "Session Expired"
-                    )
+//                    Snack.showMsg(
+//                        requireActivity().findViewById(android.R.id.content),
+//                        "Session Expired"
+//                    )
                     evm.erpCacheHelper?.saveLoginStatus(LoginStatus.PREV_LOGGED_OUT)
                 } else {
                     Snack.showMsg(

@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
+import android.text.SpannableString
+import android.text.util.Linkify
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -28,6 +30,7 @@ import com.binbard.geu.one.databinding.DialogFeedbackBinding
 import com.binbard.geu.one.helpers.AlertMsg
 import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
+import com.binbard.geu.one.helpers.Snack
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
 import com.binbard.geu.one.ui.erp.ErpRepository
 import com.binbard.geu.one.ui.erp.ErpViewModel
@@ -138,17 +141,11 @@ class MainActivity : AppCompatActivity() {
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
                 if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
                     appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        AppUpdateType.IMMEDIATE,
-                        this,
-                        1
+                        appUpdateInfo, AppUpdateType.IMMEDIATE, this, 1
                     )
                 } else if (appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
                     appUpdateManager.startUpdateFlowForResult(
-                        appUpdateInfo,
-                        AppUpdateType.FLEXIBLE,
-                        this,
-                        1
+                        appUpdateInfo, AppUpdateType.FLEXIBLE, this, 1
                     )
                 }
             }
@@ -166,15 +163,10 @@ class MainActivity : AppCompatActivity() {
         NetUtils.getAppUpdateInfo(this, BuildConfig.VERSION_CODE, erpViewModel)
         erpViewModel.updateAvailable.observe(this) {
             val priorityMap = mapOf(
-                0 to "No",
-                1 to "Very Low",
-                2 to "Low",
-                3 to "Medium",
-                4 to "High",
-                5 to "Very High"
+                0 to "No", 1 to "Very Low", 2 to "Low", 3 to "Medium", 4 to "High", 5 to "Very High"
             )
             if (it > 0) {
-                val repeat = if (it==1 || it==2) 0 else if(it==3) 1 else -1
+                val repeat = if (it == 1 || it == 2) 0 else if (it == 3) 1 else -1
                 AlertMsg.showMessage(
                     this,
                     "Update Available",
@@ -185,7 +177,8 @@ class MainActivity : AppCompatActivity() {
                         intent.data =
                             Uri.parse("https://play.google.com/store/apps/details?id=${packageName}")
                         startActivity(intent)
-                    }, repeat
+                    },
+                    repeat
                 )
             }
         }
@@ -196,13 +189,11 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         val appUpdateManager = AppUpdateManagerFactory.create(this)
-        appUpdateManager
-            .appUpdateInfo
-            .addOnSuccessListener { appUpdateInfo ->
-                if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-                    appUpdateManager.completeUpdate()
-                }
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                appUpdateManager.completeUpdate()
             }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -240,14 +231,12 @@ class MainActivity : AppCompatActivity() {
                 else if (selectedChip == dialogFeedbackBinding.chipReview.id) feedbackType =
                     "review"
 
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Feedback")
-                    .setMessage("Info: This is always shared anonymously.")
+                MaterialAlertDialogBuilder(this).setTitle("Feedback")
+                    .setMessage("Info: This is always shared anonymously. We can't revert back to you. Contact via email for any queries.")
                     .setView(dialogFeedbackBinding.root)
                     .setNegativeButton("Cancel") { dialog, which ->
                         // Negative btn pressed
-                    }
-                    .setPositiveButton("SEND") { dialog, which ->
+                    }.setPositiveButton("SEND") { dialog, which ->
                         if (dialogFeedbackBinding.etFeedback.text.isEmpty()) return@setPositiveButton
                         val feedbackUrl = resources.getString(R.string.feedbackUrl)
                         NetUtils.sendFeedback(
@@ -256,8 +245,37 @@ class MainActivity : AppCompatActivity() {
                             feedbackType,
                             dialogFeedbackBinding.etFeedback.text.toString()
                         )
-                    }
-                    .show()
+                    }.show()
+                true
+            }
+
+            R.id.item_gen_contact_support -> {
+                val email = resources.getString(R.string.support_email)
+                val msg = "For any queries, contact us at:\n" + "Email: ${email}\n"
+
+                val s = SpannableString(msg)
+                Linkify.addLinks(s, Linkify.EMAIL_ADDRESSES)
+
+                MaterialAlertDialogBuilder(this).setTitle("Contact Support").setMessage(s)
+                    .setNegativeButton("Cancel") { dialog, which ->
+                        // Negative btn pressed
+                    }.setPositiveButton("Email") { dialog, which ->
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            setPackage("com.google.android.gm")
+                            putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                            putExtra(Intent.EXTRA_SUBJECT, "")
+                            putExtra(Intent.EXTRA_TEXT, "")
+                        }
+
+                        if (intent.resolveActivity(packageManager) != null) {
+                            startActivity(intent)
+                        } else {
+                            Toast.makeText(this, "Email app is not installed", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+
+                    }.show()
                 true
             }
 

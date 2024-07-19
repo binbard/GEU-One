@@ -7,5 +7,8 @@
         <item
             android:id="@+id/item_gen_feedback"
             android:title="Feedback" />
+        <item
+            android:id="@+id/item_gen_contact_support"
+            android:title="Contact Support" />
     </group>
 </menu>

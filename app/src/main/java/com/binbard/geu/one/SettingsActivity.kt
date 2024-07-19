@@ -95,7 +95,7 @@ class SettingsActivity : AppCompatActivity() {
                         "Disclaimer: This app is not affiliated with Graphic Era University.\n\n" +
                         "If you have any feedback or suggestions, please let us know.\n\n" +
                         "Contact:\n" +
-                        "geu.one.app@binbard.org"
+                        resources.getString(R.string.support_email)
 
                 val s = SpannableString(msg)
 

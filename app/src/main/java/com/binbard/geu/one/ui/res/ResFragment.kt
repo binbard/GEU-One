@@ -1,5 +1,6 @@
 package com.binbard.geu.one.ui.res
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -65,17 +66,17 @@ class ResFragment : Fragment() {
                 val resTitle = resSection.title
                 val resObjList = resSection.content
 
-                if(resTitle=="Events"){
-                    if(resObjList.isEmpty()) continue
+                if (resTitle == "Events") {
+                    if (resObjList.isEmpty()) continue
                     val vpRes = ViewPager2(requireContext())
                     val params = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         220
                     )
                     vpRes.layoutParams = params
-                    val events = mutableListOf<Pair<String,String>>()
-                    for(resObj in resObjList){
-                        events.add(Pair(resObj.imgUrl?:"",resObj.url))
+                    val events = mutableListOf<Pair<String, String>>()
+                    for (resObj in resObjList) {
+                        events.add(Pair(resObj.imgUrl ?: "", resObj.url))
                     }
                     vpRes.visibility = View.VISIBLE
                     vpRes.adapter = CarouselAdapter(requireContext(), events)
@@ -89,7 +90,8 @@ class ResFragment : Fragment() {
                     continue
                 }
 
-                val filteredList = resObjList.filter { shouldShowResObj(evm.studentData.value, it.onlyFor) }
+                val filteredList =
+                    resObjList.filter { shouldShowResObj(evm.studentData.value, it.onlyFor) }
 
                 val resCardBinding = ItemResCardBinding.inflate(inflater, container, false)
                 resCardBinding.tvResCardTitle.text = resTitle
@@ -117,8 +119,8 @@ class ResFragment : Fragment() {
             if (onlyFor.contains('@')) onlyFor.substringAfter('@').substringBefore('#') else null
         var iYearSem = if (onlyFor.contains('#')) onlyFor.substringAfter('#') else null
 
-        if(iSpecialization=="") iSpecialization=null
-        if(iYearSem=="") iYearSem=null
+        if (iSpecialization == "") iSpecialization = null
+        if (iYearSem == "") iYearSem = null
 
         if (iCourse != course) return false
         if (iSpecialization != null && iSpecialization != specialization) return false
@@ -139,29 +141,53 @@ class ResFragment : Fragment() {
                     DialogAddResourceBinding.inflate(layoutInflater, null, false)
 
                 val dsp = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                val sigName = dsp.getString("signature","Anonymous")
+                val sigName = dsp.getString("signature", "Anonymous")
 
                 dialogAddResourceBinding.etResAuthorName.setText(sigName)
 
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Add Resource")
-                    .setMessage("You can volunteer by providing a resource. This will be sent for review.")
+                    .setMessage("You can suggest a resource here. This will be sent for review.")
                     .setView(dialogAddResourceBinding.root)
                     .setNegativeButton("Cancel") { dialog, which ->
                         // Negative btn pressed
                     }
-                    .setPositiveButton("ADD") { dialog, which ->
-                        if(dialogAddResourceBinding.etResTitle.text.isEmpty()) return@setPositiveButton
-                        val feedbackUrl = resources.getString(R.string.feedbackUrl)
-                        NetUtils.sendResource(
-                            requireContext(),
-                            feedbackUrl,
-                            "${dialogAddResourceBinding.etResTitle.text} | ${dialogAddResourceBinding.etResUrl.text}"
-                        )
+                    .setPositiveButton("Send Email") { dialog, which ->
+                        if (dialogAddResourceBinding.etResTitle.text.isEmpty()) return@setPositiveButton
+
+                        val email = resources.getString(R.string.support_email)
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            setPackage("com.google.android.gm")
+                            putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                            putExtra(
+                                Intent.EXTRA_SUBJECT,
+                                "Notes: ${dialogAddResourceBinding.etResTitle.text}"
+                            )
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                "Have a look at this:\n\n" +
+                                        "Resource: ${dialogAddResourceBinding.etResUrl.text}\n\n" +
+                                        "Can you please review these resources and add it to the app?\n\n" +
+                                        "Regards: ${dialogAddResourceBinding.etResAuthorName.text}"
+                            )
+                        }
+
+                        if (intent.resolveActivity(requireActivity().packageManager) != null) {
+                            startActivity(intent)
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Email app is not installed",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        }
                     }
                     .show()
                 true
             }
+
             else -> false
         }
     }

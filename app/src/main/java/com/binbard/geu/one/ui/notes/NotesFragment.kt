@@ -93,8 +93,7 @@ class NotesFragment : Fragment() {
                 IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
                 RECEIVER_EXPORTED
             )
-        }
-        else{
+        } else {
             requireActivity().registerReceiver(
                 onComplete,
                 IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
@@ -140,22 +139,44 @@ class NotesFragment : Fragment() {
 
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Add Notes")
-                    .setMessage("You can volunteer by providing Notes here. This will be sent for review.")
+                    .setMessage("You can volunteer by providing Notes here. You will be attributed.")
                     .setView(dialogAddNotesBinding.root)
                     .setNegativeButton("Cancel") { dialog, which ->
                         // Negative btn pressed
                     }
-                    .setPositiveButton("ADD") { dialog, which ->
+                    .setPositiveButton("Send Email") { dialog, which ->
                         if (dialogAddNotesBinding.etNotesTitle.text.isEmpty() || dialogAddNotesBinding.etNotesUrl.text.isEmpty()) return@setPositiveButton
-                        val feedbackUrl = resources.getString(R.string.feedbackUrl)
-                        NetUtils.sendNotes(
-                            requireContext(),
-                            feedbackUrl,
-                            "${dialogAddNotesBinding.etNotesTitle.text} | ${dialogAddNotesBinding.etNotesUrl.text}"
-                        )
+
+                        val email = resources.getString(R.string.support_email)
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            setPackage("com.google.android.gm")
+                            putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                            putExtra(
+                                Intent.EXTRA_SUBJECT,
+                                "Notes: ${dialogAddNotesBinding.etNotesTitle.text}"
+                            )
+                            putExtra(
+                                Intent.EXTRA_TEXT,
+                                "Have a look at these notes:\n\n" +
+                                        "Notes: ${dialogAddNotesBinding.etNotesUrl.text}\n\n" + "" +
+                                        "Can you please review these notes and add it to the app?\n\n" +
+                                        "Author: ${dialogAddNotesBinding.etNotesAuthorName.text}"
+                            )
+                        }
+
+                        if (intent.resolveActivity(requireActivity().packageManager) != null) {
+                            startActivity(intent)
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Email app is not installed",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        }
                     }
                     .show()
-                true
                 true
             }
 

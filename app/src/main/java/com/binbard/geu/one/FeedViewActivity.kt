@@ -48,7 +48,7 @@ class FeedViewActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.postToolbar)
         supportActionBar?.title = ""
-        binding.postToolbar.setNavigationIcon(R.drawable.ic_camera)
+//        binding.postToolbar.setNavigationIcon(R.drawable.ic_camera)
 
         val feedSlug = intent.getStringExtra("feedSlug") ?: ""
 
