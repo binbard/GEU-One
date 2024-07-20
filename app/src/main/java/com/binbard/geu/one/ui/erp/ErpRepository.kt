@@ -55,7 +55,6 @@ class ErpRepository(context: Context, private val erpCacheHelper: ErpCacheHelper
                     "INVALID_CAPTCHA" -> {
                         Log.d("ErpRepository", "Login Failed (Invalid Captcha). Retrying...")
                         preLogin(erpViewModel)
-                        erpViewModel.loginStatus.value = LoginStatus.LOGIN_FAILED
                     }
                     "INVALID_CREDENTIALS" -> {
                         Log.d("ErpRepository", "Login Failed")

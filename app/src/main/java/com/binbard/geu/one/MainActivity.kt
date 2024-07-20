@@ -36,6 +36,8 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import java.net.URL
+import java.time.ZoneId
+import java.util.Date
 
 
 class MainActivity : AppCompatActivity() {
@@ -158,8 +160,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if(sharedPreferencesHelper.getLastChangelogShown() < BuildConfig.VERSION_CODE && sharedPreferencesHelper.isOldUser()){
-            ChangelogSheet().show(supportFragmentManager, "Changelogs")
+        if (sharedPreferencesHelper.getLastChangelogShown() < BuildConfig.VERSION_CODE) {
+            if(sharedPreferencesHelper.isOldUser()) ChangelogSheet().show(supportFragmentManager, "Changelogs")
             sharedPreferencesHelper.setLastChangelogShown(BuildConfig.VERSION_CODE)
         }
     }
