@@ -6,12 +6,15 @@
     android:layout_height="match_parent"
     android:gravity="top"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="8dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:layout_marginBottom="40dp"
         android:gravity="center_vertical">
 
@@ -19,7 +22,7 @@
             android:id="@+id/textView21"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Changelogs"
+            android:text="Changelog"
             android:textColor="@color/red_400"
             android:textSize="40sp"
             android:textStyle="bold"
@@ -38,45 +41,64 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
 
+        <TextView
+            android:id="@+id/tvChangeVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="15dp"
+            android:text="v0.0.0"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView21"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
-        android:id="@+id/llChanges"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textView22"
+        <LinearLayout
+            android:id="@+id/llChanges"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24sp"
-            android:text="1. Narendra Modi, the 14th Prime Minister of India, is a polarizing yet influential figure in Indian politics."
-            android:textSize="20sp" />
+            android:layout_margin="6dp"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/textView24"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24sp"
-            android:text="3. Modi’s tenure as Prime Minister has been characterized by several key economic reforms."
-            android:textSize="20sp" />
+            <TextView
+                android:id="@+id/textView22"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24sp"
+                android:text="1. Narendra Modi, the 14th Prime Minister of India, is a polarizing yet influential figure in Indian politics."
+                android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/textView25"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24sp"
-            android:text="4. Modi’s tenure has not been without controversy."
-            android:textSize="20sp" />
+            <TextView
+                android:id="@+id/textView24"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24sp"
+                android:text="3. Modi’s tenure as Prime Minister has been characterized by several key economic reforms."
+                android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/textView26"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24sp"
-            android:text="5. Narendra Modi remains a complex and transformative figure in Indian politics."
-            android:textSize="20sp" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/textView25"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24sp"
+                android:text="4. Modi’s tenure has not been without controversy."
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView26"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24sp"
+                android:text="5. Narendra Modi remains a complex and transformative figure in Indian politics."
+                android:textSize="20sp" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

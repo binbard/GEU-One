@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace 'com.binbard.geu.one'
-    compileSdk 34
+    compileSdk 35
 
     signingConfigs {
         debug {
@@ -28,9 +28,9 @@ android {
     defaultConfig {
         applicationId "com.binbard.geu.one"
         minSdk 26
-        targetSdk 34
-        versionCode 13
-        versionName "1.1.3"
+        targetSdk 35
+        versionCode 16
+        versionName "1.1.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release
@@ -53,6 +53,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    buildToolsVersion '35.0.0'
 }
 
 dependencies {

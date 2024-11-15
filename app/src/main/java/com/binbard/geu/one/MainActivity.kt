@@ -2,7 +2,9 @@ package com.binbard.geu.one
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.text.SpannableString
 import android.text.util.Linkify
 import android.util.Log
@@ -11,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.browser.customtabs.CustomTabsIntent
@@ -48,6 +51,53 @@ class MainActivity : AppCompatActivity() {
     private var shouldGotoChangePassword = false
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
 
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (!isGranted) {
+                if (Build.VERSION.SDK_INT >= 33) {
+                    if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                        showNotificationPermissionRationale()
+                    } else {
+                        showSettingDialog()
+                    }
+                }
+            }
+        }
+
+    private fun showNotificationPermissionRationale() {
+
+        MaterialAlertDialogBuilder(
+            this,
+            com.google.android.material.R.style.MaterialAlertDialog_Material3
+        )
+            .setTitle("Allow Permission")
+            .setMessage("Notification Permission is required, to show Notifications. Please Allow.")
+            .setPositiveButton("OK") { _, _ ->
+                if (Build.VERSION.SDK_INT >= 33) {
+                    notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showSettingDialog() {
+        MaterialAlertDialogBuilder(
+            this,
+            com.google.android.material.R.style.MaterialAlertDialog_Material3
+        )
+            .setTitle("Permission Required")
+            .setMessage("Notification Permission is required, Please allow notification permission from App Settings.")
+            .setPositiveButton("OK") { _, _ ->
+                val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
+                intent.data = Uri.parse("package:$packageName")
+                startActivity(intent)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         sharedPreferencesHelper = SharedPreferencesHelper(this)
 //        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -112,7 +162,6 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(bottomNavController, appBarConfiguration)
         binding.bottomNavView.setupWithNavController(bottomNavController)
 
-
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
@@ -161,9 +210,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (sharedPreferencesHelper.getLastChangelogShown() < BuildConfig.VERSION_CODE) {
-            if(sharedPreferencesHelper.isOldUser()) ChangelogSheet().show(supportFragmentManager, "Changelogs")
+            if (sharedPreferencesHelper.isOldUser()) ChangelogSheet().show(
+                supportFragmentManager,
+                "Changelogs"
+            )
             sharedPreferencesHelper.setLastChangelogShown(BuildConfig.VERSION_CODE)
         }
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+
     }
 
     override fun onResume() {

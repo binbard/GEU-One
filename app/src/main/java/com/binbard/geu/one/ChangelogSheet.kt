@@ -20,13 +20,18 @@ class ChangelogSheet: BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
 
+        val version = BuildConfig.VERSION_NAME
+        binding.tvChangeVersion.text = "v${version}"
+
         val notes = listOf(
+            "Support for Android 15. [New]",
+            "Added Notifications for Android 14+. [New]",
             "Fixed Login Issue in New Devices.",
             "IDCard can now be Downloaded.",
             "Midsem Marks defaults to current semester.",
             "Added Email based support for Users.",
             "Upload Notes by sending via Email.",
-            "Removed forced App Links acceptance."
+            "Removed forced App Links acceptance.",
         )
 
         binding.llChanges.removeAllViews()
