@@ -83,7 +83,13 @@ class ErpStudentFragment: Fragment() {
                     row.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT)
                     row.setPadding(10, 2, 10, 2)
 
-                    if(colorRow) row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+                    if(colorRow) {
+                        try{
+                            row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+                        } catch (e: Exception){
+                            row.setBackgroundColor(resources.getColor(com.google.android.material.R.color.material_divider_color))
+                        }
+                    }
                     colorRow = !colorRow
 
                     val textViewName = TextView(context)

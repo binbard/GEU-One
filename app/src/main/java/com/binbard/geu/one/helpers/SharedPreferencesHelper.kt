@@ -57,4 +57,12 @@ class SharedPreferencesHelper(context: Context) {
     fun setCampus(value: String) {
         sharedPreferences.edit().putString("campus", value).apply()
     }
+
+    fun getPushNotifications(): Boolean {
+        return sharedPreferences.getBoolean("pushNotifications", true)
+    }
+
+    fun setPushNotifications(value: Boolean) {
+        sharedPreferences.edit().putBoolean("pushNotifications", value).apply()
+    }
 }

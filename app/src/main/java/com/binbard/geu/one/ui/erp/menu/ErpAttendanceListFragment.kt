@@ -64,11 +64,19 @@ class ErpAttendanceListFragment : Fragment() {
             var count = 0
             val separator = View(context)
             separator.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1)
-            separator.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+            try{
+                separator.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+            } catch (e: Exception){
+                separator.setBackgroundColor(resources.getColor(com.google.android.material.R.color.material_divider_color))
+            }
             binding.tblAttendance.addView(separator)
 
             val header = Helper.createAttendanceRow(requireContext(), count, null)
-            header.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+            try{
+                header.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+            } catch (e: Exception){
+                header.setBackgroundColor(resources.getColor(com.google.android.material.R.color.material_divider_color))
+            }
             binding.tblAttendance.addView(header)
 
             val subjectAttendance = it.subjectAttendance
@@ -122,7 +130,11 @@ class ErpAttendanceListFragment : Fragment() {
                         binding.btnAtDetails.visibility = View.GONE
                     } else {
                         binding.btnAtDetails.visibility = View.GONE
-                        row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+                        try{
+                            row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+                        } catch (e: Exception){
+                            row.setBackgroundColor(resources.getColor(com.google.android.material.R.color.material_divider_color))
+                        }
                         binding.btnAtDetails.postDelayed({
                             binding.btnAtDetails.visibility = View.VISIBLE
                         }, 800)

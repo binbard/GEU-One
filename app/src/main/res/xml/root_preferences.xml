@@ -21,8 +21,8 @@
     <PreferenceCategory app:title="App">
 
         <SwitchPreferenceCompat
-            app:key="sync"
             app:defaultValue="true"
+            app:key="push_notifications"
             app:title="Receive Push Notifications" />
 
         <Preference

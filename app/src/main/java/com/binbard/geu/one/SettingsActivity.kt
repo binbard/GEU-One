@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
+import com.binbard.geu.one.helpers.FirebaseUtils
 import com.binbard.geu.one.helpers.PdfUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -37,6 +39,7 @@ class SettingsActivity : AppCompatActivity() {
 
             val campusPref = findPreference<Preference>("campus")
             val versionPref = findPreference<Preference>("version")
+            val push_notifications = findPreference<SwitchPreferenceCompat>("push_notifications")
             val clearFilesPref = findPreference<Preference>("clear_files")
             val changelogsPref = findPreference<Preference>("changelogs")
             val privacyPolicyPref = findPreference<Preference>("privacy_policy")
@@ -50,6 +53,22 @@ class SettingsActivity : AppCompatActivity() {
             val pInfo =
                 requireActivity().packageManager.getPackageInfo(requireActivity().packageName, 0)
             versionPref?.summary = "Version ${pInfo.versionName}"
+
+            push_notifications?.isChecked = sharedPreferencesHelper.getPushNotifications()
+            push_notifications?.setOnPreferenceChangeListener { _, newValue ->
+                sharedPreferencesHelper.setPushNotifications(newValue as Boolean)
+                val campus = sharedPreferencesHelper.getCampus()
+                if (newValue) {
+                    FirebaseUtils.subscribeTo("all")
+                    FirebaseUtils.subscribeTo("notes")
+                    FirebaseUtils.subscribeTo("$campus-feed")
+                } else {
+                    FirebaseUtils.unsubscribeFrom("all")
+                    FirebaseUtils.unsubscribeFrom("notes")
+                    FirebaseUtils.unsubscribeFrom("$campus-feed")
+                }
+                true
+            }
 
             clearFilesPref?.setOnPreferenceClickListener {
                 val builder = androidx.appcompat.app.AlertDialog.Builder(requireContext())

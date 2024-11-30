@@ -28,7 +28,11 @@ class ErpLoginChangeFragment : Fragment() {
 
         requireActivity().findViewById<TextView>(R.id.tvErpTitle).text = "ERP - Change Password"
 
-        binding.tvChangePassSuccess.setTextColor(requireContext().resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text))
+        try{
+            binding.tvChangePassSuccess.setTextColor(requireContext().resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text))
+        } catch (e: Exception){
+            binding.tvChangePassSuccess.setTextColor(requireContext().resources.getColor(R.color.red_200))
+        }
 
         val uri = requireActivity().intent.data
         if (uri != null) {

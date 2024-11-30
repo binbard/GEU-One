@@ -2,17 +2,15 @@ package com.binbard.geu.one.ui.feed
 
 import android.util.Log
 import com.binbard.geu.one.models.*
-import com.binbard.geu.one.ui.feed.FeedNetUtils.builder
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.text.SimpleDateFormat
 import java.util.*
 
 object FeedNetUtils {
 
-    val client = OkHttpClient()
+    private val client = OkHttpClient()
     val builder = Request.Builder()
     fun makeHttpRequest(url: String): Pair<FetchStatus,String> {
         val request = builder.url(url).build()
@@ -33,19 +31,24 @@ object FeedNetUtils {
         val dataList = mutableListOf<Feed>()
 
         val posts: List<FeedPost>
-        if(campus=="deemed"){
-            val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create()
-            val feedPostMultiWrapper = gson.fromJson(jsonData, FeedPostMultiWrapperDeemed::class.java)
-            posts = feedPostMultiWrapper.posts
-        } else{
-            val gson: Gson = GsonBuilder().create()
-            val feedPostMultiWrapperHill = gson.fromJson(jsonData, Array<FeedPostHill>::class.java)
-            val feedPostMulti = feedPostMultiWrapperHill.map { it.toFeedPost() }
-            posts = feedPostMulti.toList()
-        }
+        try{
+            if(campus=="deemed"){
+                val gson: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create()
+                val feedPostMultiWrapper = gson.fromJson(jsonData, FeedPostMultiWrapperDeemed::class.java)
+                posts = feedPostMultiWrapper.posts
+            } else{
+                val gson: Gson = GsonBuilder().create()
+                val feedPostMultiWrapperHill = gson.fromJson(jsonData, Array<FeedPostHill>::class.java)
+                val feedPostMulti = feedPostMultiWrapperHill.map { it.toFeedPost() }
+                posts = feedPostMulti.toList()
+            }
 
-        for (post in posts){
-            dataList.add(Feed(post.id, post.slug, parseDecode(post.title), post.date))
+            for (post in posts){
+                dataList.add(Feed(post.id, post.slug, parseDecode(post.title), post.date))
+            }
+        } catch (e: Exception) {
+            Log.e("FeedNetUtils", "parseFeedListJson: ${e.message}")
+            return dataList
         }
 
         return dataList
@@ -78,7 +81,7 @@ object FeedNetUtils {
         }
     }
 
-    fun parseDecode(txt: String?): String{
+    private fun parseDecode(txt: String?): String{
         if(txt==null) return ""
         var text = txt.replace("\\\\u([0-9A-Fa-f]{4})".toRegex()) {     // Decode unicode
             String(Character.toChars(it.groupValues[1].toInt(radix = 16)))

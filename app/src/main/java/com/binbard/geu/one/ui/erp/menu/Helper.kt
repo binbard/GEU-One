@@ -26,7 +26,11 @@ object Helper {
     fun getColDivider(context: Context): View {
         val divider = View(context)
         divider.layoutParams = TableRow.LayoutParams(5, TableRow.LayoutParams.MATCH_PARENT)
-        divider.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+        try{
+            divider.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+        } catch (e: Exception){
+            divider.setBackgroundColor(context.resources.getColor(com.google.android.material.R.color.material_divider_color))
+        }
         return divider
     }
 
@@ -40,7 +44,11 @@ object Helper {
     fun getRowDivider(context: Context): View {
         val divider = View(context)
         divider.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 5)
-        divider.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+        try{
+            divider.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+        } catch (e: Exception){
+            divider.setBackgroundColor(context.resources.getColor(com.google.android.material.R.color.material_divider_color))
+        }
         return divider
     }
 
@@ -140,7 +148,13 @@ object Helper {
     fun createMidtermMarksRow(context: Context, count: Int, midtermMarks: MidtermMarks): TableRow {
         val row = TableRow(context)
 
-        if (count % 2 == 0) row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+        if (count % 2 == 0) {
+            try{
+                row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+            } catch (e: Exception){
+                row.setBackgroundColor(context.resources.getColor(com.google.android.material.R.color.material_divider_color))
+            }
+        }
 
         val subject = midtermMarks.subject
         val subjectSplit = subject.split("/")
@@ -216,7 +230,13 @@ object Helper {
     ): TableRow {
         val row = TableRow(context)
 
-        if (count % 2 == 0) row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+        if (count % 2 == 0) {
+            try{
+                row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+            } catch (e: Exception){
+                row.setBackgroundColor(context.resources.getColor(com.google.android.material.R.color.material_divider_color))
+            }
+        }
 
         val yearSem = examMarks.yearSem
         val sgpa = examMarks.sgpa
@@ -318,7 +338,13 @@ object Helper {
     fun createFeeDetailsRow(context: Context, count: Int, headData: FeeHead): TableRow {
         val row = TableRow(context)
 
-        if (count % 2 == 0) row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+        if (count % 2 == 0) {
+            try{
+                row.setBackgroundResource(com.google.android.material.R.color.material_divider_color)
+            } catch (e: Exception){
+                row.setBackgroundColor(context.resources.getColor(com.google.android.material.R.color.material_divider_color))
+            }
+        }
 
         val ysCol = TextView(context)
         ysCol.textSize = 18f

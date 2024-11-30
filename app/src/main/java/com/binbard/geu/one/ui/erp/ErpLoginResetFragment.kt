@@ -36,8 +36,11 @@ class ErpLoginResetFragment : Fragment() {
 
         binding.etUid.setText(evm.loginId.value)
 
-        binding.tvResetAvailable.setTextColor(requireContext().resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text))
-
+        try{
+            binding.tvResetAvailable.setTextColor(requireContext().resources.getColor(com.google.android.material.R.color.m3_dynamic_dark_highlighted_text))
+        } catch (e: Exception){
+            binding.tvResetAvailable.setTextColor(requireContext().resources.getColor(R.color.red_200))
+        }
         evm.loginStatus.observe(viewLifecycleOwner) {
             if (it != LoginStatus.RESET_MATCH && it != LoginStatus.RESET_NOTMATCH) return@observe
             binding.pbErpPassReset.visibility = View.GONE

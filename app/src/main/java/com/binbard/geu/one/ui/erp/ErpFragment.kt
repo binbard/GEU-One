@@ -258,8 +258,8 @@ class ErpFragment : Fragment() {
                 if (savedSem != it.yearSem) {
                     evm.erpCacheHelper?.saveSemester(it.yearSem)
                     val mCourse = it.course.replace(" ", "_")
-                    FirebaseUtils.unsubscribeFrom("$campus.$mCourse.$savedSem")
-                    FirebaseUtils.subscribeTo("$campus.$mCourse.${it.yearSem}")
+                    FirebaseUtils.unsubscribeFrom("$campus/$mCourse/$savedSem")
+                    FirebaseUtils.subscribeTo("$campus/$mCourse/${it.yearSem}")
                 }
             }
             drawerLayout.findViewById<TextView>(R.id.tvStuId)?.text = it.studentID

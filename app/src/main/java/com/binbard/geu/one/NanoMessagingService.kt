@@ -9,25 +9,19 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.binbard.geu.one.helpers.FirebaseUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
-import com.binbard.geu.one.ui.erp.ErpCacheHelper
-import com.binbard.geu.one.ui.erp.ErpViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class NanoMessagingService : FirebaseMessagingService() {
-    private val TAG = "MyFirebaseMsgService"
+    private val tag = "MyFirebaseMsgService"
     private val sharedPreferencesHelper: SharedPreferencesHelper by lazy {
         SharedPreferencesHelper(this)
     }
-    private val erpCacheHelper: ErpCacheHelper by lazy {
-        ErpCacheHelper(this)
-    }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d(TAG, "FCM Message payload: ${remoteMessage.data}")
+        Log.d(tag, "FCM Message payload: ${remoteMessage.data}")
 
         if (remoteMessage.notification == null) return
 
@@ -44,14 +38,14 @@ class NanoMessagingService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        Log.d(TAG, "New token: $token")
-        FirebaseUtils.subscribeTo("notes")
+        Log.d(tag, "New FCM token: $token")
         FirebaseUtils.subscribeTo("all")
+        FirebaseUtils.subscribeTo("notes")
         sendRegistrationToServer(token)
     }
 
     private fun sendRegistrationToServer(token: String) {
-        Log.d(TAG, "sendRegistrationTokenToServer($token)")
+        Log.d(tag, "sendRegistrationTokenToServer($token)")
         sharedPreferencesHelper.setFbToken(token)
     }
 

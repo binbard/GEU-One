@@ -18,10 +18,9 @@ import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.jsoup.Jsoup
-import java.time.Duration
+import java.net.SocketTimeoutException
 import java.util.*
 
 
@@ -145,28 +144,33 @@ class ErpNetUtils(context: Context) {
                 .post(fill)
                 .build()
 
-            val response = client1.newCall(request).execute()
+            try{
+                val response = client1.newCall(request).execute()
 
-            if (response.code == 302) {
-                val cookiesList = response.headers("Set-Cookie")
-                val uid = cookiesList[0].split("=")[2].split("&")[0]
-                response.body?.close()
-                return@withContext "SUCCESS"
-            } else {
-                val body = response.body?.string() ?: ""
-                if (body.contains("Captcha does not match")) {
+                if (response.code == 302) {
+                    val cookiesList = response.headers("Set-Cookie")
+                    val uid = cookiesList[0].split("=")[2].split("&")[0]
                     response.body?.close()
-                    return@withContext "INVALID_CAPTCHA"
-                } else if (body.contains("The user name or password provided is incorrect.")) {
-                    response.body?.close()
-                    return@withContext "INVALID_CREDENTIALS"
+                    return@withContext "SUCCESS"
+                } else {
+                    val body = response.body?.string() ?: ""
+                    if (body.contains("Captcha does not match")) {
+                        response.body?.close()
+                        return@withContext "INVALID_CAPTCHA"
+                    } else if (body.contains("The user name or password provided is incorrect.")) {
+                        response.body?.close()
+                        return@withContext "INVALID_CREDENTIALS"
+                    }
                 }
+                Log.d("ErpNetUtils", "got login code: ${response.code}")
+                val cookiesList = response.headers("Set-Cookie")
+                Log.d("ErpNetUtils", "got login cookies: $cookiesList")
+                response.body?.close()
+                return@withContext "xAB"
             }
-            Log.d("ErpNetUtils", "got login code: ${response.code}")
-            val cookiesList = response.headers("Set-Cookie")
-            Log.d("ErpNetUtils", "got login cookies: $cookiesList")
-            response.body?.close()
-            return@withContext "xAB"
+            catch (e: SocketTimeoutException) {
+                return@withContext "x"
+            }
 
         }
 

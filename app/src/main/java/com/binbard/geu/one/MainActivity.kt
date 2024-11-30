@@ -27,6 +27,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.binbard.geu.one.databinding.ActivityMainBinding
 import com.binbard.geu.one.databinding.DialogFeedbackBinding
 import com.binbard.geu.one.helpers.AlertMsg
+import com.binbard.geu.one.helpers.FirebaseUtils
 import com.binbard.geu.one.helpers.NetUtils
 import com.binbard.geu.one.helpers.SharedPreferencesHelper
 import com.binbard.geu.one.ui.erp.ErpCacheHelper
@@ -133,6 +134,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.ResourcesFragment, R.id.FeedFragment, R.id.NotesFragment, R.id.ErpFragment
             )
         )
+
         bottomNavController.addOnDestinationChangedListener { _, destination, _ ->
             binding.drawerLayout.setDrawerLockMode(androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             when (destination.id) {

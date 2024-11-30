@@ -24,8 +24,9 @@ class ChangelogSheet: BottomSheetDialogFragment() {
         binding.tvChangeVersion.text = "v${version}"
 
         val notes = listOf(
-            "Support for Android 15. [New]",
-            "Added Notifications for Android 14+. [New]",
+            "Better Notification support. [New]",
+            "Fixed crash issues for older Android versions. [New]",
+            "Support for Android 15.",
             "Fixed Login Issue in New Devices.",
             "IDCard can now be Downloaded.",
             "Midsem Marks defaults to current semester.",
